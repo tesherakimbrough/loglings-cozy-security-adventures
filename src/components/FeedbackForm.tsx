@@ -95,6 +95,7 @@ const FeedbackForm = ({ onSubmit, onSkip }: FeedbackFormProps) => {
       <div className="flex justify-center gap-2" role="radiogroup" aria-label={ariaLabel}>
         {[1, 2, 3, 4, 5].map((rating) => {
           const IconComponent = icon;
+          const isSelected = rating <= value;
           return (
             <button
               key={rating}
@@ -103,22 +104,16 @@ const FeedbackForm = ({ onSubmit, onSkip }: FeedbackFormProps) => {
               aria-checked={rating === value}
               aria-label={`${rating} out of 5`}
               onClick={() => onChange(rating)}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowLeft' && rating > 1) {
-                  e.preventDefault();
-                  onChange(rating - 1);
-                } else if (e.key === 'ArrowRight' && rating < 5) {
-                  e.preventDefault();
-                  onChange(rating + 1);
-                }
-              }}
-              className="p-2 transition-all duration-200 hover:scale-110 focus-visible:scale-110 rounded-lg"
+              className={`p-2 transition-all duration-200 hover:scale-110 focus:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg cursor-pointer ${
+                isSelected ? 'transform scale-105' : ''
+              }`}
+              tabIndex={0}
             >
               <IconComponent 
-                className={`w-8 h-8 ${
-                  rating <= value 
-                    ? icon === Heart ? 'text-rose-500 fill-rose-500' : 'text-warm-amber fill-warm-amber'
-                    : 'text-gray-300 dark:text-gray-600'
+                className={`w-8 h-8 transition-colors ${
+                  isSelected
+                    ? icon === Heart ? 'text-rose-500 fill-rose-500' : 'text-amber-500 fill-amber-500'
+                    : 'text-gray-300 dark:text-gray-600 hover:text-gray-400 dark:hover:text-gray-500'
                 }`}
               />
             </button>
