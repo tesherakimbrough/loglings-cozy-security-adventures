@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, ExternalLink, Info, Waves } from 'lucide-react';
+import { Play, Pause, Volume2, ExternalLink, Info, Waves, AlertCircle } from 'lucide-react';
 import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 import { MusicType } from '../types/musicTypes';
@@ -19,6 +19,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     audioTracks,
     isPlaying,
     isLoading,
+    error,
     currentTrack,
     getCurrentTrackInfo,
     playTrack,
@@ -108,6 +109,19 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           </Button>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="w-4 h-4" />
+              <span className="text-sm font-medium">{error}</span>
+            </div>
+            <div className="text-xs text-muted-foreground mt-2">
+              Make sure audio files are uploaded to the public/sounds/ directory.
+            </div>
+          </div>
+        )}
+
         {/* Currently Playing */}
         {progress.preferences.musicType !== 'silence' && (
           <div className="p-4 bg-gradient-to-r from-forest-primary/10 to-forest-secondary/10 rounded-xl border border-forest-primary/20 cozy-hover">
@@ -118,15 +132,17 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
                 <div className="text-sm text-muted-foreground">
                   {progress.preferences.musicType === 'external' 
                     ? 'Using external music app' 
-                    : isPlaying 
-                      ? 'Playing procedural ambient audio'
-                      : 'Click play to start ambient soundscape'}
+                    : isLoading
+                      ? 'Loading audio file...'
+                      : isPlaying 
+                        ? 'Playing ambient soundscape'
+                        : 'Click play to start ambient audio'}
                 </div>
               </div>
               {isPlaying && progress.preferences.musicType !== 'external' && (
                 <div className="flex items-center gap-1 text-green-600">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium">Live</span>
+                  <span className="text-xs font-medium">Playing</span>
                 </div>
               )}
             </div>
@@ -220,7 +236,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         {/* Audio Credits */}
         <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground">Audio Technology</p>
+            <p className="text-xs font-medium text-muted-foreground">Audio Sources</p>
             <Button
               variant="ghost"
               size="sm"

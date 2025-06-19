@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { Howl } from 'howler';
 import { MusicType } from '../types/musicTypes';
 import { audioTracks } from '../config/audioTracks';
-import { useWebAudioGenerator } from './useWebAudioGenerator';
 
 export const useRealAudio = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,17 +10,7 @@ export const useRealAudio = () => {
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentTrack, setCurrentTrack] = useState<MusicType | null>(null);
-  const currentAudioRef = useRef<any>(null);
-
-  const {
-    generateForestAmbience,
-    generateRainSound,
-    generateFireplaceSound,
-    generateCafeAmbience,
-    generateLofiBeats,
-    stopAudio,
-    stopAllAudio
-  } = useWebAudioGenerator();
+  const currentHowlRef = useRef<Howl | null>(null);
 
   const getCurrentTrackInfo = (trackId: MusicType) => {
     return audioTracks.find(track => track.id === trackId) || audioTracks[0];
@@ -28,22 +18,27 @@ export const useRealAudio = () => {
 
   const stopMusic = useCallback(async (): Promise<void> => {
     return new Promise((resolve) => {
-      if (currentTrack) {
-        stopAudio(currentTrack);
+      if (currentHowlRef.current) {
+        currentHowlRef.current.fade(currentHowlRef.current.volume(), 0, 500);
+        setTimeout(() => {
+          currentHowlRef.current?.stop();
+          currentHowlRef.current?.unload();
+          currentHowlRef.current = null;
+          resolve();
+        }, 500);
+      } else {
+        resolve();
       }
-      stopAllAudio();
-      currentAudioRef.current = null;
       
       setIsPlaying(false);
       setIsLoading(false);
       setCurrentTrack(null);
       setError(null);
-      resolve();
     });
-  }, [currentTrack, stopAudio, stopAllAudio]);
+  }, []);
 
   const playTrack = useCallback(async (trackId: MusicType, volume: number = 0.3): Promise<void> => {
-    console.log('Playing procedural audio track:', trackId, 'volume:', volume);
+    console.log('Playing audio track:', trackId, 'volume:', volume);
     setError(null);
     
     if (trackId === 'silence') {
@@ -66,52 +61,64 @@ export const useRealAudio = () => {
     try {
       await stopMusic();
 
-      let audioInstance;
+      const trackInfo = getCurrentTrackInfo(trackId);
       
-      switch (trackId) {
-        case 'forest':
-          audioInstance = await generateForestAmbience();
-          break;
-        case 'rain':
-          audioInstance = await generateRainSound();
-          break;
-        case 'fireplace':
-          audioInstance = await generateFireplaceSound();
-          break;
-        case 'cozy-cafe':
-          audioInstance = await generateCafeAmbience();
-          break;
-        case 'lofi':
-          audioInstance = await generateLofiBeats();
-          break;
-        default:
-          throw new Error('Unknown track type');
+      if (!trackInfo.audioUrl) {
+        throw new Error('No audio file specified for this track');
       }
+
+      const howl = new Howl({
+        src: [trackInfo.audioUrl],
+        loop: true,
+        volume: 0,
+        html5: true,
+        onload: () => {
+          console.log('Audio loaded successfully:', trackId);
+          howl.fade(0, volume, 1000);
+          setIsLoading(false);
+          setIsPlaying(true);
+          setCurrentTrack(trackId);
+        },
+        onloaderror: (id, error) => {
+          console.error('Audio loading failed:', error);
+          setError(`Audio file not found: ${trackInfo.name}`);
+          setIsLoading(false);
+          setIsPlaying(false);
+        },
+        onplayerror: (id, error) => {
+          console.error('Audio playback failed:', error);
+          setError(`Playback failed: ${trackInfo.name}`);
+          setIsLoading(false);
+          setIsPlaying(false);
+        }
+      });
       
-      currentAudioRef.current = audioInstance;
-      setIsLoading(false);
-      setIsPlaying(true);
-      setCurrentTrack(trackId);
+      currentHowlRef.current = howl;
+      howl.play();
       
     } catch (error) {
       console.warn('Audio playback failed:', error);
-      setError('Audio generation failed. Please try again.');
+      setError('Audio file not found. Please check if audio files are properly uploaded.');
       setIsLoading(false);
       setIsPlaying(false);
     }
-  }, [stopMusic, generateForestAmbience, generateRainSound, generateFireplaceSound, generateCafeAmbience, generateLofiBeats]);
+  }, [stopMusic, getCurrentTrackInfo]);
 
   const updateVolume = useCallback((newVolume: number) => {
-    // Volume control will be handled by the individual generators
-    console.log('Updating volume to:', newVolume);
-  }, []);
+    if (currentHowlRef.current && isPlaying && currentTrack !== 'silence' && currentTrack !== 'external') {
+      currentHowlRef.current.volume(newVolume);
+    }
+  }, [isPlaying, currentTrack]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      stopAllAudio();
+      if (currentHowlRef.current) {
+        currentHowlRef.current.stop();
+        currentHowlRef.current.unload();
+      }
     };
-  }, [stopAllAudio]);
+  }, []);
 
   return {
     audioTracks,

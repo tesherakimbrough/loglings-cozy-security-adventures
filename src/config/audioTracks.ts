@@ -7,42 +7,42 @@ export const audioTracks: AudioTrack[] = [
     name: 'Forest Ambience',
     emoji: '🌲',
     description: 'Early morning forest with birds and gentle wind',
-    audioUrl: '' // Generated procedurally
+    audioUrl: '/sounds/forest-ambience.mp3'
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioUrl: '' // Generated procedurally
+    audioUrl: '/sounds/gentle-rain.mp3'
   },
   {
     id: 'cozy-cafe',
     name: 'Cozy Coffee Shop',
     emoji: '☕',
     description: 'Warm café atmosphere with gentle chatter',
-    audioUrl: '' // Generated procedurally
+    audioUrl: '/sounds/cozy-cafe.mp3'
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioUrl: '' // Generated procedurally
+    audioUrl: '/sounds/fireplace.mp3'
   },
   {
     id: 'lofi',
     name: 'Lofi Study Beats',
     emoji: '🎵',
     description: 'Chill hip-hop beats perfect for concentration',
-    audioUrl: '' // Generated procedurally
+    audioUrl: '/sounds/lofi-beats.mp3'
   },
   {
     id: 'silence',
     name: 'Peaceful Silence',
     emoji: '🔇',
     description: 'Quiet room tone for pure focus',
-    audioUrl: ''
+    audioUrl: '/sounds/silence.mp3'
   },
   {
     id: 'external',
@@ -83,7 +83,7 @@ export const audioPresets = [
 
 // Audio attribution for legal compliance
 export const audioCredits = {
-  main: 'All audio generated procedurally using Web Audio API - 100% original and royalty-free',
-  licensing: 'Procedurally generated audio is safe for commercial and open-source use',
-  technical: 'Built with Tone.js and Web Audio API for high-quality, browser-native sound synthesis'
+  main: 'Ambient sounds by InspectorJ, klankbeeld, Benboncan (freesound.org), and yniprint (opengameart.org)',
+  licensing: 'Licensed under CC BY 3.0 or CC0',
+  technical: 'High-quality audio files with seamless looping and crossfade technology'
 };

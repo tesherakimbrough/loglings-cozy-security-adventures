@@ -59,7 +59,8 @@ const MusicControlBar = () => {
                 <div className="text-sm font-medium">{currentTrackInfo.name}</div>
                 <div className="text-xs text-muted-foreground">
                   {!hasUserInteracted ? 'Click play to start' : 
-                   isPlaying ? 'Playing real audio' : 'Ready to play'}
+                   isLoading ? 'Loading...' :
+                   isPlaying ? 'Playing ambient audio' : 'Ready to play'}
                 </div>
               </div>
             </div>
