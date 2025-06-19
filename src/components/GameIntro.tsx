@@ -1,3 +1,4 @@
+
 import { Play, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserMode } from '../types/userTypes';
@@ -27,6 +28,10 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
   const isProMode = userMode === 'career-pro';
   const { profile } = useUserProfile();
   const achievementSystem = AchievementSystem();
+  
+  // Only show admin features in development
+  const isDevMode = import.meta.env.DEV || window.location.hostname === 'localhost';
+  const showAdminFeatures = isDevMode;
 
   const handleStartClick = () => {
     onStartGame(userMode);
@@ -35,10 +40,10 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Enhanced Header with Navigation and Launch Readiness */}
+        {/* Enhanced Header with Navigation */}
         <div className="flex items-center justify-between">
           <GameIntroNavigation />
-          <LaunchReadinessModal />
+          {showAdminFeatures && <LaunchReadinessModal />}
         </div>
 
         {/* Early Access Banner for new users */}
@@ -68,8 +73,8 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         {/* Enhanced Features Preview */}
         <GameIntroNewFeatures />
 
-        {/* Soft Launch Readiness for experienced users */}
-        {profile.progress.totalSessions >= 5 && (
+        {/* Admin-only: Soft Launch Readiness for experienced users */}
+        {showAdminFeatures && profile.progress.totalSessions >= 5 && (
           <SoftLaunchReadinessChecker />
         )}
 
