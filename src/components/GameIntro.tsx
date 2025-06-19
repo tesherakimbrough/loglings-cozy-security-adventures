@@ -1,12 +1,16 @@
-import { Heart, Sparkles, TreePine, Play, Shield } from 'lucide-react';
+import { Heart, Sparkles, TreePine, Play, Shield, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { UserMode } from '../types/userTypes';
 import ThemeToggle from './ThemeToggle';
 import WaitlistButton from './WaitlistButton';
+import DonationButton from './DonationButton';
 import ProgressTracker from './ProgressTracker';
 import DailyChallenge from './DailyChallenge';
 import GameSettings from './GameSettings';
+import LaunchReadinessDashboard from './LaunchReadinessDashboard';
+import { useState } from 'react';
 
 interface GameIntroProps {
   onStartGame: () => void;
@@ -14,6 +18,7 @@ interface GameIntroProps {
 }
 
 const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) => {
+  const [showLaunchDashboard, setShowLaunchDashboard] = useState(false);
   const isProMode = userMode === 'career-pro';
 
   const getModeContent = () => {
@@ -103,6 +108,19 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         <div className="flex items-center justify-between">
           <GameSettings />
           <div className="flex items-center gap-3">
+            {/* Launch Readiness Dashboard Access */}
+            <Dialog open={showLaunchDashboard} onOpenChange={setShowLaunchDashboard}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="hidden md:flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4" />
+                  Launch Dashboard
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-7xl max-h-[90vh] overflow-y-auto">
+                <LaunchReadinessDashboard />
+              </DialogContent>
+            </Dialog>
+            <DonationButton />
             <WaitlistButton />
             <ThemeToggle />
           </div>
