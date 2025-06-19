@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 import MusicSelector from './MusicSelector';
 
@@ -40,9 +39,6 @@ const GameSettings = () => {
             <CardContent className="space-y-6">
               {/* Music Selection */}
               <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  🎵 Study Atmosphere
-                </h4>
                 <MusicSelector />
               </div>
 
@@ -63,22 +59,6 @@ const GameSettings = () => {
                     onCheckedChange={(checked) => handlePreferenceChange('audioEnabled', checked)}
                   />
                 </div>
-                {progress.preferences.audioEnabled && (
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Volume2 className="w-4 h-4" />
-                      <span>Effects Volume</span>
-                    </div>
-                    <Slider
-                      value={[progress.preferences.effectsVolume]}
-                      onValueChange={(value) => handlePreferenceChange('effectsVolume', value[0])}
-                      max={1}
-                      min={0}
-                      step={0.1}
-                      className="w-full"
-                    />
-                  </div>
-                )}
               </div>
 
               {/* Difficulty Settings */}
