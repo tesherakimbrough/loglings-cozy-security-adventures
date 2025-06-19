@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { CozyThemeProvider } from "./components/CozyThemeProvider";
 import { usePerformance } from "./hooks/usePerformance";
 import { useSession } from "./hooks/useSession";
 import { useEffect } from "react";
@@ -46,17 +47,19 @@ const AppContent = () => {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/waitlist" element={<Waitlist />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
+        <CozyThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/waitlist" element={<Waitlist />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CozyThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );

@@ -1,32 +1,76 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { Heart, Sparkles, TreePine } from 'lucide-react';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   message?: string;
+  cozyVariant?: 'default' | 'forest' | 'warm';
 }
 
-const LoadingSpinner = ({ size = 'md', className, message }: LoadingSpinnerProps) => {
+const LoadingSpinner = ({ 
+  size = 'md', 
+  className, 
+  message,
+  cozyVariant = 'default' 
+}: LoadingSpinnerProps) => {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
     lg: 'w-12 h-12'
   };
 
+  const getCozyIcon = () => {
+    switch (cozyVariant) {
+      case 'forest': return <TreePine className="w-6 h-6 text-cozy-forest animate-gentle-float" />;
+      case 'warm': return <Heart className="w-6 h-6 text-cozy-warm animate-cozy-pulse" />;
+      default: return <Sparkles className="w-6 h-6 text-cozy-sage animate-sparkle" />;
+    }
+  };
+
+  const getCozyMessages = () => {
+    const messages = [
+      "The Loglings are preparing something magical...",
+      "Gathering forest wisdom and warm memories...",
+      "Sprinkling cozy dust on your adventure...",
+      "The ancient trees are sharing their secrets...",
+      "Creating a warm, safe space for learning..."
+    ];
+    return message || messages[Math.floor(Math.random() * messages.length)];
+  };
+
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-3", className)}>
-      <div 
-        className={cn(
-          "border-4 border-primary border-t-transparent rounded-full animate-spin",
-          sizeClasses[size]
-        )}
-      />
-      {message && (
-        <p className="text-muted-foreground text-sm animate-pulse">
-          {message}
-        </p>
+    <div className={cn(
+      "flex flex-col items-center justify-center gap-4 p-8",
+      "cozy-card candlelit-warmth",
+      className
+    )}>
+      <div className="relative">
+        <div 
+          className={cn(
+            "border-4 rounded-full animate-spin",
+            "border-cozy-sage/30 border-t-cozy-forest",
+            sizeClasses[size]
+          )}
+        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          {getCozyIcon()}
+        </div>
+      </div>
+      
+      {message !== undefined && (
+        <div className="text-center space-y-2">
+          <p className="text-cozy-forest dark:text-cozy-sage font-cozy font-medium animate-cozy-pulse">
+            {getCozyMessages()}
+          </p>
+          <div className="flex justify-center gap-1">
+            <div className="w-2 h-2 bg-cozy-sage rounded-full animate-gentle-bounce"></div>
+            <div className="w-2 h-2 bg-cozy-forest rounded-full animate-gentle-bounce animation-delay-300"></div>
+            <div className="w-2 h-2 bg-cozy-warm rounded-full animate-gentle-bounce animation-delay-600"></div>
+          </div>
+        </div>
       )}
     </div>
   );
