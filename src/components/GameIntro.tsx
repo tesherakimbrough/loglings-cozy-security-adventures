@@ -17,13 +17,17 @@ import LaunchReadinessModal from './LaunchReadinessModal';
 import { useUserProfile } from '../hooks/useUserProfile';
 
 interface GameIntroProps {
-  onStartGame: () => void;
+  onStartGame: (mode: UserMode) => void;
   userMode?: UserMode;
 }
 
 const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) => {
   const isProMode = userMode === 'career-pro';
   const { profile } = useUserProfile();
+
+  const handleStartClick = () => {
+    onStartGame(userMode);
+  };
 
   return (
     <div className="min-h-screen p-4">
@@ -63,7 +67,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         {/* Start Adventure Button */}
         <div className="text-center">
           <Button 
-            onClick={onStartGame}
+            onClick={handleStartClick}
             size="lg"
             className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
           >
