@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Settings, Volume2, VolumeX, Smartphone, Bell, Share2 } from 'lucide-react';
+import { Settings, Volume2, VolumeX, Smartphone, Bell, Share2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -30,7 +30,15 @@ const GameSettings = () => {
       {isOpen && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <Card className="w-full max-w-md cozy-card cozy-glow max-h-[90vh] overflow-y-auto">
-            <CardHeader>
+            <CardHeader className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="absolute right-2 top-2 h-6 w-6"
+              >
+                <X className="w-4 h-4" />
+              </Button>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <Settings className="w-5 h-5" />
                 Cozy Settings
