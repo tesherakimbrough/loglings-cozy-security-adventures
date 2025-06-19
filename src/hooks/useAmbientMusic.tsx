@@ -17,35 +17,35 @@ const audioTracks: AudioTrack[] = [
     name: 'Forest Ambience',
     emoji: '🌲',
     description: 'Gentle nature sounds with birds and rustling leaves',
-    audioUrl: 'https://www.soundjay.com/misc/sounds-807.mp3'
+    audioUrl: ''
   },
   {
     id: 'lofi',
     name: 'Lofi Study Beats',
     emoji: '🎵',
     description: 'Chill hip-hop beats perfect for concentration',
-    audioUrl: 'https://www.soundjay.com/misc/sounds-808.mp3'
+    audioUrl: ''
   },
   {
     id: 'cozy-cafe',
     name: 'Cozy Coffee Shop',
     emoji: '☕',
     description: 'Warm café atmosphere with gentle chatter',
-    audioUrl: 'https://www.soundjay.com/misc/sounds-809.mp3'
+    audioUrl: ''
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioUrl: 'https://www.soundjay.com/misc/sounds-810.mp3'
+    audioUrl: ''
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioUrl: 'https://www.soundjay.com/misc/sounds-811.mp3'
+    audioUrl: ''
   },
   {
     id: 'silence',
@@ -56,74 +56,180 @@ const audioTracks: AudioTrack[] = [
   }
 ];
 
+interface AmbientAudio {
+  play: () => Promise<void>;
+  pause: () => void;
+  volume: number;
+  setVolume: (volume: number) => void;
+}
+
 export const useAmbientMusic = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicType>('forest');
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [isLoading, setIsLoading] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const fadeTimeoutRef = useRef<NodeJS.Timeout>();
+  const audioRef = useRef<AmbientAudio | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
-  // Create a simple oscillator-based ambient sound generator
-  const createAmbientAudio = (trackId: MusicType): HTMLAudioElement => {
-    // Create audio context for generating ambient sounds
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    // Configure based on track type
-    switch (trackId) {
-      case 'forest':
-        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-        oscillator.type = 'sawtooth';
-        break;
-      case 'rain':
-        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-        oscillator.type = 'triangle';
-        break;
-      case 'fireplace':
-        oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
-        oscillator.type = 'square';
-        break;
-      case 'lofi':
-        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
-        oscillator.type = 'sine';
-        break;
-      case 'cozy-cafe':
-        oscillator.frequency.setValueAtTime(250, audioContext.currentTime);
-        oscillator.type = 'triangle';
-        break;
-      default:
-        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-        oscillator.type = 'sine';
+  // Create ambient audio with multiple layers for realistic soundscapes
+  const createAmbientAudio = (trackId: MusicType): AmbientAudio => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
-
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
     
-    // Create a mock audio element that represents our generated sound
-    const mockAudio = {
-      play: () => {
-        oscillator.start();
-        return Promise.resolve();
-      },
-      pause: () => {
-        try {
-          oscillator.stop();
-        } catch (e) {
-          // Oscillator may already be stopped
+    const audioContext = audioContextRef.current;
+    const masterGain = audioContext.createGain();
+    masterGain.connect(audioContext.destination);
+    
+    let isAudioPlaying = false;
+    const sources: AudioNode[] = [];
+
+    // White noise generator for base ambient sound
+    const createWhiteNoise = (gain: number = 0.1) => {
+      const bufferSize = audioContext.sampleRate * 2;
+      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+      
+      const noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.loop = true;
+      
+      const noiseGain = audioContext.createGain();
+      noiseGain.gain.setValueAtTime(gain, audioContext.currentTime);
+      
+      noiseSource.connect(noiseGain);
+      noiseGain.connect(masterGain);
+      
+      sources.push(noiseSource);
+      return noiseSource;
+    };
+
+    // Low frequency oscillator for depth
+    const createLowFreqOsc = (frequency: number, gain: number = 0.05) => {
+      const osc = audioContext.createOscillator();
+      const oscGain = audioContext.createGain();
+      
+      osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      osc.type = 'sine';
+      oscGain.gain.setValueAtTime(gain, audioContext.currentTime);
+      
+      osc.connect(oscGain);
+      oscGain.connect(masterGain);
+      
+      sources.push(osc);
+      return osc;
+    };
+
+    // Configure based on track type with multiple layers
+    const configureSoundscape = () => {
+      switch (trackId) {
+        case 'forest':
+          // White noise filtered for wind
+          const windNoise = createWhiteNoise(0.08);
+          
+          // Low frequency for depth
+          createLowFreqOsc(40, 0.03);
+          createLowFreqOsc(80, 0.02);
+          
+          // Mid frequencies for rustling
+          createLowFreqOsc(200, 0.01);
+          createLowFreqOsc(150, 0.015);
+          break;
+          
+        case 'rain':
+          // High frequency white noise for rain
+          createWhiteNoise(0.15);
+          
+          // Low rumble for thunder
+          createLowFreqOsc(30, 0.02);
+          createLowFreqOsc(60, 0.015);
+          break;
+          
+        case 'fireplace':
+          // Crackling noise
+          createWhiteNoise(0.06);
+          
+          // Low frequency for fire rumble
+          createLowFreqOsc(45, 0.04);
+          createLowFreqOsc(90, 0.03);
+          createLowFreqOsc(120, 0.02);
+          break;
+          
+        case 'lofi':
+          // Soft vinyl crackle
+          createWhiteNoise(0.03);
+          
+          // Warm bass tones
+          createLowFreqOsc(65, 0.04);
+          createLowFreqOsc(130, 0.03);
+          createLowFreqOsc(195, 0.02);
+          break;
+          
+        case 'cozy-cafe':
+          // Soft ambient noise
+          createWhiteNoise(0.05);
+          
+          // Gentle hum
+          createLowFreqOsc(100, 0.025);
+          createLowFreqOsc(200, 0.02);
+          createLowFreqOsc(300, 0.015);
+          break;
+          
+        default:
+          createWhiteNoise(0.05);
+          createLowFreqOsc(100, 0.02);
+      }
+    };
+
+    configureSoundscape();
+
+    const ambientAudio: AmbientAudio = {
+      play: async () => {
+        if (!isAudioPlaying) {
+          // Resume audio context if suspended
+          if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+          }
+          
+          sources.forEach(source => {
+            if ('start' in source) {
+              (source as AudioScheduledSourceNode).start();
+            }
+          });
+          isAudioPlaying = true;
         }
       },
-      currentTime: 0,
-      volume: volume,
-      loop: true,
-      addEventListener: () => {},
-      removeEventListener: () => {}
-    } as any;
+      
+      pause: () => {
+        if (isAudioPlaying) {
+          sources.forEach(source => {
+            try {
+              if ('stop' in source) {
+                (source as AudioScheduledSourceNode).stop();
+              }
+            } catch (e) {
+              // Source may already be stopped
+            }
+          });
+          isAudioPlaying = false;
+        }
+      },
+      
+      get volume() {
+        return masterGain.gain.value;
+      },
+      
+      setVolume: (newVolume: number) => {
+        masterGain.gain.setValueAtTime(newVolume, audioContext.currentTime);
+      }
+    };
 
-    return mockAudio;
+    return ambientAudio;
   };
 
   const getCurrentTrackInfo = () => {
@@ -135,7 +241,6 @@ export const useAmbientMusic = () => {
       if (audioRef.current) {
         try {
           audioRef.current.pause();
-          audioRef.current.currentTime = 0;
         } catch (error) {
           console.warn('Error stopping audio:', error);
         }
@@ -167,7 +272,7 @@ export const useAmbientMusic = () => {
 
       // Create ambient audio for the selected track
       const audio = createAmbientAudio(trackId);
-      audio.volume = newVolume;
+      audio.setVolume(newVolume);
       
       audioRef.current = audio;
       
@@ -189,7 +294,7 @@ export const useAmbientMusic = () => {
   const updateVolume = (newVolume: number) => {
     setVolume(newVolume);
     if (audioRef.current && isPlaying && currentTrack !== 'silence') {
-      audioRef.current.volume = newVolume;
+      audioRef.current.setVolume(newVolume);
     }
   };
 
@@ -197,7 +302,6 @@ export const useAmbientMusic = () => {
     if (!hasUserInteracted) return;
     
     try {
-      // Create a simple success beep
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
@@ -223,9 +327,6 @@ export const useAmbientMusic = () => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (fadeTimeoutRef.current) {
-        clearTimeout(fadeTimeoutRef.current);
-      }
       if (audioRef.current) {
         try {
           audioRef.current.pause();
