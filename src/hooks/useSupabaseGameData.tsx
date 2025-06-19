@@ -13,7 +13,7 @@ interface GameSession {
   total_rounds: number;
   time_elapsed: number;
   difficulty_level: string;
-  scenarios_played: any[];
+  scenarios_played: any;
   created_at: string;
 }
 
@@ -95,7 +95,13 @@ export const useSupabaseGameData = () => {
         return;
       }
 
-      setGameHistory(data || []);
+      // Transform the data to ensure scenarios_played is properly handled
+      const transformedData = data?.map(session => ({
+        ...session,
+        scenarios_played: session.scenarios_played || []
+      })) || [];
+
+      setGameHistory(transformedData);
       
     } catch (error) {
       console.error('Exception loading game history:', error);
