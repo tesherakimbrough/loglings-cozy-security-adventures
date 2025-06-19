@@ -15,12 +15,22 @@ export const generateEnhancedLogEntry = (difficulty: 'beginner' | 'intermediate'
   return {
     ...scenario,
     timestamp: new Date().toISOString(),
-    difficulty
+    difficulty,
+    // Ensure all required properties are present
+    sourceIP: scenario.sourceIP || '192.168.1.1',
+    eventType: scenario.eventType || 'Unknown Event',
+    user: scenario.user || 'unknown@company.com',
+    location: scenario.location || 'Unknown Location',
+    status: scenario.status || 'UNKNOWN',
+    details: scenario.details || 'No details available',
+    threatLevel: scenario.threatLevel || 'safe',
+    explanation: scenario.explanation || 'No explanation available',
+    category: scenario.category
   };
 };
 
-const getScenariosByDifficulty = (difficulty: string) => {
-  const beginnerScenarios: Partial<EnhancedLogEntry>[] = [
+const getScenariosByDifficulty = (difficulty: string): EnhancedLogEntry[] => {
+  const beginnerScenarios: EnhancedLogEntry[] = [
     {
       sourceIP: '192.168.1.100',
       eventType: 'User Login',
@@ -31,6 +41,8 @@ const getScenariosByDifficulty = (difficulty: string) => {
       threatLevel: 'safe' as ThreatLevel,
       explanation: 'This is a normal login - same user, same location, during work hours. The Loglings feel peaceful! 🌸',
       category: 'authentication',
+      difficulty: 'beginner',
+      timestamp: new Date().toISOString(),
       hints: ['Check the time and location', 'Is this the user\'s normal pattern?'],
       educationalContext: 'Normal authentication logs show expected user behavior patterns.'
     },
@@ -44,12 +56,14 @@ const getScenariosByDifficulty = (difficulty: string) => {
       threatLevel: 'critical' as ThreatLevel,
       explanation: 'Someone is trying to break into the admin account from far away! Sage the Alert Logling needs your help! 🚨',
       category: 'authentication',
+      difficulty: 'beginner',
+      timestamp: new Date().toISOString(),
       hints: ['Check the IP location', 'How many attempts were made?'],
       educationalContext: 'Multiple failed logins from unusual locations indicate potential brute force attacks.'
     }
   ];
 
-  const intermediateScenarios: Partial<EnhancedLogEntry>[] = [
+  const intermediateScenarios: EnhancedLogEntry[] = [
     {
       sourceIP: '10.0.0.15',
       eventType: 'File Access',
@@ -60,12 +74,14 @@ const getScenariosByDifficulty = (difficulty: string) => {
       threatLevel: 'warning' as ThreatLevel,
       explanation: 'Bob is accessing important files at an unusual time. Luna the Curious Logling wonders why! 🤔',
       category: 'data-breach',
+      difficulty: 'intermediate',
+      timestamp: new Date().toISOString(),
       hints: ['Consider the timing', 'What type of files were accessed?'],
       educationalContext: 'Unusual access patterns to sensitive data require investigation even from authorized users.'
     }
   ];
 
-  const advancedScenarios: Partial<EnhancedLogEntry>[] = [
+  const advancedScenarios: EnhancedLogEntry[] = [
     {
       sourceIP: '172.16.0.8',
       eventType: 'Network Traffic',
@@ -76,6 +92,8 @@ const getScenariosByDifficulty = (difficulty: string) => {
       threatLevel: 'warning' as ThreatLevel,
       explanation: 'Something is sending a lot of data outside during maintenance. Luna thinks this needs investigation! 🕵️',
       category: 'network',
+      difficulty: 'advanced',
+      timestamp: new Date().toISOString(),
       hints: ['Consider the timing and volume', 'Is this normal for maintenance?'],
       educationalContext: 'Data exfiltration often happens during maintenance windows when monitoring may be relaxed.'
     }
