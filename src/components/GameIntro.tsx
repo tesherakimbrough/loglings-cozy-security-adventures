@@ -11,9 +11,7 @@ import GameIntroNewFeatures from './GameIntroNewFeatures';
 import GameIntroNavigation from './GameIntroNavigation';
 import EnhancedUserOnboarding from './EnhancedUserOnboarding';
 import LaunchFeedbackCollector from './LaunchFeedbackCollector';
-import SoftLaunchReadinessChecker from './SoftLaunchReadinessChecker';
 import EarlyAccessBanner from './EarlyAccessBanner';
-import LaunchReadinessModal from './LaunchReadinessModal';
 import LevelProgressionSystem from './LevelProgressionSystem';
 import LearningPaths from './LearningPaths';
 import AchievementSystem from './AchievementSystem';
@@ -28,10 +26,6 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
   const isProMode = userMode === 'career-pro';
   const { profile } = useUserProfile();
   const achievementSystem = AchievementSystem();
-  
-  // Only show admin features in development
-  const isDevMode = import.meta.env.DEV || window.location.hostname === 'localhost';
-  const showAdminFeatures = isDevMode;
 
   const handleStartClick = () => {
     onStartGame(userMode);
@@ -40,11 +34,8 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Enhanced Header with Navigation */}
-        <div className="flex items-center justify-between">
-          <GameIntroNavigation />
-          {showAdminFeatures && <LaunchReadinessModal />}
-        </div>
+        {/* Navigation */}
+        <GameIntroNavigation />
 
         {/* Early Access Banner for new users */}
         {profile.progress.totalSessions < 3 && <EarlyAccessBanner />}
@@ -72,11 +63,6 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
 
         {/* Enhanced Features Preview */}
         <GameIntroNewFeatures />
-
-        {/* Admin-only: Soft Launch Readiness for experienced users */}
-        {showAdminFeatures && profile.progress.totalSessions >= 5 && (
-          <SoftLaunchReadinessChecker />
-        )}
 
         {/* Start Adventure Button */}
         <div className="text-center">
