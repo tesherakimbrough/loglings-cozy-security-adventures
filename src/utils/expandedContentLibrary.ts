@@ -24,7 +24,7 @@ interface LaunchReadyScenario {
 const premiumScenarioTemplates = [
   {
     category: 'advanced_persistent_threat',
-    difficulty: 'advanced',
+    difficulty: 'advanced' as const,
     threatLevel: 'critical',
     isPremium: true,
     baseScenario: {
@@ -36,7 +36,7 @@ const premiumScenarioTemplates = [
   },
   {
     category: 'zero_day_exploit',
-    difficulty: 'advanced',
+    difficulty: 'advanced' as const,
     threatLevel: 'critical',
     isPremium: true,
     baseScenario: {
@@ -48,7 +48,7 @@ const premiumScenarioTemplates = [
   },
   {
     category: 'supply_chain_attack',
-    difficulty: 'advanced',
+    difficulty: 'advanced' as const,
     threatLevel: 'critical',
     isPremium: true,
     baseScenario: {
