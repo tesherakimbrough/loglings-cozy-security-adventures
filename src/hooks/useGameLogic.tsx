@@ -5,6 +5,7 @@ import { generateExpandedLog } from '../utils/expandedLogScenarios';
 import { useSoundFeedback } from './useSoundFeedback';
 import { useDailyChallenges } from './useDailyChallenges';
 import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
+import { useAnalytics } from './useAnalytics';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../pages/Index';
 
@@ -42,6 +43,7 @@ export const useGameLogic = (
   const { playCorrectSound, playIncorrectSound, cleanup } = useSoundFeedback();
   const { todaysChallenge, updateChallengeProgress } = useDailyChallenges();
   const { calculateOptimalDifficulty, updateMetrics, getEncouragementMessage } = useAdaptiveDifficulty();
+  const { trackThreatAssessment } = useAnalytics();
   const totalRounds = 10;
 
   useEffect(() => {
@@ -58,13 +60,31 @@ export const useGameLogic = (
   }, [cleanup]);
 
   const generateNewLog = () => {
-    // Use adaptive difficulty or user preference
-    const difficulty = calculateOptimalDifficulty();
-    const newLog = generateExpandedLog(difficulty);
-    setCurrentLog(newLog as LogEntry);
-    setFeedback(null);
-    setShowNextRound(false);
-    setIsCorrect(null);
+    try {
+      // Use adaptive difficulty or user preference
+      const difficulty = calculateOptimalDifficulty();
+      const newLog = generateExpandedLog(difficulty);
+      setCurrentLog(newLog as LogEntry);
+      setFeedback(null);
+      setShowNextRound(false);
+      setIsCorrect(null);
+    } catch (error) {
+      console.error('Error generating log:', error);
+      // Fallback to basic log generation
+      setCurrentLog({
+        timestamp: new Date().toISOString(),
+        sourceIP: '192.168.1.100',
+        eventType: 'login_attempt',
+        user: 'test_user',
+        location: 'office',
+        status: 'success',
+        details: 'Normal login during business hours',
+        threatLevel: 'safe',
+        explanation: 'This appears to be a normal login attempt during regular business hours.',
+        category: 'authentication',
+        difficulty: 'beginner'
+      });
+    }
   };
 
   const getEnhancedFeedback = (playerChoice: ThreatLevel, log: LogEntry, correct: boolean) => {
@@ -89,6 +109,9 @@ export const useGameLogic = (
 
     const answerIsCorrect = playerChoice === currentLog.threatLevel;
     let pointsEarned = 0;
+
+    // Track the assessment for analytics
+    trackThreatAssessment(answerIsCorrect, currentLog.threatLevel);
 
     // Enhanced scoring system
     if (answerIsCorrect) {
