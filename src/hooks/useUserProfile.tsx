@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { UserProfile, UserMode } from '../types/userTypes';
 
@@ -8,8 +7,10 @@ const defaultProfile: UserProfile = {
   preferences: {
     difficulty: 'beginner',
     audioEnabled: true,
+    soundEffectsEnabled: true,
     musicType: 'forest',
     musicVolume: 0.3,
+    soundEffectsVolume: 0.4,
     notifications: true,
     shareAchievements: false
   },
@@ -33,7 +34,18 @@ export const useUserProfile = () => {
     if (savedProfile) {
       try {
         const parsed = JSON.parse(savedProfile);
-        setProfile({ ...defaultProfile, ...parsed });
+        // Migrate old profiles that don't have new sound properties
+        const migratedProfile = {
+          ...defaultProfile,
+          ...parsed,
+          preferences: {
+            ...defaultProfile.preferences,
+            ...parsed.preferences,
+            soundEffectsEnabled: parsed.preferences?.soundEffectsEnabled ?? true,
+            soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4
+          }
+        };
+        setProfile(migratedProfile);
       } catch (error) {
         console.warn('Failed to parse saved profile, using defaults');
         setProfile(defaultProfile);

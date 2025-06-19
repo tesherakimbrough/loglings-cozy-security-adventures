@@ -1,4 +1,3 @@
-
 export type UserMode = 'cozy-everyday' | 'career-pro';
 
 export interface UserProfile {
@@ -7,8 +6,10 @@ export interface UserProfile {
   preferences: {
     difficulty: string;
     audioEnabled: boolean;
+    soundEffectsEnabled: boolean;
     musicType: string;
     musicVolume: number;
+    soundEffectsVolume: number;
     notifications: boolean;
     shareAchievements: boolean;
   };

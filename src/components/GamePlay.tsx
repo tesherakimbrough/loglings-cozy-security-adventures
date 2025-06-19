@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
 import { generateLogEntry, LogEntry, ThreatLevel } from '../utils/logGenerator';
+import { useSoundFeedback } from '../hooks/useSoundFeedback';
 
 interface GamePlayProps {
   onEndGame: (gameData: GameData) => void;
@@ -21,7 +22,10 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [showNextRound, setShowNextRound] = useState(false);
   const [gameStartTime] = useState(Date.now());
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [isProMode] = useState(userMode === 'career-pro');
 
+  const { playCorrectSound, playIncorrectSound, cleanup } = useSoundFeedback();
   const totalRounds = 10;
 
   useEffect(() => {
@@ -34,40 +38,69 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
 
   useEffect(() => {
     generateNewLog();
-  }, []);
+    return cleanup;
+  }, [cleanup]);
 
   const generateNewLog = () => {
     setCurrentLog(generateLogEntry());
     setFeedback(null);
     setShowNextRound(false);
+    setIsCorrect(null);
+  };
+
+  const getEnhancedFeedback = (playerChoice: ThreatLevel, log: LogEntry, correct: boolean) => {
+    if (correct) {
+      if (isProMode) {
+        const proMessages = {
+          'safe': `Excellent analysis! This appears to be normal user behavior - ${log.explanation}`,
+          'warning': `Good catch! Your threat detection skills identified this anomaly correctly - ${log.explanation}`,
+          'critical': `Outstanding incident response! You correctly escalated this critical threat - ${log.explanation}`
+        };
+        return proMessages[log.threatLevel];
+      } else {
+        const cozyMessages = {
+          'safe': `Perfect! Pip the Safe Logling is so happy! 🌸 ${log.explanation}`,
+          'warning': `Wonderful! Luna the Curious Logling thanks you for noticing! ✨ ${log.explanation}`,
+          'critical': `Excellent! Sage the Alert Logling is proud of your quick thinking! 🌿 ${log.explanation}`
+        };
+        return cozyMessages[log.threatLevel];
+      }
+    } else {
+      if (isProMode) {
+        const correctAction = {
+          'safe': 'normal activity',
+          'warning': 'suspicious behavior requiring investigation',
+          'critical': 'a critical security incident'
+        }[log.threatLevel];
+        return `Let's review this together. This was actually ${correctAction}. ${log.explanation} Keep practicing - each scenario builds your expertise!`;
+      } else {
+        return `That's okay, dear friend! Every step teaches us something beautiful. 💙 ${log.explanation}`;
+      }
+    }
   };
 
   const handleThreatAssessment = (playerChoice: ThreatLevel) => {
     if (!currentLog) return;
 
-    const isCorrect = playerChoice === currentLog.threatLevel;
+    const answerIsCorrect = playerChoice === currentLog.threatLevel;
     let pointsEarned = 0;
-    let feedbackMessage = '';
 
-    if (isCorrect) {
+    // Play sound feedback
+    if (answerIsCorrect) {
+      playCorrectSound();
       pointsEarned = currentLog.threatLevel === 'critical' ? 100 : 
                     currentLog.threatLevel === 'warning' ? 75 : 50;
       setCorrectAnswers(prev => prev + 1);
-      
-      if (currentLog.threatLevel === 'safe') {
-        feedbackMessage = `Perfect! Pip the Safe Logling is so happy! 🌸 ${currentLog.explanation}`;
-      } else if (currentLog.threatLevel === 'warning') {
-        feedbackMessage = `Wonderful! Luna the Curious Logling thanks you for noticing! ✨ ${currentLog.explanation}`;
-      } else {
-        feedbackMessage = `Excellent! Sage the Alert Logling is proud of your quick thinking! 🌿 ${currentLog.explanation}`;
-      }
     } else {
+      playIncorrectSound();
       pointsEarned = -25;
-      feedbackMessage = `That's okay, dear friend! Every step teaches us something beautiful. 💙 ${currentLog.explanation}`;
     }
 
+    const enhancedFeedback = getEnhancedFeedback(playerChoice, currentLog, answerIsCorrect);
+    
     setScore(prev => prev + pointsEarned);
-    setFeedback(feedbackMessage);
+    setFeedback(enhancedFeedback);
+    setIsCorrect(answerIsCorrect);
     setShowNextRound(true);
 
     if (currentRound >= totalRounds) {
@@ -75,7 +108,7 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
         onEndGame({
           score: score + pointsEarned,
           totalRounds,
-          correctAnswers: correctAnswers + (isCorrect ? 1 : 0),
+          correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
           timeElapsed
         });
       }, 2000);
@@ -107,6 +140,15 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
       case 'warning': return 'curious-logling';
       case 'safe': return 'safe-logling';
     }
+  };
+
+  const getFeedbackIcon = () => {
+    if (isCorrect === null) return null;
+    return isCorrect ? (
+      <CheckCircle className="w-6 h-6 text-green-600 animate-gentle-float" />
+    ) : (
+      <AlertTriangle className="w-6 h-6 text-amber-600 animate-gentle-float" />
+    );
   };
 
   if (!currentLog) return <div>Loading our cozy adventure...</div>;
@@ -149,7 +191,10 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
               Chapter {currentRound}: A New Discovery
             </CardTitle>
             <p className="text-muted-foreground">
-              The Loglings have found something interesting! Let's explore it together with gentle curiosity.
+              {isProMode 
+                ? "Analyze this security log and determine the appropriate response level."
+                : "The Loglings have found something interesting! Let's explore it together with gentle curiosity."
+              }
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -174,9 +219,17 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
             {!feedback && (
               <div className="space-y-6">
                 <div className="text-center space-y-3">
-                  <h3 className="text-xl font-semibold text-primary">Which Logling friend feels right about this?</h3>
+                  <h3 className="text-xl font-semibold text-primary">
+                    {isProMode 
+                      ? "What's your assessment?" 
+                      : "Which Logling friend feels right about this?"
+                    }
+                  </h3>
                   <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Take your time and trust your instincts. The Loglings are here to support you, no matter what you choose.
+                    {isProMode
+                      ? "Analyze the log data and select the appropriate threat level based on your security expertise."
+                      : "Take your time and trust your instincts. The Loglings are here to support you, no matter what you choose."
+                    }
                   </p>
                 </div>
                 <div className="flex gap-6 justify-center">
@@ -186,8 +239,8 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
                     className="safe-logling hover:scale-105 transition-all duration-200 p-6 flex flex-col items-center gap-2 min-w-[140px]"
                   >
                     <Heart className="w-8 h-8" />
-                    <span className="font-semibold">Pip Says</span>
-                    <span className="text-sm">"All is well!"</span>
+                    <span className="font-semibold">{isProMode ? "Safe" : "Pip Says"}</span>
+                    <span className="text-sm">{isProMode ? "Normal activity" : '"All is well!"'}</span>
                   </Button>
                   <Button 
                     onClick={() => handleThreatAssessment('warning')}
@@ -195,8 +248,8 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
                     className="curious-logling hover:scale-105 transition-all duration-200 p-6 flex flex-col items-center gap-2 min-w-[140px]"
                   >
                     <Sparkles className="w-8 h-8" />
-                    <span className="font-semibold">Luna Says</span>
-                    <span className="text-sm">"Hmm, curious..."</span>
+                    <span className="font-semibold">{isProMode ? "Warning" : "Luna Says"}</span>
+                    <span className="text-sm">{isProMode ? "Needs investigation" : '"Hmm, curious..."'}</span>
                   </Button>
                   <Button 
                     onClick={() => handleThreatAssessment('critical')}
@@ -204,8 +257,8 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
                     className="alert-logling hover:scale-105 transition-all duration-200 p-6 flex flex-col items-center gap-2 min-w-[140px]"
                   >
                     <TreePine className="w-8 h-8" />
-                    <span className="font-semibold">Sage Says</span>
-                    <span className="text-sm">"Needs care!"</span>
+                    <span className="font-semibold">{isProMode ? "Critical" : "Sage Says"}</span>
+                    <span className="text-sm">{isProMode ? "Immediate action" : '"Needs care!"'}</span>
                   </Button>
                 </div>
               </div>
@@ -215,13 +268,21 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
               <div className="space-y-4">
                 <div className={`p-6 rounded-2xl border-2 ${getLoglingClass(currentLog.threatLevel)} relative overflow-hidden`}>
                   <div className="flex items-start gap-3 mb-3">
-                    <div className="animate-gentle-float">
-                      {getLoglingIcon(currentLog.threatLevel)}
+                    <div className="flex items-center gap-2">
+                      <div className="animate-gentle-float">
+                        {getLoglingIcon(currentLog.threatLevel)}
+                      </div>
+                      {getFeedbackIcon()}
                     </div>
                     <Badge variant="outline" className={`${getLoglingClass(currentLog.threatLevel)} font-semibold`}>
-                      {currentLog.threatLevel === 'safe' ? 'Pip the Safe Logling' :
-                       currentLog.threatLevel === 'warning' ? 'Luna the Curious Logling' :
-                       'Sage the Alert Logling'} was right!
+                      {isCorrect ? (
+                        isProMode ? "Correct Assessment!" : 
+                        currentLog.threatLevel === 'safe' ? 'Pip the Safe Logling' :
+                        currentLog.threatLevel === 'warning' ? 'Luna the Curious Logling' :
+                        'Sage the Alert Logling'
+                      ) : (
+                        isProMode ? "Let's Learn Together" : "Learning Moment"
+                      )} {isCorrect ? "was right!" : ""}
                     </Badge>
                   </div>
                   <p className="text-sm leading-relaxed">{feedback}</p>
@@ -233,7 +294,7 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
                 {showNextRound && currentRound < totalRounds && (
                   <div className="text-center">
                     <Button onClick={nextRound} className="logling-button">
-                      Continue Our Adventure 🌸
+                      {isProMode ? "Next Scenario 🔍" : "Continue Our Adventure 🌸"}
                     </Button>
                   </div>
                 )}

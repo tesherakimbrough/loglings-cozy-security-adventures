@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { useUserProfile } from '../hooks/useUserProfile';
 import MusicSelector from './MusicSelector';
 
@@ -94,7 +95,46 @@ const GameSettings = () => {
                 <MusicSelector />
               </div>
 
-              {/* Audio Settings */}
+              {/* Sound Effects Settings */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2 text-sm">
+                  {profile.preferences.soundEffectsEnabled ? (
+                    <Volume2 className="w-4 h-4 text-accent shrink-0" />
+                  ) : (
+                    <VolumeX className="w-4 h-4 text-muted-foreground shrink-0" />
+                  )}
+                  Answer Feedback Sounds
+                </h4>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-sm text-muted-foreground flex-1">
+                      Gentle chimes and feedback sounds
+                    </span>
+                    <Switch
+                      checked={profile.preferences.soundEffectsEnabled}
+                      onCheckedChange={(checked) => handlePreferenceChange('soundEffectsEnabled', checked)}
+                      className="shrink-0"
+                    />
+                  </div>
+                  {profile.preferences.soundEffectsEnabled && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Volume</span>
+                        <span className="text-primary font-medium">{Math.round(profile.preferences.soundEffectsVolume * 100)}%</span>
+                      </div>
+                      <Slider
+                        value={[profile.preferences.soundEffectsVolume]}
+                        onValueChange={([value]) => handlePreferenceChange('soundEffectsVolume', value)}
+                        max={1}
+                        step={0.1}
+                        className="w-full"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* General Audio Settings */}
               <div className="space-y-3">
                 <h4 className="font-semibold flex items-center gap-2 text-sm">
                   {profile.preferences.audioEnabled ? (
@@ -102,11 +142,11 @@ const GameSettings = () => {
                   ) : (
                     <VolumeX className="w-4 h-4 text-muted-foreground shrink-0" />
                   )}
-                  Sound Effects
+                  General Audio
                 </h4>
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm text-muted-foreground flex-1">
-                    Game feedback sounds
+                    Enable all game sounds
                   </span>
                   <Switch
                     checked={profile.preferences.audioEnabled}
@@ -155,7 +195,6 @@ const GameSettings = () => {
                 </div>
               </div>
 
-              {/* Social Sharing */}
               <div className="space-y-3">
                 <h4 className="font-semibold flex items-center gap-2 text-sm">
                   <Share2 className="w-4 h-4 text-green-600 shrink-0" />
