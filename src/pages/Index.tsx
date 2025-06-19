@@ -1,14 +1,12 @@
 
-import { useState, useEffect } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import GameIntro from '@/components/GameIntro';
-import GamePlay from '@/components/GamePlay';
-import GameResults from '@/components/GameResults';
-import ProgressTracker from '@/components/ProgressTracker';
-import UserProfileSection from '@/components/UserProfileSection';
-import { UserMode } from '@/types/userTypes';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { useAuth } from '@/hooks/useAuth';
+import { useState } from 'react';
+import GameIntro from '../components/GameIntro';
+import AdvancedGamePlay from '../components/AdvancedGamePlay';
+import GameResults from '../components/GameResults';
+import OnboardingTutorial from '../components/OnboardingTutorial';
+import FeedbackCollectionSystem from '../components/FeedbackCollectionSystem';
+import { UserMode } from '../types/userTypes';
+import { useUserProfile } from '../hooks/useUserProfile';
 
 export interface GameData {
   score: number;
@@ -20,21 +18,16 @@ export interface GameData {
   difficulty: string;
 }
 
-const Index = () => {
-  const [gameState, setGameState] = useState<'intro' | 'playing' | 'results'>('intro');
-  const [gameData, setGameData] = useState<GameData | null>(null);
-  const [selectedMode, setSelectedMode] = useState<UserMode>('cozy-everyday');
-  const { profile } = useUserProfile();
-  const { user, loading: authLoading } = useAuth();
+type GameState = 'intro' | 'playing' | 'results';
 
-  useEffect(() => {
-    if (profile) {
-      setSelectedMode(profile.mode);
-    }
-  }, [profile]);
+const Index = () => {
+  const [gameState, setGameState] = useState<GameState>('intro');
+  const [gameData, setGameData] = useState<GameData | null>(null);
+  const [userMode, setUserMode] = useState<UserMode>('cozy-everyday');
+  const { profile } = useUserProfile();
 
   const handleStartGame = (mode: UserMode) => {
-    setSelectedMode(mode);
+    setUserMode(mode);
     setGameState('playing');
   };
 
@@ -44,61 +37,37 @@ const Index = () => {
   };
 
   const handlePlayAgain = () => {
-    setGameState('playing');
     setGameData(null);
-  };
-
-  const handleBackToIntro = () => {
     setGameState('intro');
-    setGameData(null);
   };
-
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          <p className="text-muted-foreground">Loading your cozy adventure...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {user && <UserProfileSection />}
-        
-        {gameState === 'intro' && (
-          <GameIntro onStartGame={handleStartGame} />
-        )}
-        
-        {gameState === 'playing' && (
-          <GamePlay 
-            onEndGame={handleEndGame} 
-            userMode={selectedMode}
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial />
+      
+      {gameState === 'intro' && (
+        <GameIntro onStartGame={handleStartGame} userMode={userMode} />
+      )}
+      
+      {gameState === 'playing' && (
+        <AdvancedGamePlay onEndGame={handleEndGame} userMode={userMode} />
+      )}
+      
+      {gameState === 'results' && gameData && (
+        <>
+          <GameResults 
+            gameData={gameData} 
+            onPlayAgain={handlePlayAgain}
+            userMode={userMode}
           />
-        )}
-        
-        {gameState === 'results' && gameData && (
-          <div className="space-y-8">
-            <GameResults 
-              gameData={gameData}
-              onRestart={handlePlayAgain}
-              userMode={selectedMode}
-            />
-            
-            <Tabs defaultValue="progress" className="w-full">
-              <TabsList className="grid w-full grid-cols-1">
-                <TabsTrigger value="progress">Your Progress</TabsTrigger>
-              </TabsList>
-              <TabsContent value="progress" className="mt-6">
-                <ProgressTracker />
-              </TabsContent>
-            </Tabs>
-          </div>
-        )}
-      </div>
+          <FeedbackCollectionSystem
+            trigger="post-session"
+            onSubmit={() => {}}
+            onClose={() => {}}
+          />
+        </>
+      )}
     </div>
   );
 };

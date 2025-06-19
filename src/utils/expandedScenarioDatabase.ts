@@ -1,5 +1,4 @@
-
-import { ThreatLevel } from './logGenerator';
+import { LogEntry, ThreatLevel } from './logGenerator';
 
 interface LogEntry {
   timestamp: string;
@@ -562,40 +561,110 @@ const scenarioDatabase: LogEntry[] = [
   }
 ];
 
-// Scenario generation with improved variety and context
-export const generateAdvancedScenario = (difficulty: string = 'beginner') => {
-  let availableScenarios = scenarioDatabase;
-  
-  // Filter by difficulty if specified
-  if (difficulty !== 'mixed') {
-    availableScenarios = scenarioDatabase.filter(scenario => 
-      scenario.difficulty === difficulty
-    );
+// Enhanced scenario generation with uniqueness guarantee
+export const generateAdvancedScenario = (
+  difficulty: 'beginner' | 'intermediate' | 'advanced',
+  excludeIds: string[] = []
+): any => {
+  try {
+    const { generateContextualScenario } = require('./advancedScenarioDatabase');
+    return generateContextualScenario(difficulty, excludeIds);
+  } catch (error) {
+    console.error('Error loading advanced scenarios, using fallback:', error);
+    
+    // Fallback to original scenarios with enhanced uniqueness
+    const scenarios = getScenariosByDifficulty(difficulty);
+    const availableScenarios = scenarios.filter(s => !excludeIds.includes(s.id || ''));
+    
+    if (availableScenarios.length === 0) {
+      // Reset exclusions if we've exhausted all scenarios
+      console.log('Scenario pool exhausted, resetting for variety');
+      return scenarios[Math.floor(Math.random() * scenarios.length)];
+    }
+    
+    return availableScenarios[Math.floor(Math.random() * availableScenarios.length)];
   }
-  
-  // If no scenarios match, fall back to all scenarios
-  if (availableScenarios.length === 0) {
-    availableScenarios = scenarioDatabase;
+};
+
+const getScenariosByDifficulty = (difficulty: string): LogEntry[] => {
+  const beginnerScenarios: LogEntry[] = [
+    {
+      sourceIP: '192.168.1.100',
+      eventType: 'User Login',
+      user: 'alice@company.com',
+      location: 'Office Network',
+      status: 'SUCCESS',
+      details: 'User Alice logged in successfully from her usual workstation during business hours.',
+      threatLevel: 'safe' as ThreatLevel,
+      explanation: 'This is a normal login - same user, same location, during work hours. The Loglings feel peaceful! 🌸',
+      category: 'authentication',
+      difficulty: 'beginner',
+      timestamp: new Date().toISOString(),
+      learningTip: 'Normal authentication logs show expected user behavior patterns.'
+    },
+    {
+      sourceIP: '203.0.113.45',
+      eventType: 'Login Attempt',
+      user: 'admin@company.com',
+      location: 'Unknown Country',
+      status: 'FAILED',
+      details: 'Multiple failed login attempts for admin account from an unfamiliar international IP address.',
+      threatLevel: 'critical' as ThreatLevel,
+      explanation: 'Someone is trying to break into the admin account from far away! Sage the Alert Logling needs your help! 🚨',
+      category: 'authentication',
+      difficulty: 'beginner',
+      timestamp: new Date().toISOString(),
+      learningTip: 'Multiple failed logins from unusual locations indicate potential brute force attacks.'
+    }
+  ];
+
+  const intermediateScenarios: LogEntry[] = [
+    {
+      sourceIP: '10.0.0.15',
+      eventType: 'File Access',
+      user: 'bob@company.com',
+      location: 'Internal Network',
+      status: 'SUCCESS',
+      details: 'User Bob accessed sensitive customer database files outside of normal business hours.',
+      threatLevel: 'warning' as ThreatLevel,
+      explanation: 'Bob is accessing important files at an unusual time. Luna the Curious Logling wonders why! 🤔',
+      category: 'data-breach',
+      difficulty: 'intermediate',
+      timestamp: new Date().toISOString(),
+      learningTip: 'Unusual access patterns to sensitive data require investigation even from authorized users.'
+    }
+  ];
+
+  const advancedScenarios: LogEntry[] = [
+    {
+      sourceIP: '172.16.0.8',
+      eventType: 'Network Traffic',
+      user: 'system',
+      location: 'DMZ Server',
+      status: 'ANOMALY',
+      details: 'Unusual outbound traffic pattern detected: 500MB encrypted data transfer to external server during maintenance window.',
+      threatLevel: 'warning' as ThreatLevel,
+      explanation: 'Something is sending a lot of data outside during maintenance. Luna thinks this needs investigation! 🕵️',
+      category: 'network',
+      difficulty: 'advanced',
+      timestamp: new Date().toISOString(),
+      learningTip: 'Data exfiltration often happens during maintenance windows when monitoring may be relaxed.'
+    }
+  ];
+
+  switch (difficulty) {
+    case 'beginner': return beginnerScenarios;
+    case 'intermediate': return [...beginnerScenarios, ...intermediateScenarios];
+    case 'advanced': return [...beginnerScenarios, ...intermediateScenarios, ...advancedScenarios];
+    default: return beginnerScenarios;
   }
-  
-  const template = availableScenarios[Math.floor(Math.random() * availableScenarios.length)];
-  
-  // Add some variety to prevent repetition
-  const variations = {
-    sourceIP: generateContextualIP(template.category),
-    user: generateContextualUser(template.category),
-    timestamp: generateRecentTimestamp(),
-    location: generateContextualLocation(template.category)
-  };
-  
-  return {
-    ...template,
-    sourceIP: variations.sourceIP,
-    user: variations.user,
-    timestamp: variations.timestamp,
-    location: variations.location,
-    id: crypto.randomUUID()
-  };
+};
+
+export const getDifficultyRecommendation = (accuracy: number, sessionCount: number): 'beginner' | 'intermediate' | 'advanced' => {
+  if (sessionCount < 5) return 'beginner';
+  if (accuracy >= 80 && sessionCount >= 10) return 'advanced';
+  if (accuracy >= 65) return 'intermediate';
+  return 'beginner';
 };
 
 // Helper functions for more realistic data generation
