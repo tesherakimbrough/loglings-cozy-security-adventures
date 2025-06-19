@@ -1,405 +1,175 @@
-import { useState, useEffect } from 'react';
-import { Heart, Sparkles, Clock, RotateCcw, TreePine, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Trophy, Target, Clock, TrendingUp, Star, Award } from 'lucide-react';
+import ConfettiCelebration from './ConfettiCelebration';
+import EnhancedSocialSharing from './EnhancedSocialSharing';
 import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
-import SocialSharing from './SocialSharing';
-import EnhancedSocialSharing from './EnhancedSocialSharing';
-import PremiumPrompt from './PremiumPrompt';
-import LaunchFeedbackForm from './LaunchFeedbackForm';
-import { useFeedbackAndPremium } from '../hooks/useFeedbackAndPremium';
-import { useLaunchAnalytics } from '../hooks/useLaunchAnalytics';
-import { useKeyboardNavigation } from '../hooks/useKeyboardNavigation';
+import { useSupabaseGameData } from '../hooks/useSupabaseGameData';
 
 interface GameResultsProps {
   gameData: GameData;
   onRestart: () => void;
-  userMode?: UserMode;
+  userMode: UserMode;
 }
 
-const GameResults = ({ gameData, onRestart, userMode = 'cozy-everyday' }: GameResultsProps) => {
-  const [bestScore, setBestScore] = useState<number>(0);
-  const [showPremiumPrompt, setShowPremiumPrompt] = useState(false);
-  const [showLaunchFeedback, setShowLaunchFeedback] = useState(false);
-  const [premiumPromptType, setPremiumPromptType] = useState<'sessions' | 'score' | 'achievement'>('sessions');
-  
-  const { shouldShowPremiumPrompt, markPromptShown, markPromptDismissed, handleUpgrade } = useFeedbackAndPremium();
-  const { trackLaunchInteraction } = useLaunchAnalytics();
-  const { announceToScreenReader } = useKeyboardNavigation();
+const GameResults = ({ gameData, onRestart, userMode }: GameResultsProps) => {
+  const { saveGameSession, updateUserProgress, getGameStatistics } = useSupabaseGameData();
+  const stats = getGameStatistics();
 
   useEffect(() => {
-    // Announce results to screen readers
-    const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
-    announceToScreenReader(
-      `Adventure complete! You collected ${gameData.score} joy points with ${accuracy}% accuracy. ${gameData.correctAnswers} Logling friends helped successfully.`
-    );
+    // Save game data when component mounts
+    saveGameSession(gameData);
+    updateUserProgress(gameData);
+  }, [gameData]);
 
-    // Load best score from localStorage
-    const savedBestScore = localStorage.getItem('loglings-best-joy');
-    const currentBest = savedBestScore ? parseInt(savedBestScore) : 0;
-    
-    if (gameData.score > currentBest) {
-      localStorage.setItem('loglings-best-joy', gameData.score.toString());
-      setBestScore(gameData.score);
-      announceToScreenReader('Congratulations! You achieved a new personal best!');
+  const getPerformanceLevel = (accuracy: number) => {
+    if (accuracy >= 90) return { level: 'Exceptional', color: 'text-yellow-600', icon: Trophy };
+    if (accuracy >= 80) return { level: 'Excellent', color: 'text-purple-600', icon: Star };
+    if (accuracy >= 70) return { level: 'Great', color: 'text-blue-600', icon: Award };
+    if (accuracy >= 60) return { level: 'Good', color: 'text-green-600', icon: Target };
+    return { level: 'Learning', color: 'text-orange-600', icon: TrendingUp };
+  };
+
+  const performance = getPerformanceLevel(gameData.accuracy);
+  const PerformanceIcon = performance.icon;
+
+  const getEncouragementMessage = () => {
+    if (gameData.accuracy >= 90) {
+      return "🌟 Outstanding! You're a true cybersecurity guardian!";
+    } else if (gameData.accuracy >= 80) {
+      return "🛡️ Excellent work! Your security instincts are sharp!";
+    } else if (gameData.accuracy >= 70) {
+      return "🚀 Great job! You're building strong security skills!";
+    } else if (gameData.accuracy >= 60) {
+      return "🌱 Good progress! Keep practicing to grow your expertise!";
     } else {
-      setBestScore(currentBest);
-    }
-
-    // Update progress tracking
-    updateProgressTracking();
-    
-    // Check for premium prompts
-    checkForPremiumPrompts();
-
-    // Check for launch feedback (every 3rd session)
-    const sessionCount = JSON.parse(localStorage.getItem('loglings-progress') || '{}').totalSessions || 0;
-    if (sessionCount > 0 && sessionCount % 3 === 0 && !localStorage.getItem('loglings-launch-feedback-shown')) {
-      setTimeout(() => {
-        setShowLaunchFeedback(true);
-        localStorage.setItem('loglings-launch-feedback-shown', 'true');
-      }, 2000);
-    }
-  }, [gameData.score]);
-
-  const updateProgressTracking = () => {
-    const savedProgress = localStorage.getItem('loglings-progress');
-    let progress = savedProgress ? JSON.parse(savedProgress) : {
-      totalSessions: 0,
-      totalScore: 0,
-      correctAnswers: 0,
-      loglingsFriended: [],
-      achievements: [],
-      currentStreak: 0,
-      longestStreak: 0
-    };
-
-    progress.totalSessions += 1;
-    progress.totalScore += gameData.score;
-    progress.correctAnswers += gameData.correctAnswers;
-
-    const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
-    progress.achievements = progress.achievements.map((achievement: any) => {
-      if (achievement.id === 'first-friend' && !achievement.unlocked) {
-        achievement.unlocked = true;
-      }
-      if (achievement.id === 'curious-explorer' && !achievement.unlocked) {
-        achievement.progress = Math.min((achievement.progress || 0) + 1, achievement.maxProgress);
-        if (achievement.progress >= achievement.maxProgress) {
-          achievement.unlocked = true;
-        }
-      }
-      if (achievement.id === 'forest-guardian' && !achievement.unlocked && accuracy >= 90) {
-        achievement.unlocked = true;
-      }
-      if (achievement.id === 'wisdom-keeper' && !achievement.unlocked) {
-        achievement.progress = Math.min(progress.totalScore, achievement.maxProgress);
-        if (achievement.progress >= achievement.maxProgress) {
-          achievement.unlocked = true;
-        }
-      }
-      return achievement;
-    });
-
-    localStorage.setItem('loglings-progress', JSON.stringify(progress));
-  };
-
-  const checkForPremiumPrompts = () => {
-    const savedProgress = localStorage.getItem('loglings-progress');
-    const progress = savedProgress ? JSON.parse(savedProgress) : { totalSessions: 0 };
-    
-    const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
-    
-    if (shouldShowPremiumPrompt('sessions', progress.totalSessions)) {
-      setPremiumPromptType('sessions');
-      setShowPremiumPrompt(true);
-      markPromptShown('sessions');
-      return;
-    }
-    
-    if (shouldShowPremiumPrompt('score', undefined, gameData.score)) {
-      setPremiumPromptType('score');
-      setShowPremiumPrompt(true);
-      markPromptShown('score');
-      return;
-    }
-    
-    if (accuracy >= 90 && shouldShowPremiumPrompt('achievement')) {
-      setPremiumPromptType('achievement');
-      setShowPremiumPrompt(true);
-      markPromptShown('achievement');
-      return;
+      return "📚 Every expert was once a beginner. Keep learning!";
     }
   };
 
-  const handlePremiumDismiss = () => {
-    setShowPremiumPrompt(false);
-    markPromptDismissed();
+  const getImprovementTip = () => {
+    if (gameData.accuracy < 70) {
+      return "💡 Focus on understanding the context clues in each scenario. Time, location, and user behavior patterns are key indicators.";
+    } else if (gameData.accuracy < 85) {
+      return "🎯 Great foundation! Try to spot subtle anomalies like unusual login times or access patterns outside normal job functions.";
+    } else {
+      return "🏆 You're mastering the fundamentals! Challenge yourself with advanced threat scenarios to become a true expert.";
+    }
   };
-
-  const handlePremiumUpgrade = () => {
-    setShowPremiumPrompt(false);
-    handleUpgrade();
-  };
-
-  const handleLaunchFeedbackSubmit = (feedback: any) => {
-    setShowLaunchFeedback(false);
-    trackLaunchInteraction('feedback_submitted', 'game_results');
-    announceToScreenReader('Thank you for helping our forest grow with your feedback!');
-  };
-
-  const handleRestartClick = () => {
-    trackLaunchInteraction('game_restart', 'results_screen');
-    announceToScreenReader('Starting a new forest adventure!');
-    onRestart();
-  };
-
-  const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
-  const isNewRecord = gameData.score === bestScore && bestScore > 0;
-
-  const getCozyLevel = () => {
-    if (accuracy >= 90) return { 
-      level: 'Logling Whisperer', 
-      color: 'text-leaf-glow', 
-      icon: TreePine,
-      message: 'The Loglings sing songs about your kindness!' 
-    };
-    if (accuracy >= 75) return { 
-      level: 'Forest Guardian', 
-      color: 'text-warm-amber', 
-      icon: Star,
-      message: 'You bring such warmth to our digital grove!' 
-    };
-    if (accuracy >= 60) return { 
-      level: 'Curious Adventurer', 
-      color: 'text-blue-500', 
-      icon: Sparkles,
-      message: 'Your curiosity makes the Loglings dance with joy!' 
-    };
-    return { 
-      level: 'Gentle Learner', 
-      color: 'text-accessible-secondary', 
-      icon: Heart,
-      message: 'Every step you take fills our hearts with hope!' 
-    };
-  };
-
-  const cozyLevel = getCozyLevel();
-  const CozyIcon = cozyLevel.icon;
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  if (showLaunchFeedback) {
-    return (
-      <div className="min-h-screen p-4 flex items-center justify-center">
-        <LaunchFeedbackForm
-          onSubmit={handleLaunchFeedbackSubmit}
-          onSkip={() => setShowLaunchFeedback(false)}
-        />
-      </div>
-    );
-  }
 
   return (
-    <>
-      <div className="min-h-screen p-4">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* Skip link for screen readers */}
-          <a href="#main-content" className="skip-link">
-            Skip to main content
-          </a>
+    <div className="space-y-6">
+      <ConfettiCelebration trigger={gameData.accuracy >= 80} />
+      
+      <Card className="cozy-card cozy-glow text-center">
+        <CardHeader>
+          <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-gentle-bounce">
+            <PerformanceIcon className="w-10 h-10 text-white" />
+          </div>
+          <CardTitle className="text-3xl cozy-heading">
+            Adventure Complete! 🌸
+          </CardTitle>
+          <p className="text-muted-foreground">
+            {getEncouragementMessage()}
+          </p>
+        </CardHeader>
+        
+        <CardContent className="space-y-6">
+          {/* Performance Badge */}
+          <div className="flex justify-center">
+            <Badge variant="outline" className={`text-lg px-4 py-2 ${performance.color} border-current`}>
+              {performance.level} Performance
+            </Badge>
+          </div>
 
-          {/* Header */}
-          <header className="text-center space-y-6" id="main-content">
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div className="animate-gentle-float">
-                <TreePine 
-                  className={`w-16 h-16 ${isNewRecord ? 'text-warm-amber animate-sparkle' : 'text-leaf-glow'}`}
-                  aria-hidden="true"
-                />
+          {/* Main Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary mb-1">{gameData.score}</div>
+              <div className="text-sm text-muted-foreground">Joy Points</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-emerald-600 mb-1">
+                {Math.round(gameData.accuracy)}%
               </div>
-              <div className="space-y-2">
-                <h1 className="text-6xl font-bold cozy-heading bg-gradient-to-r from-leaf-glow to-warm-amber bg-clip-text text-transparent">
-                  Adventure Complete!
-                </h1>
-                <p className="text-xl text-accessible-primary">
-                  The Loglings are so proud of you! 🌸
-                </p>
+              <div className="text-sm text-muted-foreground">Accuracy</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 mb-1">
+                {gameData.correctAnswers}/{gameData.totalQuestions}
               </div>
-              <div className="animate-gentle-float animation-delay-1000">
-                <Heart className="w-16 h-16 text-warm-amber animate-sparkle" aria-hidden="true" />
+              <div className="text-sm text-muted-foreground">Correct</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600 mb-1">
+                {Math.floor(gameData.timeElapsed / 60)}m {gameData.timeElapsed % 60}s
+              </div>
+              <div className="text-sm text-muted-foreground">Time</div>
+            </div>
+          </div>
+
+          {/* Progress Comparison */}
+          {stats.totalGames > 1 && (
+            <div className="p-4 bg-muted/30 rounded-lg">
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Your Progress Journey
+              </h4>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="text-center">
+                  <div className="font-bold text-lg">{stats.totalGames}</div>
+                  <div className="text-muted-foreground">Total Adventures</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-lg">{stats.averageScore}</div>
+                  <div className="text-muted-foreground">Avg Score</div>
+                </div>
+                <div className="text-center">
+                  <div className={`font-bold text-lg ${
+                    stats.improvementTrend === 'improving' ? 'text-green-600' : 
+                    stats.improvementTrend === 'declining' ? 'text-orange-600' : 'text-blue-600'
+                  }`}>
+                    {stats.improvementTrend === 'improving' ? '📈' : 
+                     stats.improvementTrend === 'declining' ? '📉' : '➡️'}
+                  </div>
+                  <div className="text-muted-foreground">Trend</div>
+                </div>
               </div>
             </div>
-            {isNewRecord && (
-              <Badge className="bg-warm-amber/20 text-warm-amber border-warm-amber text-lg px-6 py-3 animate-cozy-pulse">
-                ✨ New Personal Best! The forest celebrates! ✨
-              </Badge>
-            )}
-          </header>
+          )}
 
-          {/* Results and Enhanced Social Sharing Grid */}
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Joy Collected Card */}
-            <Card className="cozy-card cozy-glow candlelit-warmth">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 bg-leaf-glow/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
-                  <Sparkles className="w-8 h-8 text-leaf-glow" aria-hidden="true" />
-                </div>
-                <CardTitle className="cozy-heading text-leaf-glow">Joy Collected</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center space-y-4">
-                <div className="text-6xl font-bold stat-number" aria-label={`${gameData.score} joy points collected`}>
-                  {gameData.score}
-                </div>
-                <div className="text-accessible-secondary">
-                  Best Collection: <span className="text-warm-amber font-semibold">{bestScore}</span>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Improvement Tip */}
+          <div className="p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg text-left">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+              🎯 Your Next Growth Step
+            </h4>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              {getImprovementTip()}
+            </p>
+          </div>
 
-            {/* Cozy Achievement Card */}
-            <Card className="cozy-card cozy-glow candlelit-warmth">
-              <CardHeader className="text-center">
-                <div className={`w-16 h-16 bg-warm-amber/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500`}>
-                  <CozyIcon className={`w-8 h-8 ${cozyLevel.color}`} aria-hidden="true" />
-                </div>
-                <CardTitle className="cozy-heading text-warm-amber">Your Cozy Title</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center space-y-4">
-                <div className={`text-2xl font-bold ${cozyLevel.color}`}>{cozyLevel.level}</div>
-                <div className="text-accessible-secondary text-sm">
-                  {cozyLevel.message}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Enhanced Social Sharing */}
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            <Button
+              onClick={onRestart}
+              className="flex-1 logling-button"
+              size="lg"
+            >
+              Continue Journey 🌟
+            </Button>
             <EnhancedSocialSharing 
-              gameData={gameData} 
-              achievements={['Forest Guardian', 'Wisdom Keeper']}
+              score={gameData.score}
+              accuracy={gameData.accuracy}
+              mode={userMode}
             />
           </div>
-
-          {/* Detailed Garden Stats */}
-          <Card className="cozy-card cozy-glow candlelit-warmth">
-            <CardHeader>
-              <CardTitle className="text-center text-3xl cozy-heading text-leaf-glow">Your Adventure Garden</CardTitle>
-              <p className="text-center text-accessible-secondary">Look at all the beautiful moments you've collected!</p>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-4 gap-6 text-center">
-                <div className="space-y-3">
-                  <div className="w-12 h-12 bg-green-200 dark:bg-green-800/30 rounded-full flex items-center justify-center mx-auto animate-gentle-float">
-                    <Heart className="w-6 h-6 text-green-600 dark:text-green-400" aria-hidden="true" />
-                  </div>
-                  <div className="text-3xl font-bold stat-number" aria-label={`${gameData.correctAnswers} Logling friends helped`}>
-                    {gameData.correctAnswers}
-                  </div>
-                  <div className="text-sm text-accessible-secondary">Logling Friends</div>
-                  <div className="text-xs text-accessible-secondary">helped successfully</div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="w-12 h-12 bg-warm-amber/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-200">
-                    <Sparkles className="w-6 h-6 text-warm-amber" aria-hidden="true" />
-                  </div>
-                  <div className="text-3xl font-bold text-warm-amber" aria-label={`${accuracy} percent harmony rate`}>
-                    {accuracy}%
-                  </div>
-                  <div className="text-sm text-accessible-secondary">Harmony Rate</div>
-                  <div className="text-xs text-accessible-secondary">with forest wisdom</div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="w-12 h-12 bg-blue-200 dark:bg-blue-800/30 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-400">
-                    <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
-                  </div>
-                  <div className="text-3xl font-bold text-blue-600 dark:text-blue-400" aria-label={`${formatTime(gameData.timeElapsed)} peaceful time exploring`}>
-                    {formatTime(gameData.timeElapsed)}
-                  </div>
-                  <div className="text-sm text-accessible-secondary">Peaceful Time</div>
-                  <div className="text-xs text-accessible-secondary">exploring together</div>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="w-12 h-12 bg-leaf-glow/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-600">
-                    <TreePine className="w-6 h-6 text-leaf-glow" aria-hidden="true" />
-                  </div>
-                  <div className="text-3xl font-bold stat-number">
-                    {Math.round((gameData.timeElapsed / gameData.totalRounds) * 10) / 10}s
-                  </div>
-                  <div className="text-sm text-accessible-secondary">Thoughtful Pace</div>
-                  <div className="text-xs text-accessible-secondary">per discovery</div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Gentle Feedback */}
-          <Card className="cozy-card cozy-glow candlelit-warmth">
-            <CardContent className="pt-6">
-              <div className="text-center space-y-4">
-                <h3 className="text-2xl font-semibold cozy-heading text-leaf-glow">Message from the Forest Elder</h3>
-                <div className="text-accessible-secondary max-w-3xl mx-auto text-lg leading-relaxed">
-                  {accuracy >= 90 && "✨ Your heart shines with the wisdom of the ancient trees! The Loglings gather around you with such joy. You've become a true guardian of our digital forest."}
-                  {accuracy >= 75 && accuracy < 90 && "🌸 Your gentle spirit and keen observation bring such warmth to our grove. The Loglings dance when they see you coming!"}
-                  {accuracy >= 60 && accuracy < 75 && "🌱 Every question you ask and every choice you make helps our forest grow stronger. Your curiosity is a gift to all of us."}
-                  {accuracy < 60 && "💙 Your willingness to learn and explore fills our hearts with hope. Remember, every great guardian started exactly where you are now."}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Continue Adventure */}
-          <div className="flex justify-center gap-4">
-            <Button 
-              onClick={handleRestartClick}
-              size="lg"
-              className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
-              aria-label="Start a new forest adventure"
-            >
-              <RotateCcw className="w-6 h-6 mr-3" aria-hidden="true" />
-              Continue Our Adventure
-            </Button>
-          </div>
-
-          {/* Creator Credit - Cozy Style */}
-          <footer className="text-center pt-8 border-t border-border/50">
-            <p className="text-accessible-secondary flex items-center justify-center gap-2">
-              Lovingly crafted by 
-              <span className="text-leaf-glow font-semibold flex items-center gap-1">
-                <Heart className="w-4 h-4" aria-hidden="true" />
-                Teshera Kimbrough
-              </span>
-              - AI Security Engineer
-            </p>
-            <p className="text-sm text-accessible-secondary mt-2">
-              Where cybersecurity learning blooms like wildflowers 🌼
-            </p>
-            <p className="text-xs text-accessible-secondary mt-1">
-              May your journey through digital forests always be filled with wonder
-            </p>
-          </footer>
-        </div>
-      </div>
-
-      {showPremiumPrompt && (
-        <PremiumPrompt
-          trigger={premiumPromptType}
-          onDismiss={handlePremiumDismiss}
-          onUpgrade={handlePremiumUpgrade}
-          sessionsPlayed={JSON.parse(localStorage.getItem('loglings-progress') || '{}').totalSessions}
-          currentScore={gameData.score}
-          achievement={premiumPromptType === 'achievement' ? 'Forest Guardian' : undefined}
-        />
-      )}
-    </>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
