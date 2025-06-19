@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
+import MusicSelector from './MusicSelector';
 
 const GameSettings = () => {
   const { progress, updatePreferences } = useEnhancedProgress();
@@ -28,7 +30,7 @@ const GameSettings = () => {
 
       {isOpen && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md cozy-card cozy-glow">
+          <Card className="w-full max-w-md cozy-card cozy-glow max-h-[90vh] overflow-y-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-primary">
                 <Settings className="w-5 h-5" />
@@ -36,6 +38,14 @@ const GameSettings = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Music Selection */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2">
+                  🎵 Study Atmosphere
+                </h4>
+                <MusicSelector />
+              </div>
+
               {/* Audio Settings */}
               <div className="space-y-3">
                 <h4 className="font-semibold flex items-center gap-2">
@@ -44,15 +54,31 @@ const GameSettings = () => {
                   ) : (
                     <VolumeX className="w-4 h-4 text-muted-foreground" />
                   )}
-                  Forest Sounds
+                  Sound Effects
                 </h4>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Ambient audio & feedback</span>
+                  <span className="text-sm text-muted-foreground">Game feedback sounds</span>
                   <Switch
                     checked={progress.preferences.audioEnabled}
                     onCheckedChange={(checked) => handlePreferenceChange('audioEnabled', checked)}
                   />
                 </div>
+                {progress.preferences.audioEnabled && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Volume2 className="w-4 h-4" />
+                      <span>Effects Volume</span>
+                    </div>
+                    <Slider
+                      value={[progress.preferences.effectsVolume]}
+                      onValueChange={(value) => handlePreferenceChange('effectsVolume', value[0])}
+                      max={1}
+                      min={0}
+                      step={0.1}
+                      className="w-full"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Difficulty Settings */}

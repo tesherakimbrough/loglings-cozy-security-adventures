@@ -13,6 +13,8 @@ export const useAudio = (src: string, options: AudioOptions = {}) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    if (!src) return;
+    
     audioRef.current = new Audio(src);
     const audio = audioRef.current;
     
@@ -61,12 +63,11 @@ export const useAudio = (src: string, options: AudioOptions = {}) => {
   return { play, pause, stop, isPlaying, isLoaded };
 };
 
+// Legacy compatibility - now uses the new ambient music system
 export const useAmbientAudio = () => {
-  // Using data URLs for simple tones since we can't load external audio files
   const forestAmbient = useAudio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ', { volume: 0.3, loop: true });
   
   const playSuccess = () => {
-    // Simple success chime
     const successTone = useAudio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ', { volume: 0.6 });
     successTone.play();
   };

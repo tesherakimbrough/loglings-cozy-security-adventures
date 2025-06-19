@@ -3,6 +3,7 @@ import { useState } from 'react';
 import GameIntro from '../components/GameIntro';
 import GamePlay from '../components/GamePlay';
 import GameResults from '../components/GameResults';
+import MusicControlBar from '../components/MusicControlBar';
 
 export type GameState = 'intro' | 'playing' | 'results';
 
@@ -46,6 +47,9 @@ const Index = () => {
       {gameState === 'intro' && <GameIntro onStartGame={startGame} />}
       {gameState === 'playing' && <GamePlay onEndGame={endGame} />}
       {gameState === 'results' && <GameResults gameData={gameData} onRestart={resetGame} />}
+      
+      {/* Music control bar available throughout the app */}
+      <MusicControlBar />
     </div>
   );
 };

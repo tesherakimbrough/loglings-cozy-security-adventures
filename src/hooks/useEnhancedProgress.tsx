@@ -50,6 +50,9 @@ export interface LearningMetrics {
 
 export interface UserPreferences {
   audioEnabled: boolean;
+  musicType: 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence';
+  musicVolume: number;
+  effectsVolume: number;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   notifications: boolean;
   shareAchievements: boolean;
@@ -74,6 +77,9 @@ export const useEnhancedProgress = () => {
     },
     preferences: {
       audioEnabled: true,
+      musicType: 'forest',
+      musicVolume: 0.3,
+      effectsVolume: 0.6,
       difficulty: 'beginner',
       notifications: true,
       shareAchievements: true
