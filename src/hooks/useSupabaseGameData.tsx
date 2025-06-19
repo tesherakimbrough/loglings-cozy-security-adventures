@@ -9,10 +9,9 @@ interface GameSession {
   id: string;
   user_id: string;
   score: number;
-  accuracy: number;
-  time_elapsed: number;
   correct_answers: number;
   total_rounds: number;
+  time_elapsed: number;
   difficulty_level: string;
   scenarios_played: any[];
   created_at: string;
@@ -181,7 +180,9 @@ export const useSupabaseGameData = () => {
 
     const totalGames = gameHistory.length;
     const totalScore = gameHistory.reduce((sum, game) => sum + game.score, 0);
-    const totalAccuracy = gameHistory.reduce((sum, game) => sum + (game.accuracy || 0), 0);
+    // Calculate accuracy from correct_answers and total_rounds
+    const totalAccuracy = gameHistory.reduce((sum, game) => 
+      sum + (game.total_rounds > 0 ? (game.correct_answers / game.total_rounds) * 100 : 0), 0);
     const totalTime = gameHistory.reduce((sum, game) => sum + game.time_elapsed, 0);
     const bestScore = Math.max(...gameHistory.map(game => game.score));
     

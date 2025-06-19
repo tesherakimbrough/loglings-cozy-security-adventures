@@ -63,7 +63,7 @@ const GameResults = ({ gameData, onRestart, userMode }: GameResultsProps) => {
 
   return (
     <div className="space-y-6">
-      <ConfettiCelebration trigger={gameData.accuracy >= 80} />
+      <ConfettiCelebration isActive={gameData.accuracy >= 80} />
       
       <Card className="cozy-card cozy-glow text-center">
         <CardHeader>
@@ -162,9 +162,7 @@ const GameResults = ({ gameData, onRestart, userMode }: GameResultsProps) => {
               Continue Journey 🌟
             </Button>
             <EnhancedSocialSharing 
-              score={gameData.score}
-              accuracy={gameData.accuracy}
-              mode={userMode}
+              gameData={gameData}
             />
           </div>
         </CardContent>
