@@ -3,7 +3,7 @@
 
 A magical, cozy cybersecurity learning game where you explore the enchanted forest while mastering threat detection and log analysis. Join the Loglings on their journey to protect the digital woodland!
 
-![Forest Badge](https://img.shields.io/badge/Status-Beta%20Grove-8bc97a)
+![Forest Badge](https://img.shields.io/badge/Status-Open%20Beta-8bc97a)
 ![Learning Badge](https://img.shields.io/badge/Learning-Cybersecurity-f6d976)
 ![Theme Badge](https://img.shields.io/badge/Theme-Cozy%20Forest-a8c2a0)
 ![Platform Badge](https://img.shields.io/badge/Platform-Web%20Browser-blue)
@@ -17,307 +17,440 @@ Loglings transforms the traditionally intimidating world of cybersecurity into a
 - 📊 Understand cybersecurity patterns
 - 🌱 Build confidence in digital security
 
-**Platform**: Web-based game accessible through any modern browser
-**Current Status**: Open Beta - Play immediately at [your-app-url.lovable.app](https://your-app-url.lovable.app)
+**Platform**: Web-based game accessible through any modern browser  
+**Current Status**: Open Beta - Play immediately!  
+**Perfect for**: Beginners and seasoned professionals who want a mindful approach to cybersecurity education
 
-Perfect for beginners and seasoned professionals who want a more mindful approach to cybersecurity education.
-
-## 🎮 How to Play Right Now
-
-### Instant Play (No Installation Required)
-1. Visit [your-app-url.lovable.app](https://your-app-url.lovable.app) in your web browser
-2. Choose your adventure mode:
-   - **🏠 Cozy Everyday**: Gentle learning with extended time limits
-   - **⚡ Forest Challenge**: Faster-paced scenarios for confident learners
-3. Start analyzing log entries and making security decisions
-4. Watch your forest grove grow as you learn!
-
-### What Happens When You Play
-Each scenario presents you with a realistic log entry like this:
-
-```
-🌲 Cozy Log Story Example:
 ---
-Time: 2024-01-15 14:23:07
-Source: web-server-01.enchanted-corp.com
-Event: Multiple failed login attempts detected
-User: admin@enchanted-corp.com
-IP: 192.168.1.100 (Internal Network)
-Attempts: 5 failed logins in 2 minutes
 
-Your forest wisdom is needed: Is this a threat? 🤔
+## 🎮 Quick Start for Players
+
+### Ready to Play Right Now?
+1. **Visit**: [your-lovable-app-url.lovable.app](https://your-lovable-app-url.lovable.app)
+2. **Choose Your Adventure**:
+   - 🏠 **Cozy Everyday**: Gentle learning with extended time limits (perfect for beginners)
+   - ⚡ **Forest Challenge**: Faster-paced scenarios for confident learners
+3. **Start Learning**: No signup required - jump right into your first cozy log adventure!
+
+### What Does Gameplay Look Like?
+
+Here's an example of what you'll encounter in the enchanted forest:
+
+```
+🌲 Cozy Log Story: "The Midnight Garden Visit"
+───────────────────────────────────────────────────
+
+🕐 Time: 2024-01-15 02:47:33
+🌐 Source: garden-gate.enchanted-corp.com  
+📝 Event: Login attempt
+👤 User: backup-admin
+🗺️ Location: Romania (IP: 203.0.113.42)
+📊 Details: SUCCESS after 15 failed attempts
+🕰️ Last seen: 45 days ago (usually works 9AM-5PM EST)
+
+Luna the Logling notices something unusual in the midnight garden...
+Someone has been trying to open the magical backup vault at a very 
+strange hour. The gate finally opened, but should Luna be worried?
+
+Your forest wisdom is needed: How suspicious is this? 🤔
+
+🟢 Low Risk - Just late-night maintenance
+🟡 Medium Risk - Unusual but might be normal  
+🟠 High Risk - Definitely needs investigation
+🔴 Critical Risk - Wake up the forest guardians!
 ```
 
-You'll assess the risk level and learn why certain patterns matter in cybersecurity.
+**What happens next?** You'll learn why certain patterns matter, get gentle feedback on your choice, and watch your forest knowledge grow with each scenario!
 
-## ✨ Forest Features
+---
 
-### 🎮 Core Gameplay
-- **Real Log Analysis**: Work with authentic cybersecurity scenarios
-- **Adaptive Difficulty**: The forest grows with you - scenarios adjust to your skill level
-- **Contextual Learning**: Real-world cybersecurity scenarios in a cozy setting
-- **Progressive Mastery**: Multiple difficulty levels from beginner to advanced
-- **Streak System**: Build momentum with consecutive correct answers
-
-### 🎨 Cozy Experience
-- **Forest Aesthetic**: Warm colors, gentle animations, and magical elements
-- **Ambient Audio**: Soothing forest sounds and cozy background music
-- **Accessibility**: Full keyboard navigation and screen reader support
-- **Mindful Design**: Stress-free learning environment
-
-### 📈 Progress & Growth
-- **Achievement System**: Unlock forest badges and celebrate milestones
-- **Daily Challenges**: Fresh scenarios to keep your skills sharp
-- **Learning Paths**: Guided journeys through cybersecurity topics
-- **Progress Tracking**: Visual representation of your forest journey
-
-## 🚀 Quick Start for Players
-
-### System Requirements
-- **Browser**: Chrome 80+, Firefox 75+, Safari 13+, or Edge 80+
-- **Internet**: Stable connection required
-- **Optional**: Headphones for full cozy audio experience
-
-### Getting Started
-1. **Play Now**: Visit the live game at [your-app-url.lovable.app](https://your-app-url.lovable.app)
-2. **Choose Your Path**: Select Cozy Everyday for gentle learning or Forest Challenge for faster gameplay
-3. **Complete Tutorial**: Follow the friendly Logling guides through your first scenarios
-4. **Track Progress**: Create an account to save your forest journey (optional)
-
-### Early Access & Waitlist
-- **Current Status**: Open Beta - anyone can play immediately
-- **Waitlist Benefits**: Join for updates on new features and premium content
-- **Premium Features**: Advanced learning paths and extended content library (coming soon)
-
-## 🛠️ Developer Setup
+## 🚀 Getting Started (Developers)
 
 ### Prerequisites
 - **Node.js**: Version 18 or higher ([Download here](https://nodejs.org/))
 - **Package Manager**: npm (included with Node.js) or bun
+- **Browser**: Modern browser for testing (Chrome 80+, Firefox 75+, Safari 13+)
 - **Supabase Account**: For backend features ([Sign up free](https://supabase.com))
 
-### Local Development Setup
+### 🛠️ Local Development Setup
 
 ```bash
-# 1. Clone the repository
+# 1. Clone the magical forest
 git clone <YOUR_GIT_URL>
-cd <YOUR_PROJECT_NAME>
+cd loglings-cozy-cybersecurity
 
-# 2. Install dependencies
+# 2. Install forest dependencies
 npm install
 
-# 3. Set up environment variables
+# 3. Set up your environment
 cp .env.example .env.local
 
-# 4. Configure Supabase (see Environment Setup below)
+# 4. Configure Supabase (see step-by-step guide below)
 # Edit .env.local with your Supabase credentials
 
-# 5. Start development server
+# 5. Start your local forest
 npm run dev
 
-# 6. Open your browser
+# 6. Open the enchanted portal
 # Navigate to http://localhost:8080
 ```
 
-### Environment Setup
+### 🔐 Environment Configuration
 
-Create a `.env.local` file with your Supabase configuration:
+Create a `.env.local` file in your project root:
 
 ```env
 VITE_SUPABASE_URL=your-supabase-project-url
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
 
-**Getting Supabase Credentials:**
-1. Create a free account at [supabase.com](https://supabase.com)
-2. Create a new project
-3. Go to Settings → API
-4. Copy your Project URL and anon public key
-5. Paste them into your `.env.local` file
+**Step-by-step Supabase setup:**
 
-### Database Setup
-The game uses Supabase for user profiles, progress tracking, and game sessions:
+1. **Create Account**: Visit [supabase.com](https://supabase.com) and sign up for free
+2. **New Project**: Click "New Project" and choose your organization
+3. **Project Settings**: Give it a cozy name like "loglings-forest"
+4. **Get Credentials**: 
+   - Go to Settings → API in your Supabase dashboard
+   - Copy your "Project URL" (starts with `https://`)
+   - Copy your "anon public" key (long string starting with `eyJ`)
+5. **Update Environment**: Paste both values into your `.env.local` file
+6. **Database Setup**: The app will automatically create needed tables on first run
 
-```sql
--- Key tables created automatically:
--- profiles: User information and preferences
--- user_progress: Learning progress and achievements  
--- game_sessions: Individual game session data
--- user_preferences: Audio, accessibility, and display settings
-```
+### 🌳 Tech Stack & Architecture
 
-Run the included Supabase migrations to set up the database schema.
-
-## 🌍 Deployment Options
-
-### Option 1: Quick Deploy with Lovable (Recommended)
-1. Open your [Lovable Project](https://lovable.dev/projects/df4af8dc-1c12-4dd5-bf66-0663e3f87d73)
-2. Click **Share → Publish**
-3. Your forest is live instantly! 🎉
-
-### Option 2: Self-Hosting
-Deploy the standard React app to any hosting platform:
-
-**Vercel:**
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-**Netlify:**
-```bash
-npm run build
-# Upload dist/ folder to Netlify
-```
-
-**Manual Deployment:**
-```bash
-npm run build
-# Upload dist/ folder to your web server
-```
-
-### Custom Domain Setup
-- **Lovable**: Connect custom domains in Project → Settings → Domains (requires paid plan)
-- **Self-hosted**: Configure DNS records with your hosting provider
-
-## 🛠️ Tech Forest
-
-Built with modern, cozy technologies:
-
+**Frontend Forest**:
 - **Framework**: React 18 with TypeScript
 - **Styling**: Tailwind CSS + Custom Cozy Theme
-- **UI Components**: Shadcn/ui for consistent design
-- **Build Tool**: Vite for fast development
-- **Backend**: Supabase (Authentication, Database, Real-time)
+- **UI Components**: Shadcn/ui for consistent forest design
+- **Build Tool**: Vite for lightning-fast development
+- **Routing**: React Router for forest navigation
+
+**Backend Woodland**:
+- **Database**: Supabase (PostgreSQL with real-time features)
+- **Authentication**: Supabase Auth (optional - guest play supported)
+- **File Storage**: Supabase Storage for assets
+- **API**: Supabase Edge Functions for custom logic
+
+**Cozy Extras**:
 - **Audio**: Howler.js for ambient forest sounds
-- **Charts**: Recharts for progress visualization
-- **Routing**: React Router for navigation
-- **State Management**: React Query for data fetching
+- **Charts**: Recharts for progress visualization  
+- **State Management**: React Query for smooth data fetching
+- **Animations**: Custom CSS animations for magical effects
 
-## 🎯 Learning Content
-
-### Scenario Types
-- **Authentication Logs**: Suspicious login patterns, brute force attempts
-- **Network Traffic**: Unusual connections, data exfiltration indicators
-- **System Events**: File modifications, privilege escalations
-- **Application Logs**: Error patterns, injection attempts
-- **Infrastructure**: Server health, performance anomalies
-
-### Example Learning Scenario
-
+**Architecture Overview**:
 ```
-🔍 Forest Scenario: "The Midnight Visitor"
-
-Log Entry:
-2024-01-15 02:47:33 | auth-server | LOGIN_ATTEMPT
-User: backup-admin | IP: 203.0.113.42 | Status: SUCCESS
-Previous failed attempts: 15 | Location: Romania
-Last successful login: 45 days ago | Normal hours: 9AM-5PM EST
-
-Your Assessment Options:
-🟢 Low Risk - Legitimate late-night maintenance
-🟡 Medium Risk - Unusual but potentially normal
-🟠 High Risk - Suspicious pattern requiring investigation
-🔴 Critical Risk - Likely security incident
-
-Learning Outcome: Understanding normal vs. abnormal user behavior patterns
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   React App     │───▶│   Supabase       │───▶│   Game Logic    │
+│   (Frontend)    │    │   (Backend)      │    │   (Scenarios)   │
+│                 │    │                  │    │                 │
+│ • Game UI       │    │ • User Profiles  │    │ • Log Analysis  │
+│ • Progress      │    │ • Progress Data  │    │ • Difficulty    │
+│ • Audio System  │    │ • Game Sessions  │    │ • Achievement   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 
-### Difficulty Progression
-- **Beginner Grove**: Clear indicators, guided explanations
-- **Learning Path**: Contextual hints and immediate feedback
-- **Forest Ranger**: Complex scenarios with multiple factors
-- **Master Guardian**: Real-world complexity and edge cases
+---
+
+## 🎯 How to Play
+
+### For Absolute Beginners
+- **No prior security knowledge needed!** The forest guides will teach you everything
+- **Start with "Cozy Everyday" mode** for gentle, extended time limits
+- **Read each scenario like a cozy story** - the context helps you learn
+- **Don't worry about getting answers wrong** - that's how the forest grows!
+
+### Learning Progression
+1. **Beginner Grove**: Clear indicators with detailed explanations
+2. **Learning Path**: Contextual hints with immediate feedback  
+3. **Forest Ranger**: Complex scenarios with multiple factors
+4. **Master Guardian**: Real-world complexity and edge cases
+
+### What You'll Learn
+- **Authentication Patterns**: Spotting unusual login behaviors
+- **Network Analysis**: Understanding traffic flows and anomalies
+- **System Events**: Recognizing file changes and privilege escalations
+- **Application Security**: Identifying injection attempts and errors
+- **Risk Assessment**: Developing intuition for threat levels
+
+### Educational Value
+These aren't made-up scenarios - they're based on **real security incidents** from actual enterprise environments, carefully adapted into cozy stories. You'll learn genuine skills that transfer directly to:
+- SOC (Security Operations Center) analyst roles
+- IT security positions  
+- General cybersecurity awareness
+- Digital literacy and safety
+
+---
 
 ## 🤝 Contributing to the Forest
 
-### For Players
-- **Bug Reports**: Use the in-game feedback system
-- **Feature Requests**: Share ideas through the feedback collection
-- **Beta Testing**: Help us improve through active play and feedback
+### 🌱 For New Contributors
 
-### For Developers
+We'd love your help growing our cozy forest! Here's how to get involved:
+
 ```bash
-# Development workflow
-git checkout -b feature/your-feature-name
+# 1. Fork the repository on GitHub
+# 2. Clone your fork locally
+git clone https://github.com/YOUR-USERNAME/loglings-cozy-cybersecurity.git
+
+# 3. Create a feature branch
+git checkout -b feature/your-cozy-feature
+
+# 4. Make your changes and test locally
 npm run dev
-# Make your changes
-npm run build  # Ensure it builds
-npm run test   # Run any tests
-git commit -m "Add cozy feature"
-git push origin feature/your-feature-name
-# Create pull request
+
+# 5. Commit with descriptive messages
+git commit -m "Add cozy feature: gentle log tooltips"
+
+# 6. Push to your fork and create a Pull Request
+git push origin feature/your-cozy-feature
 ```
 
-### Content Creators
-Help expand our scenario library:
-- Create realistic log scenarios
-- Develop learning paths for specific topics
-- Contribute to accessibility features
-- Enhance cozy aesthetic elements
+### 🎨 Ways to Contribute
 
-## 📖 Documentation & Support
+**For Developers**:
+- 🐛 Fix bugs and improve performance
+- ✨ Add new cozy UI features  
+- 🎵 Enhance audio and visual effects
+- ♿ Improve accessibility features
+- 📱 Optimize mobile experience
 
-- **Player Guide**: [In-game tutorial and help system]
-- **Developer Docs**: [Lovable Platform Documentation](https://docs.lovable.dev/)
-- **API Reference**: Check `src/types/` for TypeScript definitions
-- **Community Support**: [Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
+**For Security Professionals**:
+- 📝 Create realistic log scenarios
+- 🎓 Develop learning paths for specific topics
+- 🔍 Review content for technical accuracy
+- 📚 Suggest new cybersecurity concepts to cover
 
-### Troubleshooting Common Issues
+**For Designers & Artists**:
+- 🎨 Enhance cozy aesthetic elements
+- 🌿 Create new forest characters and elements
+- 🎪 Design achievement badges and celebrations
+- 📱 Improve user experience flows
+
+**For Educators**:
+- 🏫 Develop curriculum integration guides
+- 📖 Create lesson plans around scenarios
+- 🎯 Design assessment rubrics
+- 👥 Suggest classroom-friendly features
+
+### 📋 Contribution Guidelines
+
+**Code Style**:
+- TypeScript for all new code
+- Follow existing naming conventions (`camelCase` for variables, `PascalCase` for components)
+- Use Tailwind CSS classes for styling
+- Keep components small and focused (under 100 lines when possible)
+
+**Cozy Principles**:
+- Maintain welcoming, non-intimidating language
+- Ensure accessibility (screen readers, keyboard navigation)
+- Test on mobile devices
+- Keep loading times fast for a smooth experience
+
+**Before Submitting**:
+- [ ] Test your changes locally (`npm run dev`)
+- [ ] Ensure the app builds without errors (`npm run build`)
+- [ ] Check for TypeScript errors
+- [ ] Test core functionality (gameplay, navigation, audio)
+- [ ] Write clear commit messages
+
+For detailed guidelines, see our [CONTRIBUTING.md](./CONTRIBUTING.md) *(coming soon!)*
+
+---
+
+## 🌍 Community & Support
+
+### Join Our Cozy Community!
+
+- 💬 **Discord**: [Lovable Community](https://discord.com/channels/1119885301872070706/1280461670979993613) - Chat with other forest adventurers!
+- 🐙 **GitHub**: [Issues & Discussions](https://github.com/your-username/loglings) - Report bugs or suggest features
+- 🐦 **Updates**: Follow our progress and announcements *(coming soon!)*
+- 📧 **Direct Contact**: Reach out through the in-game feedback system
+
+### Getting Help
+
+**For Players**:
+- Use the in-game help system (🌿 icon in top-right)
+- Check our [FAQ section](#faq) below
+- Ask questions in our Discord community
+
+**For Developers**:
+- Review the [troubleshooting section](#troubleshooting) below
+- Check existing GitHub issues before creating new ones
+- Join our Discord for real-time development chat
+- Read the [Lovable Platform Documentation](https://docs.lovable.dev/)
+
+### Feedback & Bug Reports
+
+We treasure your feedback! Here's how to share it:
+
+- **In-Game**: Use the feedback button (preferred for gameplay issues)
+- **GitHub Issues**: For technical problems or feature requests
+- **Discord**: For community discussion and quick questions
+- **Email**: For sensitive issues or partnership inquiries
+
+---
+
+## 📊 Roadmap & Future Plans
+
+### Currently Growing 🌱
+- ✅ **Core Gameplay**: Fully functional log analysis scenarios
+- ✅ **Cozy Experience**: Complete aesthetic and audio system  
+- ✅ **Progress Tracking**: User accounts and achievement system
+- ✅ **Accessibility**: Keyboard navigation and screen reader support
+
+### Coming Soon 🌸
+- 🚧 **Mobile Optimization**: Enhanced touch experience
+- 🚧 **Advanced Learning Paths**: Specialized security tracks
+- 🚧 **Multiplayer Features**: Collaborative forest exploration
+- 🚧 **Content Creator Tools**: Build your own scenarios
+
+### Future Forest Expansion 🌳
+- 📋 **Enterprise Features**: Classroom management and analytics
+- 📋 **Advanced Analytics**: Detailed learning insights
+- 📋 **API Access**: Integration with learning management systems
+- 📋 **Certification Paths**: Official cybersecurity skill validation
+
+### Community Wishlist 💝
+*What features would you love to see? Let us know in Discord or GitHub discussions!*
+
+---
+
+## ❓ FAQ
+
+**Q: Do I need cybersecurity experience to play?**  
+A: Not at all! The game is designed for complete beginners. Your forest guides will teach you everything you need to know.
+
+**Q: Is this a real learning tool or just for fun?**  
+A: Both! While the presentation is cozy and fun, you'll learn genuine cybersecurity skills used by professionals every day.
+
+**Q: How long is a typical play session?**  
+A: Sessions are flexible! You can play for 5 minutes or 5 hours. "Cozy Everyday" mode is perfect for short, relaxed sessions.
+
+**Q: Can I play with friends?**  
+A: Currently it's single-player, but multiplayer forest exploration is on our roadmap!
+
+**Q: Is my progress saved?**  
+A: Yes! Create an account to save progress across devices, or play as a guest with local browser storage.
+
+**Q: Does it work on mobile?**  
+A: Yes! The game works on mobile browsers, with enhanced mobile experience coming soon.
+
+**Q: Is it really free?**  
+A: The core game is completely free! We're exploring optional premium content for advanced learners.
+
+---
+
+## 🛠️ Troubleshooting
+
+### Common Player Issues
 
 **Game won't load:**
-- Check browser compatibility (Chrome 80+, Firefox 75+)
-- Disable ad blockers temporarily
-- Clear browser cache and cookies
+```bash
+# Check browser compatibility (Chrome 80+, Firefox 75+, Safari 13+)
+# Disable ad blockers temporarily  
+# Clear browser cache and refresh
+```
 
 **Audio not working:**
-- Check browser audio permissions
-- Ensure autoplay is enabled for the site
-- Try refreshing the page
+```bash
+# Check browser audio permissions
+# Ensure autoplay is enabled for the site
+# Try refreshing the page
+# Check system volume settings
+```
 
 **Progress not saving:**
-- Create an account for persistent progress
-- Check internet connection
-- Verify Supabase connection in developer tools
+```bash
+# Create an account for persistent progress
+# Check internet connection
+# Verify cookies are enabled
+```
 
-## 🌟 Community & Support
+### Common Developer Issues
 
-- **Discord**: [Lovable Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
-- **Bug Reports**: In-game feedback system or GitHub Issues
-- **Feature Requests**: Community Discord or feedback system
-- **Developer Support**: Lovable documentation and community
+**Build fails after git pull:**
+```bash
+# Clear node modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
 
-## 📊 Project Status
+**Supabase connection errors:**
+```bash
+# Verify .env.local file exists and has correct format
+# Check Supabase project status at supabase.com
+# Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set
+# Try regenerating anon key in Supabase dashboard
+```
 
-- ✅ **Core Gameplay**: Fully functional log analysis scenarios
-- ✅ **Cozy Experience**: Complete aesthetic and audio system
-- ✅ **Progress Tracking**: User accounts and achievement system
-- 🚧 **Premium Features**: Advanced learning paths (in development)
-- 🚧 **Mobile Optimization**: Enhanced mobile experience (coming soon)
-- 📋 **Planned**: Multiplayer forest exploration, advanced analytics
+**TypeScript errors:**
+```bash
+# Update TypeScript and restart your editor
+npm install typescript@latest
+# Check for missing type definitions
+npm install @types/node --save-dev
+```
 
-## 📄 License
+**Performance issues:**
+```bash
+# Check browser dev tools for console errors
+# Disable browser extensions temporarily
+# Close other resource-intensive applications
+# Try incognito/private browsing mode
+```
+
+---
+
+## 🌟 Project Origin & Vision
+
+### Why Loglings Exists
+
+After years in cybersecurity, I (Teshera) noticed something troubling: too many brilliant minds were intimidated away from our field by harsh, unwelcoming learning environments. Security is often taught through fear, complexity, and stress - but it doesn't have to be.
+
+**The Vision**: Create a space where learning cybersecurity feels like coming home to a warm fireplace. Where making mistakes is part of the journey, not a failure. Where complex concepts are wrapped in gentle stories that make them approachable and memorable.
+
+**The Mission**: Make cybersecurity education accessible to everyone, regardless of background, by combining professional-grade learning with cozy game design.
+
+### Community Values
+
+Our forest thrives on these principles:
+- 🌱 **Growth over Perfection**: Mistakes help us learn
+- 🤗 **Inclusion over Intimidation**: Everyone belongs here  
+- 🧠 **Understanding over Memorization**: We build intuition, not just knowledge
+- 💚 **Support over Competition**: We grow together
+- ✨ **Joy over Stress**: Learning should spark curiosity, not anxiety
+
+---
+
+## 📄 License & Attribution
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🙏 Acknowledgments
+### 🙏 Acknowledgments
 
-- **Lovable Platform** - Making cozy development possible
-- **Supabase** - Powering our backend forest infrastructure  
-- **Forest Community** - Beta testers and feedback providers
-- **Cybersecurity Educators** - Inspiring accessible security education
-- **Open Source Contributors** - Building a better digital forest together
+- **Lovable Platform** - Making cozy development accessible and joyful
+- **Supabase** - Powering our backend forest infrastructure seamlessly
+- **Open Source Community** - Building the tools that make magic possible
+- **Beta Forest Explorers** - Our brave early players providing invaluable feedback
+- **Cybersecurity Educators** - Inspiring us to make security education more accessible
+- **Cozy Game Community** - Showing us that games can be both relaxing and meaningful
+
+### Special Thanks
+
+To every security professional who's ever thought "there has to be a gentler way to teach this" - this project is for you, and because of you.
 
 ---
 
 <div align="center">
 
-**Ready to begin your forest journey?** 🌱
+**Ready to begin your cozy cybersecurity journey?** 🌱
 
-[🎮 Start Playing Now](https://your-app-url.lovable.app) | [📧 Join Updates](./src/pages/Waitlist.tsx) | [💻 Contribute](./CONTRIBUTING.md)
+[🎮 Start Playing Now](https://your-lovable-app-url.lovable.app) | [💬 Join Discord](https://discord.com/channels/1119885301872070706/1280461670979993613) | [🛠️ Contribute on GitHub](https://github.com/your-username/loglings)
 
-*Made with 🌿 for a more accessible cybersecurity world*
+*Made with 🌿 and endless cups of tea for a more accessible cybersecurity world*
 
-**Version**: Beta Grove | **Last Updated**: December 2024
+**Version**: Open Beta Forest | **Last Updated**: December 2024  
+**Creator**: [Teshera Kimbrough](https://github.com/your-profile) | **Platform**: [Lovable](https://lovable.dev)
 
 </div>
