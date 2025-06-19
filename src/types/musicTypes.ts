@@ -1,5 +1,5 @@
 
-export type MusicType = 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence' | 'external';
+export type MusicType = 'forest' | 'rain' | 'cozy-cafe' | 'fireplace' | 'lofi' | 'silence' | 'external';
 
 export interface AudioTrack {
   id: MusicType;
@@ -7,4 +7,13 @@ export interface AudioTrack {
   emoji: string;
   description: string;
   audioUrl: string;
+}
+
+export interface AudioPreset {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  tracks: MusicType[];
+  volumes: Record<string, number>;
 }
