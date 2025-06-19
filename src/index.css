@@ -1,5 +1,6 @@
-
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -31,6 +32,23 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+    
+    /* Cozy Forest Colors */
+    --forest-night: #1a2520;
+    --tree-shadow: #2d3b32;
+    --moss-glow: #8bc97a;
+    --firefly-light: #f6d976;
+    --sage-whisper: #a8c2a0;
+    --forest-breath: #f0f8f0;
+    --leaf-glow: #c8e6c0;
+    --spring-moss: #9dd189;
+    --warm-amber: #e8c076;
+    --sunset-peach: #f4c2a0;
+    --berry-blush: #e6a4b8;
+    --moonbeam: #f8f8f6;
+    --text-primary: #2d3b32;
+    --text-cozy: #5a7060;
+    --text-whisper: #8a9690;
   }
 
   .dark {
@@ -58,6 +76,23 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    
+    /* Dark mode cozy colors */
+    --forest-night: #0f1512;
+    --tree-shadow: #1a2520;
+    --moss-glow: #7ab86a;
+    --firefly-light: #f2d46b;
+    --sage-whisper: #98b690;
+    --forest-breath: #1e2a24;
+    --leaf-glow: #6ea060;
+    --spring-moss: #85c275;
+    --warm-amber: #d4b066;
+    --sunset-peach: #e0b090;
+    --berry-blush: #d094a8;
+    --moonbeam: #2a3530;
+    --text-primary: #e8f0e8;
+    --text-cozy: #c8d8c8;
+    --text-whisper: #a8b8a8;
   }
 }
 
