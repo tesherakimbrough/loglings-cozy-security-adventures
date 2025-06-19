@@ -57,5 +57,14 @@ export const audioTracks: AudioTrack[] = [
 export const audioCredits = {
   main: 'Audio temporarily using test sounds - working on implementing proper ambient tracks',
   note: 'We are working on integrating high-quality ambient audio from trusted royalty-free sources',
-  licensing: 'All audio will be used under Creative Commons licenses - safe for commercial and open-source use'
+  licensing: 'All audio will be used under Creative Commons licenses - safe for commercial and open-source use',
+  freesound: {
+    rain: 'Rain: "Gentle Rain" by InspectorJ (freesound.org), CC BY 3.0',
+    forest: 'Forest: "Early Morning Forest Ambience" by klankbeeld (freesound.org), CC BY 3.0',
+    coffeeshop: 'Coffee Shop: "Coffee Shop" by Benboncan (freesound.org), CC0',
+    fireplace: 'Fireplace: "Fireplace Crackling" by klankbeeld (freesound.org), CC BY 3.0'
+  },
+  opengameart: {
+    lofi: 'Lo-fi Loop: "Lofi Chillhop Loop" by user yniprint (opengameart.org), CC0'
+  }
 };
