@@ -68,9 +68,25 @@ export const useAmbientMusic = () => {
     return audioTracks.find(track => track.id === currentTrack) || audioTracks[0];
   };
 
-  const playTrack = async (trackId: MusicType, newVolume: number = volume) => {
+  const stopMusic = async (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (audioRef.current) {
+        const audio = audioRef.current;
+        audio.pause();
+        audio.currentTime = 0;
+        audioRef.current = null;
+      }
+      setIsPlaying(false);
+      setIsLoading(false);
+      resolve();
+    });
+  };
+
+  const playTrack = async (trackId: MusicType, newVolume: number = volume): Promise<void> => {
+    console.log('Playing track:', trackId, 'volume:', newVolume);
+    
     if (trackId === 'silence') {
-      stopMusic();
+      await stopMusic();
       setCurrentTrack(trackId);
       return;
     }
@@ -78,89 +94,41 @@ export const useAmbientMusic = () => {
     setIsLoading(true);
     
     try {
-      // Fade out current track
-      if (audioRef.current && isPlaying) {
-        await fadeOut();
-      }
+      // Stop current track
+      await stopMusic();
 
       // Load new track
       const track = audioTracks.find(t => t.id === trackId);
       if (track && track.audioData) {
-        audioRef.current = new Audio(track.audioData);
-        audioRef.current.loop = true;
-        audioRef.current.volume = 0;
+        const audio = new Audio(track.audioData);
+        audio.loop = true;
+        audio.volume = newVolume;
         
-        const audio = audioRef.current;
+        audioRef.current = audio;
         
         audio.addEventListener('canplaythrough', () => {
           setIsLoading(false);
           setCurrentTrack(trackId);
-          fadeIn(newVolume);
+          setIsPlaying(true);
+          setVolume(newVolume);
         });
 
-        audio.addEventListener('ended', () => setIsPlaying(false));
+        audio.addEventListener('ended', () => {
+          setIsPlaying(false);
+        });
+
+        audio.addEventListener('error', (e) => {
+          console.warn('Audio error:', e);
+          setIsLoading(false);
+          setIsPlaying(false);
+        });
         
         await audio.play();
       }
     } catch (error) {
       console.warn('Audio playback failed:', error);
       setIsLoading(false);
-    }
-  };
-
-  const fadeIn = (targetVolume: number) => {
-    if (!audioRef.current) return;
-    
-    setIsPlaying(true);
-    const audio = audioRef.current;
-    const steps = 20;
-    const volumeIncrement = targetVolume / steps;
-    let currentStep = 0;
-
-    const fadeInterval = setInterval(() => {
-      if (currentStep >= steps || !audio) {
-        clearInterval(fadeInterval);
-        return;
-      }
-      
-      audio.volume = Math.min(volumeIncrement * currentStep, targetVolume);
-      currentStep++;
-    }, 50);
-  };
-
-  const fadeOut = (): Promise<void> => {
-    return new Promise((resolve) => {
-      if (!audioRef.current) {
-        resolve();
-        return;
-      }
-
-      const audio = audioRef.current;
-      const steps = 20;
-      const volumeDecrement = audio.volume / steps;
-      let currentStep = 0;
-
-      const fadeInterval = setInterval(() => {
-        if (currentStep >= steps || !audio) {
-          clearInterval(fadeInterval);
-          if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-          }
-          setIsPlaying(false);
-          resolve();
-          return;
-        }
-        
-        audio.volume = Math.max(audio.volume - volumeDecrement, 0);
-        currentStep++;
-      }, 50);
-    });
-  };
-
-  const stopMusic = async () => {
-    if (audioRef.current && isPlaying) {
-      await fadeOut();
+      setIsPlaying(false);
     }
   };
 
@@ -173,9 +141,13 @@ export const useAmbientMusic = () => {
 
   const playSuccessSound = () => {
     // Simple success chime that plays over the ambient music
-    const successAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ');
-    successAudio.volume = 0.6;
-    successAudio.play().catch(console.warn);
+    try {
+      const successAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ');
+      successAudio.volume = 0.6;
+      successAudio.play().catch(console.warn);
+    } catch (error) {
+      console.warn('Success sound failed:', error);
+    }
   };
 
   // Cleanup on unmount
@@ -186,6 +158,7 @@ export const useAmbientMusic = () => {
       }
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current = null;
       }
     };
   }, []);

@@ -18,18 +18,24 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     currentTrack,
     isPlaying,
     isLoading,
-    volume,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
     updateVolume
   } = useAmbientMusic();
 
-  const [previewTrack, setPreviewTrack] = useState<MusicType | null>(null);
-
   const handleTrackSelect = async (trackId: MusicType) => {
-    await playTrack(trackId, progress.preferences.musicVolume);
+    // Update preferences first
     updatePreferences({ musicType: trackId });
+    
+    // If selecting silence, stop music
+    if (trackId === 'silence') {
+      await stopMusic();
+      return;
+    }
+    
+    // Play the selected track
+    await playTrack(trackId, progress.preferences.musicVolume);
   };
 
   const handleVolumeChange = (newVolume: number[]) => {
@@ -38,11 +44,14 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     updatePreferences({ musicVolume: volumeValue });
   };
 
-  const togglePlayPause = () => {
+  const togglePlayPause = async () => {
     if (isPlaying) {
-      stopMusic();
+      await stopMusic();
     } else {
-      playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
+      // Only play if not silence
+      if (progress.preferences.musicType !== 'silence') {
+        await playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
+      }
     }
   };
 
@@ -102,13 +111,15 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         </div>
 
         {/* Currently Playing */}
-        {currentTrack !== 'silence' && (
+        {progress.preferences.musicType !== 'silence' && (
           <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
             <div className="flex items-center gap-2">
               <span className="text-lg">{currentTrackInfo.emoji}</span>
               <div>
                 <div className="font-medium text-sm">{currentTrackInfo.name}</div>
-                <div className="text-xs text-muted-foreground">{currentTrackInfo.description}</div>
+                <div className="text-xs text-muted-foreground">
+                  {isPlaying ? 'Now playing' : 'Ready to play'}
+                </div>
               </div>
             </div>
           </div>
@@ -119,7 +130,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           {audioTracks.map((track) => (
             <Button
               key={track.id}
-              variant={currentTrack === track.id ? "default" : "outline"}
+              variant={progress.preferences.musicType === track.id ? "default" : "outline"}
               size="sm"
               onClick={() => handleTrackSelect(track.id)}
               className="h-auto p-3 flex flex-col items-center gap-1 cozy-card hover:scale-105 transition-all"
@@ -136,6 +147,9 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
             <div className="flex items-center gap-2 text-sm">
               <Volume2 className="w-4 h-4" />
               <span>Music Volume</span>
+              <span className="text-xs text-muted-foreground ml-auto">
+                {Math.round(progress.preferences.musicVolume * 100)}%
+              </span>
             </div>
             <Slider
               value={[progress.preferences.musicVolume]}

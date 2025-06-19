@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2 } from 'lucide-react';
 import { useAmbientMusic } from '../hooks/useAmbientMusic';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
-import MusicSelector from './MusicSelector';
 
 const MusicControlBar = () => {
   const { progress } = useEnhancedProgress();
@@ -24,15 +23,15 @@ const MusicControlBar = () => {
     }
   }, [progress.preferences.audioEnabled, progress.preferences.musicType]);
 
-  const togglePlayPause = () => {
+  const togglePlayPause = async () => {
     if (isPlaying) {
-      stopMusic();
+      await stopMusic();
     } else if (progress.preferences.musicType !== 'silence') {
-      playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
+      await playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
     }
   };
 
-  if (!progress.preferences.audioEnabled) {
+  if (!progress.preferences.audioEnabled || progress.preferences.musicType === 'silence') {
     return null;
   }
 
@@ -47,7 +46,7 @@ const MusicControlBar = () => {
               variant="outline"
               size="sm"
               onClick={togglePlayPause}
-              disabled={isLoading || currentTrack === 'silence'}
+              disabled={isLoading}
               className="cozy-card"
             >
               {isLoading ? (
@@ -63,9 +62,9 @@ const MusicControlBar = () => {
               <span className="text-lg">{currentTrackInfo.emoji}</span>
               <div className="hidden sm:block">
                 <div className="text-sm font-medium">{currentTrackInfo.name}</div>
-                {isPlaying && (
-                  <div className="text-xs text-muted-foreground">Now playing</div>
-                )}
+                <div className="text-xs text-muted-foreground">
+                  {isPlaying ? 'Now playing' : 'Ready to play'}
+                </div>
               </div>
             </div>
           </div>
