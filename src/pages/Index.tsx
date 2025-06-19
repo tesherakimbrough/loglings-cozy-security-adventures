@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import GameIntro from '../components/GameIntro';
 import GamePlay from '../components/GamePlay';
@@ -7,7 +6,6 @@ import MusicControlBar from '../components/MusicControlBar';
 import OnboardingModal from '../components/OnboardingModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorBoundary from '../components/ErrorBoundary';
-import EarlyAccessBanner from '../components/EarlyAccessBanner';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { useMobileOptimization } from '../hooks/useMobileOptimization';
@@ -110,15 +108,6 @@ const Index = () => {
       {shouldShowMobileWarning && (
         <div className="fixed top-0 left-0 right-0 bg-yellow-100 border-b border-yellow-300 p-2 text-center text-sm text-yellow-800 z-50">
           For the best experience, please rotate your device to portrait mode
-        </div>
-      )}
-
-      {/* Early Access Banner */}
-      {gameState === 'intro' && (
-        <div className="relative z-20 p-4">
-          <ErrorBoundary fallback={<div>Error loading banner</div>}>
-            <EarlyAccessBanner />
-          </ErrorBoundary>
         </div>
       )}
 
