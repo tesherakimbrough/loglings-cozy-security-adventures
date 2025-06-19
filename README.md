@@ -1,4 +1,5 @@
-# 🌱 Loglings: Cozy Cybersecurity Forest 🌿
+
+# 🌱 Loglings: Cozy Cybersecurity Adventures 🌿
 
 A magical, cozy cybersecurity learning game where you explore the enchanted forest while mastering threat detection and log analysis. Join the Loglings on their journey to protect the digital woodland!
 
