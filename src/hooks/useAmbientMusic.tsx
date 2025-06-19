@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 
 export type MusicType = 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence' | 'external';
@@ -108,7 +109,7 @@ const generateFallbackAudio = (trackId: MusicType, audioContext: AudioContext) =
   const sources: AudioScheduledSourceNode[] = [];
   let noiseSource: AudioBufferSourceNode | null = null;
 
-  const cleanup = () => {
+  let cleanup = () => {
     sources.forEach(source => {
       try { 
         source.stop(); 
