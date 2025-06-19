@@ -26,7 +26,7 @@ Loglings transforms the traditionally intimidating world of cybersecurity into a
 ## 🎮 Quick Start for Players
 
 ### Ready to Play Right Now?
-1. **Visit**: [your-lovable-app-url.lovable.app](https://your-lovable-app-url.lovable.app)
+1. **Visit**: [loglings.lovable.app](https://loglings.lovable.app)
 2. **Choose Your Adventure**:
    - 🏠 **Cozy Everyday**: Gentle learning with extended time limits (perfect for beginners)
    - ⚡ **Forest Challenge**: Faster-paced scenarios for confident learners
