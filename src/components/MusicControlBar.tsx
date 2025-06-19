@@ -1,5 +1,4 @@
 
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2 } from 'lucide-react';
 import { useAmbientMusic } from '../hooks/useAmbientMusic';
@@ -8,7 +7,6 @@ import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 const MusicControlBar = () => {
   const { progress } = useEnhancedProgress();
   const {
-    currentTrack,
     isPlaying,
     isLoading,
     hasUserInteracted,
@@ -17,29 +15,22 @@ const MusicControlBar = () => {
     stopMusic
   } = useAmbientMusic();
 
-  // Only auto-start music after user has interacted with the page
-  useEffect(() => {
-    if (hasUserInteracted && 
-        progress.preferences.audioEnabled && 
-        progress.preferences.musicType !== 'silence' && 
-        !isPlaying) {
-      playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
-    }
-  }, [hasUserInteracted, progress.preferences.audioEnabled, progress.preferences.musicType]);
-
   const togglePlayPause = async () => {
     if (isPlaying) {
       await stopMusic();
-    } else if (progress.preferences.musicType !== 'silence') {
+    } else if (progress.preferences.musicType !== 'silence' && progress.preferences.musicType !== 'external') {
       await playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
     }
   };
 
-  if (!progress.preferences.audioEnabled || progress.preferences.musicType === 'silence') {
+  // Don't show control bar for silence or external music
+  if (!progress.preferences.audioEnabled || 
+      progress.preferences.musicType === 'silence' || 
+      progress.preferences.musicType === 'external') {
     return null;
   }
 
-  const currentTrackInfo = getCurrentTrackInfo();
+  const currentTrackInfo = getCurrentTrackInfo(progress.preferences.musicType);
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-40">

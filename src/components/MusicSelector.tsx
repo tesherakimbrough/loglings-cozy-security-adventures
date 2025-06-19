@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2 } from 'lucide-react';
+import { Play, Pause, Volume2, AlertCircle } from 'lucide-react';
 import { useAmbientMusic, MusicType } from '../hooks/useAmbientMusic';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 
@@ -15,37 +15,24 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
   const { progress, updatePreferences } = useEnhancedProgress();
   const {
     audioTracks,
-    currentTrack,
     isPlaying,
     isLoading,
-    useExternalMusic,
     usingFallback,
+    error,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
-    updateVolume,
-    openExternalMusicInstructions
+    updateVolume
   } = useAmbientMusic();
 
   const handleTrackSelect = async (trackId: MusicType) => {
     // Update preferences first
     updatePreferences({ musicType: trackId });
     
-    // If selecting silence, stop music
-    if (trackId === 'silence') {
+    // Don't auto-play, let user click play button
+    if (isPlaying) {
       await stopMusic();
-      return;
     }
-    
-    // If selecting external music, show instructions
-    if (trackId === 'external') {
-      await stopMusic();
-      openExternalMusicInstructions();
-      return;
-    }
-    
-    // Play the selected track
-    await playTrack(trackId, progress.preferences.musicVolume);
   };
 
   const handleVolumeChange = (newVolume: number[]) => {
@@ -58,14 +45,13 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     if (isPlaying) {
       await stopMusic();
     } else {
-      // Only play if not silence
       if (progress.preferences.musicType !== 'silence') {
         await playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
       }
     }
   };
 
-  const currentTrackInfo = getCurrentTrackInfo();
+  const currentTrackInfo = getCurrentTrackInfo(progress.preferences.musicType);
 
   if (compact) {
     return (
@@ -120,6 +106,16 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           </Button>
         </div>
 
+        {/* Error Display */}
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="flex items-center gap-2 text-sm text-red-700 dark:text-red-300">
+              <AlertCircle className="w-4 h-4" />
+              <span>{error}</span>
+            </div>
+          </div>
+        )}
+
         {/* Currently Playing */}
         {progress.preferences.musicType !== 'silence' && (
           <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
@@ -131,8 +127,8 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
                   {progress.preferences.musicType === 'external' 
                     ? 'Using external music app' 
                     : isPlaying 
-                      ? usingFallback ? 'Generated ambient audio' : 'Now playing'
-                      : 'Ready to play'}
+                      ? 'Playing generated ambient audio'
+                      : 'Click play to start'}
                 </div>
               </div>
             </div>
@@ -180,8 +176,8 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         {usingFallback && progress.preferences.musicType !== 'external' && isPlaying && (
           <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
             <div className="text-sm text-green-700 dark:text-green-300">
-              <p className="font-medium mb-1">🎶 Enhanced Audio</p>
-              <p className="text-xs">Playing procedurally generated ambient sounds - completely DMCA-safe!</p>
+              <p className="font-medium mb-1">🎶 DMCA-Safe Audio</p>
+              <p className="text-xs">Playing procedurally generated ambient sounds - completely copyright-free!</p>
             </div>
           </div>
         )}

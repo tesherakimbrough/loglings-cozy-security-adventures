@@ -1,29 +1,26 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { MusicType } from '../types/musicTypes';
 import { audioTracks } from '../config/audioTracks';
 import { generateFallbackAudio } from '../utils/fallbackAudio';
-import { playSuccessSound } from '../utils/successSound';
 
 export type { MusicType } from '../types/musicTypes';
 
 export const useAmbientMusic = () => {
-  const [currentTrack, setCurrentTrack] = useState<MusicType>('forest');
   const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.3);
   const [isLoading, setIsLoading] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const [useExternalMusic, setUseExternalMusic] = useState(false);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fallbackAudioRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
 
-  const getCurrentTrackInfo = () => {
-    return audioTracks.find(track => track.id === currentTrack) || audioTracks[0];
+  const getCurrentTrackInfo = (trackId: MusicType) => {
+    return audioTracks.find(track => track.id === trackId) || audioTracks[0];
   };
 
-  const stopMusic = async (): Promise<void> => {
+  const stopMusic = useCallback(async (): Promise<void> => {
     return new Promise((resolve) => {
       // Stop HTML audio
       if (audioRef.current) {
@@ -41,139 +38,98 @@ export const useAmbientMusic = () => {
       setIsPlaying(false);
       setIsLoading(false);
       setUsingFallback(false);
+      setError(null);
       resolve();
     });
-  };
+  }, []);
 
-  const openExternalMusicInstructions = () => {
-    const instructions = `
-To use your own music:
+  const createAudioContext = useCallback(async (): Promise<AudioContext | null> => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      
+      if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+      
+      return audioContextRef.current;
+    } catch (error) {
+      console.warn('Failed to create audio context:', error);
+      setError('Audio not supported in this browser');
+      return null;
+    }
+  }, []);
 
-1. **Apple Music**: 
-   - Open Apple Music app or website
-   - Play your preferred playlist or album
-   - Return to this app and select "Your Music"
-
-2. **Spotify**: 
-   - Open Spotify app or website
-   - Play your preferred playlist or album
-   - Return to this app and select "Your Music"
-
-3. **Other Music Apps**: 
-   - Start playing music in any app
-   - Return to this app and select "Your Music"
-
-The ambient sounds will pause while you use external music.
-    `;
-    
-    alert(instructions);
-  };
-
-  const playTrack = async (trackId: MusicType, newVolume: number = volume): Promise<void> => {
-    console.log('Playing track:', trackId, 'volume:', newVolume);
+  const playTrack = useCallback(async (trackId: MusicType, volume: number = 0.3): Promise<void> => {
+    console.log('Playing track:', trackId, 'volume:', volume);
+    setError(null);
     
     if (trackId === 'silence') {
       await stopMusic();
-      setCurrentTrack(trackId);
       return;
     }
 
     if (trackId === 'external') {
       await stopMusic();
-      setCurrentTrack(trackId);
-      setUseExternalMusic(true);
-      openExternalMusicInstructions();
+      const instructions = `
+To use your own music:
+
+1. **Apple Music**: Open Apple Music app/website and play your playlist
+2. **Spotify**: Open Spotify app/website and play your playlist  
+3. **Other Music Apps**: Start playing music in any app
+
+Then return to this app. The ambient sounds will pause while you use external music.
+      `;
+      alert(instructions);
       return;
     }
 
     setIsLoading(true);
-    setUseExternalMusic(false);
+    setHasUserInteracted(true);
     
     try {
       await stopMusic();
-      setHasUserInteracted(true);
 
       const trackInfo = audioTracks.find(track => track.id === trackId);
-      if (!trackInfo || !trackInfo.audioUrl) {
-        throw new Error('No audio URL available');
+      if (!trackInfo) {
+        throw new Error('Track not found');
       }
 
-      // Try to use real audio first (will likely fail with our dummy URLs)
-      try {
-        const audio = new Audio();
-        audio.crossOrigin = 'anonymous';
-        audio.loop = true;
-        audio.volume = newVolume;
-        
-        await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Audio load timeout')), 5000);
-          
-          audio.onloadeddata = () => {
-            clearTimeout(timeout);
-            resolve(audio);
-          };
-          
-          audio.onerror = () => {
-            clearTimeout(timeout);
-            reject(new Error('Audio load failed'));
-          };
-          
-          audio.src = trackInfo.audioUrl;
-          audio.load();
-        });
-
-        audioRef.current = audio;
-        await audio.play();
-        setUsingFallback(false);
-        console.log('Successfully loaded external audio for:', trackId);
-        
-      } catch (audioError) {
-        console.log('External audio failed, using enhanced fallback audio for:', trackId);
-        
-        // Use enhanced fallback generated audio
-        if (!audioContextRef.current) {
-          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        }
-        
-        if (audioContextRef.current.state === 'suspended') {
-          await audioContextRef.current.resume();
-        }
-        
-        const fallbackAudio = generateFallbackAudio(trackId, audioContextRef.current);
-        fallbackAudio.setVolume(newVolume);
-        fallbackAudio.start();
-        fallbackAudioRef.current = fallbackAudio;
-        setUsingFallback(true);
+      // Always use fallback audio since external URLs are dummy
+      console.log('Using enhanced fallback audio for:', trackId);
+      
+      const audioContext = await createAudioContext();
+      if (!audioContext) {
+        throw new Error('Audio context not available');
       }
+      
+      const fallbackAudio = generateFallbackAudio(trackId, audioContext);
+      fallbackAudio.setVolume(volume);
+      fallbackAudio.start();
+      fallbackAudioRef.current = fallbackAudio;
+      setUsingFallback(true);
       
       setIsLoading(false);
-      setCurrentTrack(trackId);
       setIsPlaying(true);
-      setVolume(newVolume);
       
     } catch (error) {
-      console.warn('Audio playback failed completely:', error);
+      console.warn('Audio playback failed:', error);
+      setError('Failed to play audio. Try clicking play again.');
       setIsLoading(false);
       setIsPlaying(false);
       setUsingFallback(false);
     }
-  };
+  }, [stopMusic, createAudioContext]);
 
-  const updateVolume = (newVolume: number) => {
-    setVolume(newVolume);
-    if (currentTrack !== 'silence' && currentTrack !== 'external') {
-      if (audioRef.current) {
-        audioRef.current.volume = newVolume;
-      }
-      if (fallbackAudioRef.current) {
-        fallbackAudioRef.current.setVolume(newVolume);
-      }
+  const updateVolume = useCallback((newVolume: number) => {
+    if (fallbackAudioRef.current) {
+      fallbackAudioRef.current.setVolume(newVolume);
     }
-  };
-
-  const handlePlaySuccessSound = () => {
-    playSuccessSound(hasUserInteracted);
-  };
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume;
+    }
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -194,23 +150,27 @@ The ambient sounds will pause while you use external music.
         }
         fallbackAudioRef.current = null;
       }
+      if (audioContextRef.current) {
+        try {
+          audioContextRef.current.close();
+        } catch (error) {
+          console.warn('Audio context cleanup error:', error);
+        }
+        audioContextRef.current = null;
+      }
     };
   }, []);
 
   return {
     audioTracks,
-    currentTrack,
     isPlaying,
     isLoading,
-    volume,
     hasUserInteracted,
-    useExternalMusic,
     usingFallback,
+    error,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
-    updateVolume,
-    playSuccessSound: handlePlaySuccessSound,
-    openExternalMusicInstructions
+    updateVolume
   };
 };
