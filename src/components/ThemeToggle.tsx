@@ -28,11 +28,12 @@ const ThemeToggle = () => {
       size="icon"
       onClick={toggleTheme}
       className="cozy-card hover:scale-105 transition-all duration-200"
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {isDark ? (
         <Sun className="w-4 h-4 text-amber-500" />
       ) : (
-        <Moon className="w-4 h-4 text-primary" />
+        <Moon className="w-4 h-4 text-slate-600 dark:text-slate-300" />
       )}
     </Button>
   );
