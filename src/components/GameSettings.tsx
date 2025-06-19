@@ -29,22 +29,22 @@ const GameSettings = () => {
 
       {isOpen && (
         <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-md cozy-card cozy-glow max-h-[90vh] overflow-y-auto">
-            <CardHeader className="relative">
+          <Card className="w-full max-w-lg cozy-card cozy-glow max-h-[95vh] overflow-y-auto">
+            <CardHeader className="relative pb-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(false)}
-                className="absolute right-2 top-2 h-6 w-6"
+                className="absolute right-2 top-2 h-8 w-8"
               >
                 <X className="w-4 h-4" />
               </Button>
-              <CardTitle className="flex items-center gap-2 text-primary">
-                <Settings className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-primary text-lg pr-8">
+                <Settings className="w-5 h-5 shrink-0" />
                 Cozy Settings
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 pb-6">
               {/* Music Selection */}
               <div className="space-y-3">
                 <MusicSelector />
@@ -52,34 +52,37 @@ const GameSettings = () => {
 
               {/* Audio Settings */}
               <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
+                <h4 className="font-semibold flex items-center gap-2 text-sm">
                   {progress.preferences.audioEnabled ? (
-                    <Volume2 className="w-4 h-4 text-accent" />
+                    <Volume2 className="w-4 h-4 text-accent shrink-0" />
                   ) : (
-                    <VolumeX className="w-4 h-4 text-muted-foreground" />
+                    <VolumeX className="w-4 h-4 text-muted-foreground shrink-0" />
                   )}
                   Sound Effects
                 </h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Game feedback sounds</span>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-muted-foreground flex-1">
+                    Game feedback sounds
+                  </span>
                   <Switch
                     checked={progress.preferences.audioEnabled}
                     onCheckedChange={(checked) => handlePreferenceChange('audioEnabled', checked)}
+                    className="shrink-0"
                   />
                 </div>
               </div>
 
               {/* Difficulty Settings */}
               <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Smartphone className="w-4 h-4 text-primary" />
+                <h4 className="font-semibold flex items-center gap-2 text-sm">
+                  <Smartphone className="w-4 h-4 text-primary shrink-0" />
                   Adventure Difficulty
                 </h4>
                 <Select
                   value={progress.preferences.difficulty}
                   onValueChange={(value) => handlePreferenceChange('difficulty', value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -92,41 +95,49 @@ const GameSettings = () => {
 
               {/* Notifications */}
               <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Bell className="w-4 h-4 text-accent" />
+                <h4 className="font-semibold flex items-center gap-2 text-sm">
+                  <Bell className="w-4 h-4 text-accent shrink-0" />
                   Daily Reminders
                 </h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Gentle learning nudges</span>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-muted-foreground flex-1">
+                    Gentle learning nudges
+                  </span>
                   <Switch
                     checked={progress.preferences.notifications}
                     onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)}
+                    className="shrink-0"
                   />
                 </div>
               </div>
 
               {/* Social Sharing */}
               <div className="space-y-3">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Share2 className="w-4 h-4 text-green-600" />
+                <h4 className="font-semibold flex items-center gap-2 text-sm">
+                  <Share2 className="w-4 h-4 text-green-600 shrink-0" />
                   Share Achievements
                 </h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Celebrate with friends</span>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-muted-foreground flex-1">
+                    Celebrate with friends
+                  </span>
                   <Switch
                     checked={progress.preferences.shareAchievements}
                     onCheckedChange={(checked) => handlePreferenceChange('shareAchievements', checked)}
+                    className="shrink-0"
                   />
                 </div>
               </div>
 
               {/* Close Button */}
-              <Button
-                onClick={() => setIsOpen(false)}
-                className="w-full logling-button"
-              >
-                Save Cozy Settings
-              </Button>
+              <div className="pt-4 border-t">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  className="w-full logling-button"
+                >
+                  Save Cozy Settings
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
