@@ -7,6 +7,8 @@ import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
 import SocialSharing from './SocialSharing';
 import EnhancedSocialSharing from './EnhancedSocialSharing';
+import PremiumPrompt from './PremiumPrompt';
+import { useFeedbackAndPremium } from '../hooks/useFeedbackAndPremium';
 
 interface GameResultsProps {
   gameData: GameData;
@@ -16,6 +18,10 @@ interface GameResultsProps {
 
 const GameResults = ({ gameData, onRestart, userMode = 'cozy-everyday' }: GameResultsProps) => {
   const [bestScore, setBestScore] = useState<number>(0);
+  const [showPremiumPrompt, setShowPremiumPrompt] = useState(false);
+  const [premiumPromptType, setPremiumPromptType] = useState<'sessions' | 'score' | 'achievement'>('sessions');
+  
+  const { shouldShowPremiumPrompt, markPromptShown, markPromptDismissed, handleUpgrade } = useFeedbackAndPremium();
 
   useEffect(() => {
     // Load best score from localStorage
@@ -31,6 +37,9 @@ const GameResults = ({ gameData, onRestart, userMode = 'cozy-everyday' }: GameRe
 
     // Update progress tracking
     updateProgressTracking();
+    
+    // Check for premium prompts
+    checkForPremiumPrompts();
   }, [gameData.score]);
 
   const updateProgressTracking = () => {
@@ -77,6 +86,47 @@ const GameResults = ({ gameData, onRestart, userMode = 'cozy-everyday' }: GameRe
     localStorage.setItem('loglings-progress', JSON.stringify(progress));
   };
 
+  const checkForPremiumPrompts = () => {
+    const savedProgress = localStorage.getItem('loglings-progress');
+    const progress = savedProgress ? JSON.parse(savedProgress) : { totalSessions: 0 };
+    
+    const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
+    
+    // Check for session-based prompt
+    if (shouldShowPremiumPrompt('sessions', progress.totalSessions)) {
+      setPremiumPromptType('sessions');
+      setShowPremiumPrompt(true);
+      markPromptShown('sessions');
+      return;
+    }
+    
+    // Check for score-based prompt
+    if (shouldShowPremiumPrompt('score', undefined, gameData.score)) {
+      setPremiumPromptType('score');
+      setShowPremiumPrompt(true);
+      markPromptShown('score');
+      return;
+    }
+    
+    // Check for achievement-based prompt (high accuracy)
+    if (accuracy >= 90 && shouldShowPremiumPrompt('achievement')) {
+      setPremiumPromptType('achievement');
+      setShowPremiumPrompt(true);
+      markPromptShown('achievement');
+      return;
+    }
+  };
+
+  const handlePremiumDismiss = () => {
+    setShowPremiumPrompt(false);
+    markPromptDismissed();
+  };
+
+  const handlePremiumUpgrade = () => {
+    setShowPremiumPrompt(false);
+    handleUpgrade();
+  };
+
   const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
   const isNewRecord = gameData.score === bestScore && bestScore > 0;
 
@@ -117,169 +167,182 @@ const GameResults = ({ gameData, onRestart, userMode = 'cozy-everyday' }: GameRe
   };
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-6">
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="animate-gentle-float">
-              <TreePine className={`w-16 h-16 ${isNewRecord ? 'text-accent animate-sparkle' : 'text-primary'}`} />
+    <>
+      <div className="min-h-screen p-4">
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-6">
+            <div className="flex items-center justify-center gap-4 mb-8">
+              <div className="animate-gentle-float">
+                <TreePine className={`w-16 h-16 ${isNewRecord ? 'text-accent animate-sparkle' : 'text-primary'}`} />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-6xl font-bold forest-gradient bg-clip-text text-transparent">
+                  Adventure Complete!
+                </h1>
+                <p className="text-xl text-primary/80">
+                  The Loglings are so proud of you! 🌸
+                </p>
+              </div>
+              <div className="animate-gentle-float animation-delay-1000">
+                <Heart className="w-16 h-16 text-accent animate-sparkle" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <h1 className="text-6xl font-bold forest-gradient bg-clip-text text-transparent">
-                Adventure Complete!
-              </h1>
-              <p className="text-xl text-primary/80">
-                The Loglings are so proud of you! 🌸
-              </p>
-            </div>
-            <div className="animate-gentle-float animation-delay-1000">
-              <Heart className="w-16 h-16 text-accent animate-sparkle" />
-            </div>
+            {isNewRecord && (
+              <Badge className="bg-accent/20 text-accent border-accent text-lg px-6 py-3 animate-cozy-pulse">
+                ✨ New Personal Best! The forest celebrates! ✨
+              </Badge>
+            )}
           </div>
-          {isNewRecord && (
-            <Badge className="bg-accent/20 text-accent border-accent text-lg px-6 py-3 animate-cozy-pulse">
-              ✨ New Personal Best! The forest celebrates! ✨
-            </Badge>
-          )}
-        </div>
 
-        {/* Results and Enhanced Social Sharing Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Joy Collected Card */}
+          {/* Results and Enhanced Social Sharing Grid */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Joy Collected Card */}
+            <Card className="cozy-card cozy-glow candlelit-warmth">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
+                  <Sparkles className="w-8 h-8 text-primary" />
+                </div>
+                <CardTitle className="text-primary">Joy Collected</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center space-y-4">
+                <div className="text-6xl font-bold text-primary">{gameData.score}</div>
+                <div className="text-muted-foreground">
+                  Best Collection: <span className="text-accent font-semibold">{bestScore}</span>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Cozy Achievement Card */}
+            <Card className="cozy-card cozy-glow candlelit-warmth">
+              <CardHeader className="text-center">
+                <div className={`w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500`}>
+                  <CozyIcon className={`w-8 h-8 ${cozyLevel.color}`} />
+                </div>
+                <CardTitle className="text-accent">Your Cozy Title</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center space-y-4">
+                <div className={`text-2xl font-bold ${cozyLevel.color}`}>{cozyLevel.level}</div>
+                <div className="text-muted-foreground text-sm">
+                  {cozyLevel.message}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Enhanced Social Sharing */}
+            <EnhancedSocialSharing 
+              gameData={gameData} 
+              achievements={['Forest Guardian', 'Wisdom Keeper']}
+            />
+          </div>
+
+          {/* Detailed Garden Stats */}
           <Card className="cozy-card cozy-glow candlelit-warmth">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
-                <Sparkles className="w-8 h-8 text-primary" />
-              </div>
-              <CardTitle className="text-primary">Joy Collected</CardTitle>
+            <CardHeader>
+              <CardTitle className="text-center text-3xl text-primary">Your Adventure Garden</CardTitle>
+              <p className="text-center text-muted-foreground">Look at all the beautiful moments you've collected!</p>
             </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <div className="text-6xl font-bold text-primary">{gameData.score}</div>
-              <div className="text-muted-foreground">
-                Best Collection: <span className="text-accent font-semibold">{bestScore}</span>
+            <CardContent>
+              <div className="grid md:grid-cols-4 gap-6 text-center">
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto animate-gentle-float">
+                    <Heart className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div className="text-3xl font-bold text-primary">{gameData.correctAnswers}</div>
+                  <div className="text-sm text-muted-foreground">Logling Friends</div>
+                  <div className="text-xs text-muted-foreground">helped successfully</div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-200">
+                    <Sparkles className="w-6 h-6 text-accent" />
+                  </div>
+                  <div className="text-3xl font-bold text-accent">{accuracy}%</div>
+                  <div className="text-sm text-muted-foreground">Harmony Rate</div>
+                  <div className="text-xs text-muted-foreground">with forest wisdom</div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-400">
+                    <Clock className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div className="text-3xl font-bold text-blue-600">{formatTime(gameData.timeElapsed)}</div>
+                  <div className="text-sm text-muted-foreground">Peaceful Time</div>
+                  <div className="text-xs text-muted-foreground">exploring together</div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-600">
+                    <TreePine className="w-6 h-6 text-primary" />
+                  </div>
+                  <div className="text-3xl font-bold text-primary">
+                    {Math.round((gameData.timeElapsed / gameData.totalRounds) * 10) / 10}s
+                  </div>
+                  <div className="text-sm text-muted-foreground">Thoughtful Pace</div>
+                  <div className="text-xs text-muted-foreground">per discovery</div>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Cozy Achievement Card */}
+          {/* Gentle Feedback */}
           <Card className="cozy-card cozy-glow candlelit-warmth">
-            <CardHeader className="text-center">
-              <div className={`w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500`}>
-                <CozyIcon className={`w-8 h-8 ${cozyLevel.color}`} />
-              </div>
-              <CardTitle className="text-accent">Your Cozy Title</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center space-y-4">
-              <div className={`text-2xl font-bold ${cozyLevel.color}`}>{cozyLevel.level}</div>
-              <div className="text-muted-foreground text-sm">
-                {cozyLevel.message}
+            <CardContent className="pt-6">
+              <div className="text-center space-y-4">
+                <h3 className="text-2xl font-semibold text-primary">Message from the Forest Elder</h3>
+                <div className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
+                  {accuracy >= 90 && "✨ Your heart shines with the wisdom of the ancient trees! The Loglings gather around you with such joy. You've become a true guardian of our digital forest."}
+                  {accuracy >= 75 && accuracy < 90 && "🌸 Your gentle spirit and keen observation bring such warmth to our grove. The Loglings dance when they see you coming!"}
+                  {accuracy >= 60 && accuracy < 75 && "🌱 Every question you ask and every choice you make helps our forest grow stronger. Your curiosity is a gift to all of us."}
+                  {accuracy < 60 && "💙 Your willingness to learn and explore fills our hearts with hope. Remember, every great guardian started exactly where you are now."}
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Enhanced Social Sharing */}
-          <EnhancedSocialSharing 
-            gameData={gameData} 
-            achievements={['Forest Guardian', 'Wisdom Keeper']}
-          />
-        </div>
+          {/* Continue Adventure */}
+          <div className="flex justify-center gap-4">
+            <Button 
+              onClick={onRestart}
+              size="lg"
+              className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
+            >
+              <RotateCcw className="w-6 h-6 mr-3" />
+              Continue Our Adventure
+            </Button>
+          </div>
 
-        {/* Detailed Garden Stats */}
-        <Card className="cozy-card cozy-glow candlelit-warmth">
-          <CardHeader>
-            <CardTitle className="text-center text-3xl text-primary">Your Adventure Garden</CardTitle>
-            <p className="text-center text-muted-foreground">Look at all the beautiful moments you've collected!</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-6 text-center">
-              <div className="space-y-3">
-                <div className="w-12 h-12 bg-green-200 rounded-full flex items-center justify-center mx-auto animate-gentle-float">
-                  <Heart className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="text-3xl font-bold text-primary">{gameData.correctAnswers}</div>
-                <div className="text-sm text-muted-foreground">Logling Friends</div>
-                <div className="text-xs text-muted-foreground">helped successfully</div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-200">
-                  <Sparkles className="w-6 h-6 text-accent" />
-                </div>
-                <div className="text-3xl font-bold text-accent">{accuracy}%</div>
-                <div className="text-sm text-muted-foreground">Harmony Rate</div>
-                <div className="text-xs text-muted-foreground">with forest wisdom</div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-400">
-                  <Clock className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="text-3xl font-bold text-blue-600">{formatTime(gameData.timeElapsed)}</div>
-                <div className="text-sm text-muted-foreground">Peaceful Time</div>
-                <div className="text-xs text-muted-foreground">exploring together</div>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-600">
-                  <TreePine className="w-6 h-6 text-primary" />
-                </div>
-                <div className="text-3xl font-bold text-primary">
-                  {Math.round((gameData.timeElapsed / gameData.totalRounds) * 10) / 10}s
-                </div>
-                <div className="text-sm text-muted-foreground">Thoughtful Pace</div>
-                <div className="text-xs text-muted-foreground">per discovery</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Gentle Feedback */}
-        <Card className="cozy-card cozy-glow candlelit-warmth">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <h3 className="text-2xl font-semibold text-primary">Message from the Forest Elder</h3>
-              <div className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
-                {accuracy >= 90 && "✨ Your heart shines with the wisdom of the ancient trees! The Loglings gather around you with such joy. You've become a true guardian of our digital forest."}
-                {accuracy >= 75 && accuracy < 90 && "🌸 Your gentle spirit and keen observation bring such warmth to our grove. The Loglings dance when they see you coming!"}
-                {accuracy >= 60 && accuracy < 75 && "🌱 Every question you ask and every choice you make helps our forest grow stronger. Your curiosity is a gift to all of us."}
-                {accuracy < 60 && "💙 Your willingness to learn and explore fills our hearts with hope. Remember, every great guardian started exactly where you are now."}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Continue Adventure */}
-        <div className="flex justify-center gap-4">
-          <Button 
-            onClick={onRestart}
-            size="lg"
-            className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
-          >
-            <RotateCcw className="w-6 h-6 mr-3" />
-            Continue Our Adventure
-          </Button>
-        </div>
-
-        {/* Creator Credit - Cozy Style */}
-        <div className="text-center pt-8 border-t border-border/50">
-          <p className="text-muted-foreground flex items-center justify-center gap-2">
-            Lovingly crafted by 
-            <span className="text-primary font-semibold flex items-center gap-1">
-              <Heart className="w-4 h-4" />
-              Teshera Kimbrough
-            </span>
-            - AI Security Engineer
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Where cybersecurity learning blooms like wildflowers 🌼
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            May your journey through digital forests always be filled with wonder
-          </p>
+          {/* Creator Credit - Cozy Style */}
+          <div className="text-center pt-8 border-t border-border/50">
+            <p className="text-muted-foreground flex items-center justify-center gap-2">
+              Lovingly crafted by 
+              <span className="text-primary font-semibold flex items-center gap-1">
+                <Heart className="w-4 h-4" />
+                Teshera Kimbrough
+              </span>
+              - AI Security Engineer
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Where cybersecurity learning blooms like wildflowers 🌼
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              May your journey through digital forests always be filled with wonder
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+
+      {showPremiumPrompt && (
+        <PremiumPrompt
+          trigger={premiumPromptType}
+          onDismiss={handlePremiumDismiss}
+          onUpgrade={handlePremiumUpgrade}
+          sessionsPlayed={JSON.parse(localStorage.getItem('loglings-progress') || '{}').totalSessions}
+          currentScore={gameData.score}
+          achievement={premiumPromptType === 'achievement' ? 'Forest Guardian' : undefined}
+        />
+      )}
+    </>
   );
 };
 

@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Heart, Sparkles, TreePine, Mail, Check } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
+import FeedbackForm, { FeedbackData } from '@/components/FeedbackForm';
 import { toast } from 'sonner';
 
 const Waitlist = () => {
@@ -12,6 +12,12 @@ const Waitlist = () => {
   const [firstName, setFirstName] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+
+  // Check for premium upgrade context
+  const urlParams = new URLSearchParams(window.location.search);
+  const isPremiumSignup = urlParams.get('premium') === 'true';
+  const signupSource = urlParams.get('source') || 'waitlist';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +32,13 @@ const Waitlist = () => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // For now, just store in localStorage (can be replaced with actual API)
+    // Store waitlist data
     const waitlistData = {
       email,
       firstName,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      source: signupSource,
+      isPremium: isPremiumSignup
     };
     
     const existingData = JSON.parse(localStorage.getItem('loglings-waitlist') || '[]');
@@ -41,6 +49,18 @@ const Waitlist = () => {
     setIsSubmitted(true);
     
     toast.success('Welcome to our cozy forest! 🌸');
+    
+    // Show feedback form after a brief delay
+    setTimeout(() => setShowFeedback(true), 1500);
+  };
+
+  const handleFeedbackSubmit = (feedback: FeedbackData) => {
+    setShowFeedback(false);
+    toast.success('Your thoughts help our forest flourish! 🌱');
+  };
+
+  const handleFeedbackSkip = () => {
+    setShowFeedback(false);
   };
 
   if (isSubmitted) {
@@ -63,35 +83,44 @@ const Waitlist = () => {
           <ThemeToggle />
         </div>
 
-        <Card className="w-full max-w-md cozy-card animate-scale-in relative z-10">
-          <CardHeader className="text-center pb-6">
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-green-400 to-amber-400 rounded-full flex items-center justify-center animate-gentle-bounce">
-              <Check className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-green-700 dark:text-green-300 mb-2">
-              You're on the list! 🌸
-            </h1>
-            <p className="text-muted-foreground leading-relaxed">
-              We'll send you a gentle hello when it's your turn to explore Loglings. 
-              Thank you for joining our cozy digital forest!
-            </p>
-          </CardHeader>
-          
-          <CardContent className="text-center">
-            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 mb-6">
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                💝 Check your email for a special surprise wallpaper!
+        {showFeedback ? (
+          <FeedbackForm 
+            onSubmit={handleFeedbackSubmit}
+            onSkip={handleFeedbackSkip}
+          />
+        ) : (
+          <Card className="w-full max-w-md cozy-card animate-scale-in relative z-10">
+            <CardHeader className="text-center pb-6">
+              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-green-400 to-amber-400 rounded-full flex items-center justify-center animate-gentle-bounce">
+                <Check className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-2xl font-bold text-green-700 dark:text-green-300 mb-2">
+                {isPremiumSignup ? "Premium access request received! 🌟" : "You're on the list! 🌸"}
+              </h1>
+              <p className="text-muted-foreground leading-relaxed">
+                {isPremiumSignup 
+                  ? "We'll reach out soon about premium features and early access opportunities!"
+                  : "We'll send you a gentle hello when it's your turn to explore Loglings. Thank you for joining our cozy digital forest!"
+                }
               </p>
-            </div>
+            </CardHeader>
             
-            <Button
-              onClick={() => window.location.href = '/'}
-              className="logling-button w-full"
-            >
-              Continue Exploring
-            </Button>
-          </CardContent>
-        </Card>
+            <CardContent className="text-center">
+              <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 mb-6">
+                <p className="text-sm text-amber-700 dark:text-amber-300">
+                  💝 Check your email for a special surprise wallpaper!
+                </p>
+              </div>
+              
+              <Button
+                onClick={() => window.location.href = '/'}
+                className="logling-button w-full"
+              >
+                Continue Exploring
+              </Button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   }
@@ -124,14 +153,32 @@ const Waitlist = () => {
             <TreePine className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-3xl font-bold forest-primary mb-2">
-            Join the Cozy Waitlist!
+            {isPremiumSignup ? "Join Premium Early Access!" : "Join the Cozy Waitlist!"}
           </h1>
           <p className="text-muted-foreground leading-relaxed">
-            Be first to play, get exclusive sneak peeks, and help shape our gentle digital forest.
+            {isPremiumSignup 
+              ? "Get exclusive access to premium features and help shape the future of cozy cybersecurity learning."
+              : "Be first to play, get exclusive sneak peeks, and help shape our gentle digital forest."
+            }
           </p>
         </CardHeader>
         
         <CardContent>
+          {isPremiumSignup && (
+            <div className="bg-gradient-to-r from-amber-50 to-rose-50 dark:from-amber-950/30 dark:to-rose-950/30 rounded-lg p-4 mb-6 border border-amber-200 dark:border-amber-800/50">
+              <h4 className="font-semibold text-amber-700 dark:text-amber-300 mb-2 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" />
+                Premium Features Included
+              </h4>
+              <ul className="text-sm text-amber-600 dark:text-amber-400 space-y-1">
+                <li>• 🎵 Complete cozy audio library</li>
+                <li>• 🌟 Advanced learning paths</li>
+                <li>• 📊 Detailed progress insights</li>
+                <li>• 🎁 Early access to new content</li>
+              </ul>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="firstName" className="block text-sm font-medium text-foreground mb-2">
@@ -176,7 +223,7 @@ const Waitlist = () => {
               className="logling-button w-full text-lg py-6 relative overflow-hidden"
             >
               <Mail className="w-5 h-5 mr-2" />
-              {isLoading ? 'Joining...' : 'Join the Waitlist'}
+              {isLoading ? 'Joining...' : isPremiumSignup ? 'Request Premium Access' : 'Join the Waitlist'}
               {isLoading && (
                 <div className="absolute inset-0 bg-white/20 animate-pulse" />
               )}
