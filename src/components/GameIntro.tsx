@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserMode } from '../types/userTypes';
 import ThemeToggle from './ThemeToggle';
+import WaitlistButton from './WaitlistButton';
 import ProgressTracker from './ProgressTracker';
 import DailyChallenge from './DailyChallenge';
 import GameSettings from './GameSettings';
@@ -98,10 +99,13 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header with Theme Toggle and Settings */}
+        {/* Enhanced Header with Navigation */}
         <div className="flex items-center justify-between">
           <GameSettings />
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <WaitlistButton />
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Main Header */}
