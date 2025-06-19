@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, ExternalLink, Info, Waves, AlertCircle } from 'lucide-react';
+import { Play, Pause, Volume2, ExternalLink, Info, Waves, Focus } from 'lucide-react';
 import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 import { MusicType } from '../types/musicTypes';
@@ -19,7 +19,6 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     audioTracks,
     isPlaying,
     isLoading,
-    error,
     currentTrack,
     getCurrentTrackInfo,
     playTrack,
@@ -90,7 +89,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         <div className="flex items-center justify-between">
           <h4 className="font-semibold flex items-center gap-2 text-lg text-forest-primary">
             <Waves className="w-5 h-5" />
-            Cozy Ambient Sounds
+            Audio Preferences
           </h4>
           <Button
             variant="outline"
@@ -109,72 +108,75 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           </Button>
         </div>
 
-        {/* Error Display */}
-        {error && (
-          <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-xl">
-            <div className="flex items-center gap-2 text-destructive">
-              <AlertCircle className="w-4 h-4" />
-              <span className="text-sm font-medium">{error}</span>
-            </div>
-            <div className="text-xs text-muted-foreground mt-2">
-              Make sure audio files are uploaded to the public/sounds/ directory.
-            </div>
-          </div>
-        )}
-
-        {/* Currently Playing */}
-        {progress.preferences.musicType !== 'silence' && (
-          <div className="p-4 bg-gradient-to-r from-forest-primary/10 to-forest-secondary/10 rounded-xl border border-forest-primary/20 cozy-hover">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{currentTrackInfo.emoji}</span>
-              <div className="flex-1">
-                <div className="font-semibold text-forest-primary">{currentTrackInfo.name}</div>
-                <div className="text-sm text-muted-foreground">
-                  {progress.preferences.musicType === 'external' 
+        {/* Currently Selected */}
+        <div className="p-4 bg-gradient-to-r from-forest-primary/10 to-forest-secondary/10 rounded-xl border border-forest-primary/20 cozy-hover">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{currentTrackInfo.emoji}</span>
+            <div className="flex-1">
+              <div className="font-semibold text-forest-primary">{currentTrackInfo.name}</div>
+              <div className="text-sm text-muted-foreground">
+                {progress.preferences.musicType === 'silence' 
+                  ? 'Pure focus mode - optimized for deep learning'
+                  : progress.preferences.musicType === 'external' 
                     ? 'Using external music app' 
                     : isLoading
                       ? 'Loading audio file...'
                       : isPlaying 
                         ? 'Playing ambient soundscape'
                         : 'Click play to start ambient audio'}
-                </div>
               </div>
-              {isPlaying && progress.preferences.musicType !== 'external' && (
-                <div className="flex items-center gap-1 text-green-600">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium">Playing</span>
-                </div>
-              )}
+            </div>
+            {progress.preferences.musicType === 'silence' && (
+              <div className="flex items-center gap-1 text-green-600">
+                <Focus className="w-4 h-4" />
+                <span className="text-xs font-medium">Focus Mode</span>
+              </div>
+            )}
+            {isPlaying && progress.preferences.musicType !== 'external' && progress.preferences.musicType !== 'silence' && (
+              <div className="flex items-center gap-1 text-green-600">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium">Playing</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Pure Focus Mode Highlight */}
+        {progress.preferences.musicType === 'silence' && (
+          <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 rounded-xl border border-green-200 dark:border-green-800">
+            <div className="text-sm text-green-700 dark:text-green-300">
+              <p className="font-semibold mb-2 flex items-center gap-2">
+                <Focus className="w-4 h-4" />
+                Pure Focus Mode Active
+              </p>
+              <div className="text-xs space-y-1">
+                <p>• Zero distractions for maximum concentration</p>
+                <p>• Optimized for deep learning and skill building</p>
+                <p>• Perfect for professional training environments</p>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Preset Combinations */}
-        <div className="space-y-3">
-          <h5 className="font-medium text-sm text-forest-primary flex items-center gap-2">
-            <span>🎭</span> Popular Combinations
-          </h5>
-          <div className="grid grid-cols-1 gap-2">
-            {audioPresets.map((preset) => (
-              <Button
-                key={preset.id}
-                variant="outline"
-                size="sm"
-                className="h-auto p-3 flex items-center gap-3 cozy-card cozy-hover justify-start"
-              >
-                <span className="text-lg">{preset.emoji}</span>
-                <div className="text-left">
-                  <div className="text-sm font-medium">{preset.name}</div>
-                  <div className="text-xs text-muted-foreground">{preset.description}</div>
-                </div>
-              </Button>
-            ))}
+        {/* Coming in v2 Banner */}
+        <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 rounded-xl border border-amber-200 dark:border-amber-800">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            <p className="font-semibold mb-2 flex items-center gap-2">
+              <Waves className="w-4 h-4" />
+              Ambient Audio Library - Coming in v2!
+            </p>
+            <div className="text-xs space-y-1">
+              <p>• 60+ professional ambient soundscapes</p>
+              <p>• Forest sounds, rain, cafe atmospheres</p>
+              <p>• Full customization and mixing options</p>
+              <p className="font-medium pt-1">Focus on learning first - audio enhancement later! 🎯</p>
+            </div>
           </div>
         </div>
 
         {/* Track Selection */}
         <div className="space-y-3">
-          <h5 className="font-medium text-sm text-forest-primary">Individual Sounds</h5>
+          <h5 className="font-medium text-sm text-forest-primary">Current Options</h5>
           <div className="grid grid-cols-2 gap-3">
             {audioTracks.map((track) => (
               <Button
@@ -236,7 +238,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         {/* Audio Credits */}
         <div className="border-t pt-4">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-muted-foreground">Audio Sources</p>
+            <p className="text-xs font-medium text-muted-foreground">v2 Audio Credits</p>
             <Button
               variant="ghost"
               size="sm"
