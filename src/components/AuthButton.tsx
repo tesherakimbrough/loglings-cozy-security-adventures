@@ -1,12 +1,20 @@
 
 import { Button } from '@/components/ui/button';
-import { User, LogIn } from 'lucide-react';
+import { User, LogIn, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 const AuthButton = () => {
-  const { user, signOut } = useAuth();
+  const { user, signOut, loading } = useAuth();
   const navigate = useNavigate();
+
+  if (loading) {
+    return (
+      <Button variant="outline" size="sm" disabled>
+        <Loader2 className="w-4 h-4 animate-spin" />
+      </Button>
+    );
+  }
 
   if (user) {
     return (

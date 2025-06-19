@@ -1,22 +1,36 @@
 
-import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TreePine, Mail, Lock, User, AlertCircle } from 'lucide-react';
+import { TreePine, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const Auth = () => {
   const { user, signIn, signUp } = useAuth();
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  // Check for email verification success
+  useEffect(() => {
+    const error = searchParams.get('error');
+    const errorDescription = searchParams.get('error_description');
+    
+    if (error) {
+      setError(`Email verification failed: ${errorDescription || error}`);
+    } else if (searchParams.get('type') === 'signup') {
+      setSuccess('Email verified successfully! You can now sign in.');
+    }
+  }, [searchParams]);
 
   // Redirect if already logged in
   if (user) {
@@ -27,6 +41,7 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     const { error } = await signIn(email, password);
     
@@ -40,13 +55,18 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     const { error } = await signUp(email, password, displayName);
     
     if (error) {
       setError(error.message);
     } else {
-      setError('Please check your email for a verification link!');
+      setSuccess('Check your email for a verification link! The link will bring you back here to sign in.');
+      // Clear form
+      setEmail('');
+      setPassword('');
+      setDisplayName('');
     }
     setLoading(false);
   };
@@ -75,9 +95,16 @@ const Auth = () => {
             </TabsList>
 
             {error && (
-              <Alert variant={error.includes('email') ? 'default' : 'destructive'}>
+              <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            {success && (
+              <Alert variant="default" className="border-emerald-200 bg-emerald-50 text-emerald-800">
+                <CheckCircle className="h-4 w-4 text-emerald-600" />
+                <AlertDescription>{success}</AlertDescription>
               </Alert>
             )}
 
@@ -180,6 +207,16 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
+
+          <div className="mt-6 p-4 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-200 dark:border-emerald-800">
+            <h4 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200 mb-2">
+              Testing Note:
+            </h4>
+            <p className="text-xs text-emerald-700 dark:text-emerald-300">
+              After signing up, check your email for a verification link. Click it to verify your account, 
+              then return here to sign in with your credentials.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>
