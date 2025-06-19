@@ -1,5 +1,5 @@
 
-import { Shield, Target, Zap, Play } from 'lucide-react';
+import { Heart, Sparkles, TreePine, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -12,103 +12,160 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-4xl w-full space-y-8">
         {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Shield className="w-12 h-12 text-primary animate-pulse-glow" />
-            <h1 className="text-5xl font-bold cyber-gradient bg-clip-text text-transparent">
-              ThreatHunter
-            </h1>
+        <div className="text-center space-y-6">
+          <div className="flex items-center justify-center gap-4 mb-8">
+            <div className="animate-gentle-float">
+              <TreePine className="w-16 h-16 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <h1 className="text-6xl font-bold forest-gradient bg-clip-text text-transparent">
+                Loglings
+              </h1>
+              <p className="text-xl text-primary/80 font-medium">
+                Cozy Security Adventures
+              </p>
+            </div>
+            <div className="animate-gentle-float animation-delay-1000">
+              <Sparkles className="w-16 h-16 text-accent animate-sparkle" />
+            </div>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Master the art of cybersecurity through interactive log analysis. 
-            Hunt threats, make decisions, and become a SOC analyst hero.
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            Welcome to a gentle world where adorable Loglings help you discover the magic of cybersecurity. 
+            Learn, explore, and protect our cozy digital forest—no pressure, just curiosity and kindness.
           </p>
         </div>
 
-        {/* Game Features */}
+        {/* Meet Your Guides */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Card className="terminal-glow hover:scale-105 transition-transform">
+          <Card className="cozy-card cozy-glow hover:scale-105 transition-transform">
             <CardHeader className="text-center">
-              <Target className="w-8 h-8 text-primary mx-auto mb-2" />
-              <CardTitle>Real-World Scenarios</CardTitle>
+              <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
+                <Heart className="w-8 h-8 text-green-600" />
+              </div>
+              <CardTitle className="text-primary">Pip the Safe Logling</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-center">
-                Analyze authentic log patterns and security events based on real SOC operations.
+                A gentle spirit who loves when everything is peaceful and secure. 
+                Pip will cheer you on and celebrate safe discoveries!
               </p>
             </CardContent>
           </Card>
 
-          <Card className="terminal-glow hover:scale-105 transition-transform">
+          <Card className="cozy-card cozy-glow hover:scale-105 transition-transform">
             <CardHeader className="text-center">
-              <Zap className="w-8 h-8 text-accent mx-auto mb-2" />
-              <CardTitle>Instant Feedback</CardTitle>
+              <div className="w-16 h-16 bg-amber-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500">
+                <Sparkles className="w-8 h-8 text-amber-600" />
+              </div>
+              <CardTitle className="text-accent">Luna the Curious Logling</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-center">
-                Learn from each decision with detailed explanations and scoring.
+                Always wondering "What's this?" Luna helps you notice interesting patterns 
+                that might need a closer look—with patience and encouragement.
               </p>
             </CardContent>
           </Card>
 
-          <Card className="terminal-glow hover:scale-105 transition-transform">
+          <Card className="cozy-card cozy-glow hover:scale-105 transition-transform">
             <CardHeader className="text-center">
-              <Shield className="w-8 h-8 text-destructive mx-auto mb-2" />
-              <CardTitle>Threat Detection</CardTitle>
+              <div className="w-16 h-16 bg-rose-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-1000">
+                <TreePine className="w-8 h-8 text-rose-600" />
+              </div>
+              <CardTitle className="text-rose-600">Sage the Alert Logling</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-center">
-                Develop skills in anomaly detection, risk assessment, and incident response.
+                Wise and protective, Sage helps you spot when something needs immediate care. 
+                Don't worry—they'll guide you through it step by step.
               </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* How to Play */}
-        <Card className="terminal-glow">
+        {/* How to Play - Cozy Style */}
+        <Card className="cozy-card cozy-glow">
           <CardHeader>
-            <CardTitle className="text-center text-2xl">How to Play</CardTitle>
+            <CardTitle className="text-center text-3xl text-primary">Your Cozy Adventure Awaits</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-primary">🎯 Your Mission</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Review security logs and events</li>
-                  <li>• Identify potential threats and anomalies</li>
-                  <li>• Make quick, accurate decisions</li>
-                  <li>• Protect the organization from cyber attacks</li>
+          <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-primary flex items-center gap-2">
+                  <Heart className="w-5 h-5" />
+                  What You'll Do
+                </h3>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent">🌸</span>
+                    <span>Read gentle log stories with your Logling friends</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent">🌿</span>
+                    <span>Help Loglings understand what they're seeing</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent">✨</span>
+                    <span>Learn together—every choice teaches something beautiful</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-accent">🍃</span>
+                    <span>Collect cozy moments and grow your understanding</span>
+                  </li>
                 </ul>
               </div>
-              <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-accent">⚡ Scoring System</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• <span className="text-primary">+100 points</span> for correct threat identification</li>
-                  <li>• <span className="text-accent">+50 points</span> for proper risk assessment</li>
-                  <li>• <span className="text-destructive">-25 points</span> for missed threats</li>
-                  <li>• Speed bonus for quick decisions</li>
+              <div className="space-y-4">
+                <h3 className="text-xl font-semibold text-accent flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  How You'll Grow
+                </h3>
+                <ul className="space-y-3 text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">🌱</span>
+                    <span><strong className="text-primary">+100 joy</strong> for helping Loglings feel safe</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">🌼</span>
+                    <span><strong className="text-accent">+75 wonder</strong> for noticing curious things</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">🌺</span>
+                    <span><strong className="text-rose-500">+50 wisdom</strong> for learning something new</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary">🍀</span>
+                    <span>Gentle encouragement helps you grow stronger</span>
+                  </li>
                 </ul>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Start Game Button */}
+        {/* Start Adventure Button */}
         <div className="text-center">
           <Button 
             onClick={onStartGame}
             size="lg"
-            className="text-lg px-8 py-6 cyber-gradient hover:scale-105 transition-transform"
+            className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
           >
-            <Play className="w-6 h-6 mr-2" />
-            Start Hunting Threats
+            <Play className="w-8 h-8 mr-3" />
+            Begin Our Cozy Adventure
           </Button>
         </div>
 
-        {/* Creator Credit */}
-        <div className="text-center pt-8 border-t border-border">
-          <p className="text-muted-foreground">
-            Created by <span className="text-primary font-semibold">Teshera Kimbrough</span> - AI Security Engineer
+        {/* Creator Credit - Cozy Style */}
+        <div className="text-center pt-8 border-t border-border/50">
+          <p className="text-muted-foreground flex items-center justify-center gap-2">
+            Lovingly crafted by 
+            <span className="text-primary font-semibold flex items-center gap-1">
+              <Heart className="w-4 h-4" />
+              Teshera Kimbrough
+            </span>
+            - AI Security Engineer
+          </p>
+          <p className="text-sm text-muted-foreground mt-2">
+            Where learning cybersecurity feels like a warm hug 🤗
           </p>
         </div>
       </div>

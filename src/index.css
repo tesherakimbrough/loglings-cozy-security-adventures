@@ -5,44 +5,44 @@
 
 @layer base {
   :root {
-    --background: 220 26% 8%;
-    --foreground: 210 40% 98%;
+    --background: 25 20% 96%;
+    --foreground: 20 14% 20%;
 
-    --card: 220 20% 12%;
-    --card-foreground: 210 40% 98%;
+    --card: 40 30% 98%;
+    --card-foreground: 20 14% 20%;
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 40 30% 98%;
+    --popover-foreground: 20 14% 20%;
 
-    --primary: 142 76% 36%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 142 45% 55%;
+    --primary-foreground: 355 25% 97%;
 
-    --secondary: 220 15% 16%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 60 10% 88%;
+    --secondary-foreground: 24 9% 10%;
 
-    --muted: 220 15% 16%;
-    --muted-foreground: 215.4 16.3% 56.9%;
+    --muted: 60 5% 92%;
+    --muted-foreground: 25 5% 45%;
 
-    --accent: 46 87% 55%;
-    --accent-foreground: 220 26% 8%;
+    --accent: 340 75% 75%;
+    --accent-foreground: 355 25% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 70%;
+    --destructive-foreground: 355 25% 97%;
 
-    --border: 220 15% 20%;
-    --input: 220 15% 20%;
-    --ring: 142 76% 36%;
+    --border: 20 6% 85%;
+    --input: 20 6% 85%;
+    --ring: 142 45% 55%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --sidebar-background: 220 20% 10%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 142 76% 36%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 220 15% 16%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 15% 20%;
-    --sidebar-ring: 142 76% 36%;
+    --sidebar-background: 40 30% 95%;
+    --sidebar-foreground: 20 14% 20%;
+    --sidebar-primary: 142 45% 55%;
+    --sidebar-primary-foreground: 355 25% 97%;
+    --sidebar-accent: 60 10% 88%;
+    --sidebar-accent-foreground: 24 9% 10%;
+    --sidebar-border: 20 6% 85%;
+    --sidebar-ring: 142 45% 55%;
   }
 }
 
@@ -53,42 +53,88 @@
 
   body {
     @apply bg-background text-foreground;
-    background: linear-gradient(135deg, hsl(220, 26%, 8%) 0%, hsl(220, 20%, 12%) 100%);
+    background: linear-gradient(135deg, 
+      hsl(25, 20%, 96%) 0%, 
+      hsl(40, 30%, 98%) 30%, 
+      hsl(60, 25%, 94%) 70%, 
+      hsl(80, 30%, 96%) 100%);
     min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer components {
-  .terminal-glow {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  .cozy-glow {
+    box-shadow: 0 4px 20px rgba(142, 115, 140, 0.15);
   }
   
-  .cyber-gradient {
-    background: linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(46, 87%, 55%) 100%);
+  .forest-gradient {
+    background: linear-gradient(135deg, 
+      hsl(142, 45%, 55%) 0%, 
+      hsl(120, 40%, 60%) 50%, 
+      hsl(100, 35%, 65%) 100%);
   }
   
-  .threat-critical {
-    @apply bg-destructive/20 border-destructive text-destructive;
+  .safe-logling {
+    @apply bg-green-100 border-green-300 text-green-700;
   }
   
-  .threat-warning {
-    @apply bg-accent/20 border-accent text-accent;
+  .curious-logling {
+    @apply bg-amber-100 border-amber-300 text-amber-700;
   }
   
-  .threat-safe {
-    @apply bg-primary/20 border-primary text-primary;
+  .alert-logling {
+    @apply bg-rose-100 border-rose-300 text-rose-700;
+  }
+
+  .cozy-card {
+    @apply bg-card/80 backdrop-blur-sm border-2 border-border/50 rounded-2xl shadow-lg;
+  }
+
+  .logling-button {
+    @apply bg-gradient-to-r from-primary/80 to-primary hover:from-primary hover:to-primary/90 
+           text-primary-foreground rounded-full px-6 py-3 font-medium 
+           transform hover:scale-105 transition-all duration-200 shadow-lg;
   }
 }
 
-@keyframes pulse-glow {
+@keyframes gentle-float {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
+    transform: translateY(-8px) rotate(1deg);
   }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes cozy-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(142, 115, 140, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(142, 115, 140, 0.5);
+  }
+}
+
+.animate-gentle-float {
+  animation: gentle-float 3s ease-in-out infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-cozy-pulse {
+  animation: cozy-pulse 2s ease-in-out infinite;
 }
