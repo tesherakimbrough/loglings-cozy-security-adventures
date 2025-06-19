@@ -2,6 +2,9 @@
 import { Heart, Sparkles, TreePine, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import ThemeToggle from './ThemeToggle';
+import ProgressTracker from './ProgressTracker';
+import DailyChallenge from './DailyChallenge';
 
 interface GameIntroProps {
   onStartGame: () => void;
@@ -9,9 +12,15 @@ interface GameIntroProps {
 
 const GameIntro = ({ onStartGame }: GameIntroProps) => {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full space-y-8">
-        {/* Header */}
+    <div className="min-h-screen p-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header with Theme Toggle */}
+        <div className="flex items-center justify-between">
+          <div></div>
+          <ThemeToggle />
+        </div>
+
+        {/* Main Header */}
         <div className="text-center space-y-6">
           <div className="flex items-center justify-center gap-4 mb-8">
             <div className="animate-gentle-float">
@@ -35,12 +44,18 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
           </p>
         </div>
 
+        {/* Daily Challenge and Progress in a grid */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          <DailyChallenge />
+          <ProgressTracker />
+        </div>
+
         {/* Meet Your Guides */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Card className="cozy-card cozy-glow hover:scale-105 transition-transform">
+          <Card className="cozy-card cozy-glow candlelit-warmth hover:scale-105 transition-transform">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-green-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
-                <Heart className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 bg-green-200 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
+                <Heart className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
               <CardTitle className="text-primary">Pip the Safe Logling</CardTitle>
             </CardHeader>
@@ -52,10 +67,10 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
             </CardContent>
           </Card>
 
-          <Card className="cozy-card cozy-glow hover:scale-105 transition-transform">
+          <Card className="cozy-card cozy-glow candlelit-warmth hover:scale-105 transition-transform">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-amber-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500">
-                <Sparkles className="w-8 h-8 text-amber-600" />
+              <div className="w-16 h-16 bg-amber-200 dark:bg-amber-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500">
+                <Sparkles className="w-8 h-8 text-amber-600 dark:text-amber-400" />
               </div>
               <CardTitle className="text-accent">Luna the Curious Logling</CardTitle>
             </CardHeader>
@@ -67,12 +82,12 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
             </CardContent>
           </Card>
 
-          <Card className="cozy-card cozy-glow hover:scale-105 transition-transform">
+          <Card className="cozy-card cozy-glow candlelit-warmth hover:scale-105 transition-transform">
             <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-rose-200 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-1000">
-                <TreePine className="w-8 h-8 text-rose-600" />
+              <div className="w-16 h-16 bg-rose-200 dark:bg-rose-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-1000">
+                <TreePine className="w-8 h-8 text-rose-600 dark:text-rose-400" />
               </div>
-              <CardTitle className="text-rose-600">Sage the Alert Logling</CardTitle>
+              <CardTitle className="text-rose-600 dark:text-rose-400">Sage the Alert Logling</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground text-center">
@@ -84,7 +99,7 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
         </div>
 
         {/* How to Play - Cozy Style */}
-        <Card className="cozy-card cozy-glow">
+        <Card className="cozy-card cozy-glow candlelit-warmth">
           <CardHeader>
             <CardTitle className="text-center text-3xl text-primary">Your Cozy Adventure Awaits</CardTitle>
           </CardHeader>

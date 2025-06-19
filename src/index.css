@@ -44,6 +44,45 @@
     --sidebar-border: 20 6% 85%;
     --sidebar-ring: 142 45% 55%;
   }
+
+  .dark {
+    --background: 25 20% 8%;
+    --foreground: 30 25% 90%;
+
+    --card: 35 25% 12%;
+    --card-foreground: 30 25% 90%;
+
+    --popover: 35 25% 12%;
+    --popover-foreground: 30 25% 90%;
+
+    --primary: 142 45% 65%;
+    --primary-foreground: 355 25% 15%;
+
+    --secondary: 30 15% 18%;
+    --secondary-foreground: 30 25% 85%;
+
+    --muted: 25 15% 15%;
+    --muted-foreground: 30 15% 65%;
+
+    --accent: 45 85% 70%;
+    --accent-foreground: 25 15% 15%;
+
+    --destructive: 0 62% 60%;
+    --destructive-foreground: 355 25% 97%;
+
+    --border: 30 15% 22%;
+    --input: 30 15% 22%;
+    --ring: 142 45% 65%;
+
+    --sidebar-background: 30 15% 10%;
+    --sidebar-foreground: 30 25% 90%;
+    --sidebar-primary: 142 45% 65%;
+    --sidebar-primary-foreground: 355 25% 15%;
+    --sidebar-accent: 30 15% 18%;
+    --sidebar-accent-foreground: 30 25% 85%;
+    --sidebar-border: 30 15% 22%;
+    --sidebar-ring: 142 45% 65%;
+  }
 }
 
 @layer base {
@@ -61,11 +100,23 @@
     min-height: 100vh;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
+
+  .dark body {
+    background: linear-gradient(135deg, 
+      hsl(25, 20%, 8%) 0%, 
+      hsl(30, 25%, 10%) 30%, 
+      hsl(35, 20%, 12%) 70%, 
+      hsl(25, 15%, 8%) 100%);
+  }
 }
 
 @layer components {
   .cozy-glow {
     box-shadow: 0 4px 20px rgba(142, 115, 140, 0.15);
+  }
+  
+  .dark .cozy-glow {
+    box-shadow: 0 4px 20px rgba(255, 215, 160, 0.15);
   }
   
   .forest-gradient {
@@ -74,17 +125,36 @@
       hsl(120, 40%, 60%) 50%, 
       hsl(100, 35%, 65%) 100%);
   }
+
+  .dark .forest-gradient {
+    background: linear-gradient(135deg, 
+      hsl(142, 45%, 65%) 0%, 
+      hsl(120, 40%, 70%) 50%, 
+      hsl(100, 35%, 75%) 100%);
+  }
   
   .safe-logling {
     @apply bg-green-100 border-green-300 text-green-700;
+  }
+
+  .dark .safe-logling {
+    @apply bg-green-900/30 border-green-600/50 text-green-300;
   }
   
   .curious-logling {
     @apply bg-amber-100 border-amber-300 text-amber-700;
   }
+
+  .dark .curious-logling {
+    @apply bg-amber-900/30 border-amber-600/50 text-amber-300;
+  }
   
   .alert-logling {
     @apply bg-rose-100 border-rose-300 text-rose-700;
+  }
+
+  .dark .alert-logling {
+    @apply bg-rose-900/30 border-rose-600/50 text-rose-300;
   }
 
   .cozy-card {
@@ -95,6 +165,10 @@
     @apply bg-gradient-to-r from-primary/80 to-primary hover:from-primary hover:to-primary/90 
            text-primary-foreground rounded-full px-6 py-3 font-medium 
            transform hover:scale-105 transition-all duration-200 shadow-lg;
+  }
+
+  .candlelit-warmth {
+    @apply dark:shadow-[0_0_30px_rgba(255,215,160,0.3)];
   }
 }
 
@@ -127,6 +201,15 @@
   }
 }
 
+@keyframes candlelit-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 215, 160, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 160, 0.6);
+  }
+}
+
 .animate-gentle-float {
   animation: gentle-float 3s ease-in-out infinite;
 }
@@ -137,4 +220,8 @@
 
 .animate-cozy-pulse {
   animation: cozy-pulse 2s ease-in-out infinite;
+}
+
+.dark .animate-cozy-pulse {
+  animation: candlelit-pulse 2s ease-in-out infinite;
 }

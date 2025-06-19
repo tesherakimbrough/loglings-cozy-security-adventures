@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { Heart, Sparkles, Clock, RotateCcw, TreePine, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GameData } from '../pages/Index';
+import SocialSharing from './SocialSharing';
 
 interface GameResultsProps {
   gameData: GameData;
@@ -25,7 +25,54 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
     } else {
       setBestScore(currentBest);
     }
+
+    // Update progress tracking
+    updateProgressTracking();
   }, [gameData.score]);
+
+  const updateProgressTracking = () => {
+    const savedProgress = localStorage.getItem('loglings-progress');
+    let progress = savedProgress ? JSON.parse(savedProgress) : {
+      totalSessions: 0,
+      totalScore: 0,
+      correctAnswers: 0,
+      loglingsFriended: [],
+      achievements: [],
+      currentStreak: 0,
+      longestStreak: 0
+    };
+
+    // Update stats
+    progress.totalSessions += 1;
+    progress.totalScore += gameData.score;
+    progress.correctAnswers += gameData.correctAnswers;
+
+    // Update achievements
+    const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
+    progress.achievements = progress.achievements.map((achievement: any) => {
+      if (achievement.id === 'first-friend' && !achievement.unlocked) {
+        achievement.unlocked = true;
+      }
+      if (achievement.id === 'curious-explorer' && !achievement.unlocked) {
+        achievement.progress = Math.min((achievement.progress || 0) + 1, achievement.maxProgress);
+        if (achievement.progress >= achievement.maxProgress) {
+          achievement.unlocked = true;
+        }
+      }
+      if (achievement.id === 'forest-guardian' && !achievement.unlocked && accuracy >= 90) {
+        achievement.unlocked = true;
+      }
+      if (achievement.id === 'wisdom-keeper' && !achievement.unlocked) {
+        achievement.progress = Math.min(progress.totalScore, achievement.maxProgress);
+        if (achievement.progress >= achievement.maxProgress) {
+          achievement.unlocked = true;
+        }
+      }
+      return achievement;
+    });
+
+    localStorage.setItem('loglings-progress', JSON.stringify(progress));
+  };
 
   const accuracy = Math.round((gameData.correctAnswers / gameData.totalRounds) * 100);
   const isNewRecord = gameData.score === bestScore && bestScore > 0;
@@ -67,8 +114,8 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="max-w-4xl w-full space-y-8">
+    <div className="min-h-screen p-4">
+      <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-6">
           <div className="flex items-center justify-center gap-4 mb-8">
@@ -94,10 +141,10 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
           )}
         </div>
 
-        {/* Results Cards */}
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Results and Social Sharing Grid */}
+        <div className="grid lg:grid-cols-3 gap-6">
           {/* Joy Collected Card */}
-          <Card className="cozy-card cozy-glow">
+          <Card className="cozy-card cozy-glow candlelit-warmth">
             <CardHeader className="text-center">
               <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float">
                 <Sparkles className="w-8 h-8 text-primary" />
@@ -113,7 +160,7 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
           </Card>
 
           {/* Cozy Achievement Card */}
-          <Card className="cozy-card cozy-glow">
+          <Card className="cozy-card cozy-glow candlelit-warmth">
             <CardHeader className="text-center">
               <div className={`w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4 animate-gentle-float animation-delay-500`}>
                 <CozyIcon className={`w-8 h-8 ${cozyLevel.color}`} />
@@ -127,10 +174,13 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Social Sharing */}
+          <SocialSharing gameData={gameData} />
         </div>
 
         {/* Detailed Garden Stats */}
-        <Card className="cozy-card cozy-glow">
+        <Card className="cozy-card cozy-glow candlelit-warmth">
           <CardHeader>
             <CardTitle className="text-center text-3xl text-primary">Your Adventure Garden</CardTitle>
             <p className="text-center text-muted-foreground">Look at all the beautiful moments you've collected!</p>
@@ -179,7 +229,7 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
         </Card>
 
         {/* Gentle Feedback */}
-        <Card className="cozy-card cozy-glow">
+        <Card className="cozy-card cozy-glow candlelit-warmth">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <h3 className="text-2xl font-semibold text-primary">Message from the Forest Elder</h3>
