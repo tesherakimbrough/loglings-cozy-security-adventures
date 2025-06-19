@@ -50,7 +50,7 @@ export interface LearningMetrics {
 
 export interface UserPreferences {
   audioEnabled: boolean;
-  musicType: 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence';
+  musicType: 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence' | 'external';
   musicVolume: number;
   effectsVolume: number;
   difficulty: 'beginner' | 'intermediate' | 'advanced';

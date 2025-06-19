@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-export type MusicType = 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence';
+export type MusicType = 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence' | 'external';
 
 interface AudioTrack {
   id: MusicType;
@@ -17,35 +17,35 @@ const audioTracks: AudioTrack[] = [
     name: 'Forest Ambience',
     emoji: '🌲',
     description: 'Gentle nature sounds with birds and rustling leaves',
-    audioUrl: ''
+    audioUrl: 'https://www.soundjay.com/misc/sounds/forest_ambience.mp3'
   },
   {
     id: 'lofi',
     name: 'Lofi Study Beats',
     emoji: '🎵',
     description: 'Chill hip-hop beats perfect for concentration',
-    audioUrl: ''
+    audioUrl: 'https://www.chosic.com/wp-content/uploads/2021/05/lofi_study_112bpm.mp3'
   },
   {
     id: 'cozy-cafe',
     name: 'Cozy Coffee Shop',
     emoji: '☕',
     description: 'Warm café atmosphere with gentle chatter',
-    audioUrl: ''
+    audioUrl: 'https://www.soundjay.com/misc/sounds/coffee_shop_ambience.mp3'
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioUrl: ''
+    audioUrl: 'https://www.soundjay.com/misc/sounds/rain_gentle.mp3'
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioUrl: ''
+    audioUrl: 'https://www.soundjay.com/misc/sounds/fireplace_crackling.mp3'
   },
   {
     id: 'silence',
@@ -53,15 +53,95 @@ const audioTracks: AudioTrack[] = [
     emoji: '🔇',
     description: 'No background music for pure focus',
     audioUrl: ''
+  },
+  {
+    id: 'external',
+    name: 'Your Music',
+    emoji: '🎧',
+    description: 'Use Apple Music, Spotify, or your own playlist',
+    audioUrl: ''
   }
 ];
 
-interface AmbientAudio {
-  play: () => Promise<void>;
-  pause: () => void;
-  volume: number;
-  setVolume: (volume: number) => void;
-}
+// Fallback audio generation for when external URLs fail
+const generateFallbackAudio = (trackId: MusicType, audioContext: AudioContext) => {
+  const masterGain = audioContext.createGain();
+  masterGain.connect(audioContext.destination);
+  masterGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+
+  const sources: AudioScheduledSourceNode[] = [];
+
+  // Create more realistic layered soundscapes
+  const createLayeredOscillator = (frequencies: number[], type: OscillatorType = 'sine', baseGain: number = 0.1) => {
+    frequencies.forEach((freq, index) => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+      
+      osc.frequency.setValueAtTime(freq, audioContext.currentTime);
+      osc.type = type;
+      
+      // Add some variation to make it more natural
+      const variation = 1 + (Math.random() - 0.5) * 0.1;
+      osc.frequency.setValueAtTime(freq * variation, audioContext.currentTime);
+      
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(freq * 2, audioContext.currentTime);
+      
+      gain.gain.setValueAtTime(baseGain / (index + 1), audioContext.currentTime);
+      
+      // Add subtle amplitude modulation for more natural sound
+      const lfo = audioContext.createOscillator();
+      const lfoGain = audioContext.createGain();
+      lfo.frequency.setValueAtTime(0.1 + Math.random() * 0.2, audioContext.currentTime);
+      lfo.type = 'sine';
+      lfoGain.gain.setValueAtTime(0.02, audioContext.currentTime);
+      
+      lfo.connect(lfoGain);
+      lfoGain.connect(gain.gain);
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(masterGain);
+      
+      sources.push(osc, lfo);
+    });
+  };
+
+  // Generate realistic soundscapes based on track type
+  switch (trackId) {
+    case 'forest':
+      createLayeredOscillator([80, 120, 200, 300], 'triangle', 0.08);
+      createLayeredOscillator([400, 800, 1200], 'sawtooth', 0.03);
+      break;
+    case 'rain':
+      createLayeredOscillator([200, 400, 800, 1600], 'sawtooth', 0.15);
+      createLayeredOscillator([60, 90], 'sine', 0.05);
+      break;
+    case 'fireplace':
+      createLayeredOscillator([50, 100, 150], 'triangle', 0.1);
+      createLayeredOscillator([300, 600], 'square', 0.05);
+      break;
+    case 'lofi':
+      createLayeredOscillator([65, 130, 260], 'triangle', 0.12);
+      createLayeredOscillator([520, 1040], 'sine', 0.06);
+      break;
+    case 'cozy-cafe':
+      createLayeredOscillator([100, 200, 400], 'sine', 0.08);
+      createLayeredOscillator([300, 600], 'triangle', 0.04);
+      break;
+  }
+
+  return {
+    start: () => sources.forEach(source => source.start()),
+    stop: () => sources.forEach(source => {
+      try { source.stop(); } catch (e) { /* already stopped */ }
+    }),
+    setVolume: (volume: number) => {
+      masterGain.gain.setValueAtTime(volume, audioContext.currentTime);
+    }
+  };
+};
 
 export const useAmbientMusic = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicType>('forest');
@@ -69,168 +149,10 @@ export const useAmbientMusic = () => {
   const [volume, setVolume] = useState(0.3);
   const [isLoading, setIsLoading] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
-  const audioRef = useRef<AmbientAudio | null>(null);
+  const [useExternalMusic, setUseExternalMusic] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fallbackAudioRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
-
-  // Create ambient audio with multiple layers for realistic soundscapes
-  const createAmbientAudio = (trackId: MusicType): AmbientAudio => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-    
-    const audioContext = audioContextRef.current;
-    const masterGain = audioContext.createGain();
-    masterGain.connect(audioContext.destination);
-    
-    let isAudioPlaying = false;
-    const sources: AudioNode[] = [];
-
-    // White noise generator for base ambient sound
-    const createWhiteNoise = (gain: number = 0.1) => {
-      const bufferSize = audioContext.sampleRate * 2;
-      const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      
-      for (let i = 0; i < bufferSize; i++) {
-        output[i] = Math.random() * 2 - 1;
-      }
-      
-      const noiseSource = audioContext.createBufferSource();
-      noiseSource.buffer = noiseBuffer;
-      noiseSource.loop = true;
-      
-      const noiseGain = audioContext.createGain();
-      noiseGain.gain.setValueAtTime(gain, audioContext.currentTime);
-      
-      noiseSource.connect(noiseGain);
-      noiseGain.connect(masterGain);
-      
-      sources.push(noiseSource);
-      return noiseSource;
-    };
-
-    // Low frequency oscillator for depth
-    const createLowFreqOsc = (frequency: number, gain: number = 0.05) => {
-      const osc = audioContext.createOscillator();
-      const oscGain = audioContext.createGain();
-      
-      osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
-      osc.type = 'sine';
-      oscGain.gain.setValueAtTime(gain, audioContext.currentTime);
-      
-      osc.connect(oscGain);
-      oscGain.connect(masterGain);
-      
-      sources.push(osc);
-      return osc;
-    };
-
-    // Configure based on track type with multiple layers
-    const configureSoundscape = () => {
-      switch (trackId) {
-        case 'forest':
-          // White noise filtered for wind
-          const windNoise = createWhiteNoise(0.08);
-          
-          // Low frequency for depth
-          createLowFreqOsc(40, 0.03);
-          createLowFreqOsc(80, 0.02);
-          
-          // Mid frequencies for rustling
-          createLowFreqOsc(200, 0.01);
-          createLowFreqOsc(150, 0.015);
-          break;
-          
-        case 'rain':
-          // High frequency white noise for rain
-          createWhiteNoise(0.15);
-          
-          // Low rumble for thunder
-          createLowFreqOsc(30, 0.02);
-          createLowFreqOsc(60, 0.015);
-          break;
-          
-        case 'fireplace':
-          // Crackling noise
-          createWhiteNoise(0.06);
-          
-          // Low frequency for fire rumble
-          createLowFreqOsc(45, 0.04);
-          createLowFreqOsc(90, 0.03);
-          createLowFreqOsc(120, 0.02);
-          break;
-          
-        case 'lofi':
-          // Soft vinyl crackle
-          createWhiteNoise(0.03);
-          
-          // Warm bass tones
-          createLowFreqOsc(65, 0.04);
-          createLowFreqOsc(130, 0.03);
-          createLowFreqOsc(195, 0.02);
-          break;
-          
-        case 'cozy-cafe':
-          // Soft ambient noise
-          createWhiteNoise(0.05);
-          
-          // Gentle hum
-          createLowFreqOsc(100, 0.025);
-          createLowFreqOsc(200, 0.02);
-          createLowFreqOsc(300, 0.015);
-          break;
-          
-        default:
-          createWhiteNoise(0.05);
-          createLowFreqOsc(100, 0.02);
-      }
-    };
-
-    configureSoundscape();
-
-    const ambientAudio: AmbientAudio = {
-      play: async () => {
-        if (!isAudioPlaying) {
-          // Resume audio context if suspended
-          if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-          }
-          
-          sources.forEach(source => {
-            if ('start' in source) {
-              (source as AudioScheduledSourceNode).start();
-            }
-          });
-          isAudioPlaying = true;
-        }
-      },
-      
-      pause: () => {
-        if (isAudioPlaying) {
-          sources.forEach(source => {
-            try {
-              if ('stop' in source) {
-                (source as AudioScheduledSourceNode).stop();
-              }
-            } catch (e) {
-              // Source may already be stopped
-            }
-          });
-          isAudioPlaying = false;
-        }
-      },
-      
-      get volume() {
-        return masterGain.gain.value;
-      },
-      
-      setVolume: (newVolume: number) => {
-        masterGain.gain.setValueAtTime(newVolume, audioContext.currentTime);
-      }
-    };
-
-    return ambientAudio;
-  };
 
   const getCurrentTrackInfo = () => {
     return audioTracks.find(track => track.id === currentTrack) || audioTracks[0];
@@ -238,18 +160,47 @@ export const useAmbientMusic = () => {
 
   const stopMusic = async (): Promise<void> => {
     return new Promise((resolve) => {
+      // Stop HTML audio
       if (audioRef.current) {
-        try {
-          audioRef.current.pause();
-        } catch (error) {
-          console.warn('Error stopping audio:', error);
-        }
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
         audioRef.current = null;
       }
+      
+      // Stop fallback audio
+      if (fallbackAudioRef.current) {
+        fallbackAudioRef.current.stop();
+        fallbackAudioRef.current = null;
+      }
+      
       setIsPlaying(false);
       setIsLoading(false);
       resolve();
     });
+  };
+
+  const openExternalMusicInstructions = () => {
+    const instructions = `
+To use your own music:
+
+1. **Apple Music**: 
+   - Open Apple Music app or website
+   - Play your preferred playlist or album
+   - Return to this app and select "Your Music"
+
+2. **Spotify**: 
+   - Open Spotify app or website
+   - Play your preferred playlist or album
+   - Return to this app and select "Your Music"
+
+3. **Other Music Apps**: 
+   - Start playing music in any app
+   - Return to this app and select "Your Music"
+
+The ambient sounds will pause while you use external music.
+    `;
+    
+    alert(instructions);
   };
 
   const playTrack = async (trackId: MusicType, newVolume: number = volume): Promise<void> => {
@@ -261,23 +212,70 @@ export const useAmbientMusic = () => {
       return;
     }
 
+    if (trackId === 'external') {
+      await stopMusic();
+      setCurrentTrack(trackId);
+      setUseExternalMusic(true);
+      openExternalMusicInstructions();
+      return;
+    }
+
     setIsLoading(true);
+    setUseExternalMusic(false);
     
     try {
-      // Stop current track
       await stopMusic();
-
-      // Mark that user has interacted
       setHasUserInteracted(true);
 
-      // Create ambient audio for the selected track
-      const audio = createAmbientAudio(trackId);
-      audio.setVolume(newVolume);
-      
-      audioRef.current = audio;
-      
-      // Start playing
-      await audio.play();
+      const trackInfo = audioTracks.find(track => track.id === trackId);
+      if (!trackInfo || !trackInfo.audioUrl) {
+        throw new Error('No audio URL available');
+      }
+
+      // Try to use real audio first
+      try {
+        const audio = new Audio();
+        audio.crossOrigin = 'anonymous';
+        audio.loop = true;
+        audio.volume = newVolume;
+        
+        await new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('Audio load timeout')), 10000);
+          
+          audio.onloadeddata = () => {
+            clearTimeout(timeout);
+            resolve(audio);
+          };
+          
+          audio.onerror = () => {
+            clearTimeout(timeout);
+            reject(new Error('Audio load failed'));
+          };
+          
+          audio.src = trackInfo.audioUrl;
+          audio.load();
+        });
+
+        audioRef.current = audio;
+        await audio.play();
+        
+      } catch (audioError) {
+        console.warn('Real audio failed, using fallback:', audioError);
+        
+        // Use fallback generated audio
+        if (!audioContextRef.current) {
+          audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        }
+        
+        if (audioContextRef.current.state === 'suspended') {
+          await audioContextRef.current.resume();
+        }
+        
+        const fallbackAudio = generateFallbackAudio(trackId, audioContextRef.current);
+        fallbackAudio.setVolume(newVolume);
+        fallbackAudio.start();
+        fallbackAudioRef.current = fallbackAudio;
+      }
       
       setIsLoading(false);
       setCurrentTrack(trackId);
@@ -285,7 +283,7 @@ export const useAmbientMusic = () => {
       setVolume(newVolume);
       
     } catch (error) {
-      console.warn('Audio playback failed:', error);
+      console.warn('Audio playback failed completely:', error);
       setIsLoading(false);
       setIsPlaying(false);
     }
@@ -293,8 +291,13 @@ export const useAmbientMusic = () => {
 
   const updateVolume = (newVolume: number) => {
     setVolume(newVolume);
-    if (audioRef.current && isPlaying && currentTrack !== 'silence') {
-      audioRef.current.setVolume(newVolume);
+    if (currentTrack !== 'silence' && currentTrack !== 'external') {
+      if (audioRef.current) {
+        audioRef.current.volume = newVolume;
+      }
+      if (fallbackAudioRef.current) {
+        fallbackAudioRef.current.setVolume(newVolume);
+      }
     }
   };
 
@@ -335,6 +338,14 @@ export const useAmbientMusic = () => {
         }
         audioRef.current = null;
       }
+      if (fallbackAudioRef.current) {
+        try {
+          fallbackAudioRef.current.stop();
+        } catch (error) {
+          console.warn('Fallback cleanup error:', error);
+        }
+        fallbackAudioRef.current = null;
+      }
     };
   }, []);
 
@@ -345,10 +356,12 @@ export const useAmbientMusic = () => {
     isLoading,
     volume,
     hasUserInteracted,
+    useExternalMusic,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
     updateVolume,
-    playSuccessSound
+    playSuccessSound,
+    openExternalMusicInstructions
   };
 };

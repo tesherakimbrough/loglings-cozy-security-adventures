@@ -18,10 +18,12 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     currentTrack,
     isPlaying,
     isLoading,
+    useExternalMusic,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
-    updateVolume
+    updateVolume,
+    openExternalMusicInstructions
   } = useAmbientMusic();
 
   const handleTrackSelect = async (trackId: MusicType) => {
@@ -31,6 +33,13 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     // If selecting silence, stop music
     if (trackId === 'silence') {
       await stopMusic();
+      return;
+    }
+    
+    // If selecting external music, show instructions
+    if (trackId === 'external') {
+      await stopMusic();
+      openExternalMusicInstructions();
       return;
     }
     
@@ -64,7 +73,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           variant="outline"
           size="sm"
           onClick={togglePlayPause}
-          disabled={isLoading || progress.preferences.musicType === 'silence'}
+          disabled={isLoading || progress.preferences.musicType === 'silence' || progress.preferences.musicType === 'external'}
           className="cozy-card"
         >
           {isLoading ? (
@@ -97,7 +106,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
             variant="outline"
             size="sm"
             onClick={togglePlayPause}
-            disabled={isLoading || progress.preferences.musicType === 'silence'}
+            disabled={isLoading || progress.preferences.musicType === 'silence' || progress.preferences.musicType === 'external'}
             className="cozy-card"
           >
             {isLoading ? (
@@ -118,7 +127,9 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
               <div>
                 <div className="font-medium text-sm">{currentTrackInfo.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {isPlaying ? 'Now playing' : 'Ready to play'}
+                  {progress.preferences.musicType === 'external' 
+                    ? 'Using external music app' 
+                    : isPlaying ? 'Now playing' : 'Ready to play'}
                 </div>
               </div>
             </div>
@@ -142,7 +153,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         </div>
 
         {/* Volume Control */}
-        {progress.preferences.musicType !== 'silence' && (
+        {progress.preferences.musicType !== 'silence' && progress.preferences.musicType !== 'external' && (
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-sm">
               <Volume2 className="w-4 h-4" />
@@ -159,6 +170,16 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
               step={0.1}
               className="w-full"
             />
+          </div>
+        )}
+
+        {/* External Music Instructions */}
+        {progress.preferences.musicType === 'external' && (
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="text-sm text-blue-700 dark:text-blue-300">
+              <p className="font-medium mb-1">🎧 External Music Mode</p>
+              <p className="text-xs">Open Apple Music, Spotify, or any music app and start playing your preferred playlist.</p>
+            </div>
           </div>
         )}
       </CardContent>
