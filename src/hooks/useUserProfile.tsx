@@ -1,5 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { UserProfile, UserMode, DifficultyLevel } from '../types/userTypes';
+import { useAuth } from './useAuth';
+import { useSupabaseUserProfile } from './useSupabaseUserProfile';
 
 const defaultProfile: UserProfile = {
   mode: 'cozy-everyday',
@@ -35,93 +38,110 @@ const defaultProfile: UserProfile = {
 };
 
 export const useUserProfile = () => {
-  const [profile, setProfile] = useState<UserProfile>(defaultProfile);
+  const { user } = useAuth();
+  const supabaseProfile = useSupabaseUserProfile();
+  const [localProfile, setLocalProfile] = useState<UserProfile>(defaultProfile);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Use Supabase profile if user is logged in, otherwise use local storage
+  const profile = user ? (supabaseProfile.profile || defaultProfile) : localProfile;
+  const loading = user ? supabaseProfile.isLoading : isLoading;
+
   useEffect(() => {
-    const savedProfile = localStorage.getItem('loglings-user-profile');
-    if (savedProfile) {
-      try {
-        const parsed = JSON.parse(savedProfile);
-        // Migrate old profiles that don't have new accessibility properties
-        const migratedProfile = {
-          ...defaultProfile,
-          ...parsed,
-          preferences: {
-            ...defaultProfile.preferences,
-            ...parsed.preferences,
-            soundEffectsEnabled: parsed.preferences?.soundEffectsEnabled ?? true,
-            soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4,
-            difficulty: (parsed.preferences?.difficulty as DifficultyLevel) || 'beginner',
-            // Ensure accessibility properties have defaults
-            highContrast: parsed.preferences?.highContrast ?? false,
-            reduceMotion: parsed.preferences?.reduceMotion ?? false,
-            fontSize: parsed.preferences?.fontSize ?? 'medium',
-            colorBlindMode: parsed.preferences?.colorBlindMode ?? 'default',
-            audioDescriptions: parsed.preferences?.audioDescriptions ?? false,
-            screenReaderMode: parsed.preferences?.screenReaderMode ?? false,
-            enhancedFocus: parsed.preferences?.enhancedFocus ?? false,
-            keyboardOnly: parsed.preferences?.keyboardOnly ?? false
-          }
-        };
-        setProfile(migratedProfile);
-      } catch (error) {
-        console.warn('Failed to parse saved profile, using defaults');
-        setProfile(defaultProfile);
+    if (!user) {
+      // Load from localStorage for non-authenticated users
+      const savedProfile = localStorage.getItem('loglings-user-profile');
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile);
+          const migratedProfile = {
+            ...defaultProfile,
+            ...parsed,
+            preferences: {
+              ...defaultProfile.preferences,
+              ...parsed.preferences,
+              soundEffectsEnabled: parsed.preferences?.soundEffectsEnabled ?? true,
+              soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4,
+              difficulty: (parsed.preferences?.difficulty as DifficultyLevel) || 'beginner',
+              highContrast: parsed.preferences?.highContrast ?? false,
+              reduceMotion: parsed.preferences?.reduceMotion ?? false,
+              fontSize: parsed.preferences?.fontSize ?? 'medium',
+              colorBlindMode: parsed.preferences?.colorBlindMode ?? 'default',
+              audioDescriptions: parsed.preferences?.audioDescriptions ?? false,
+              screenReaderMode: parsed.preferences?.screenReaderMode ?? false,
+              enhancedFocus: parsed.preferences?.enhancedFocus ?? false,
+              keyboardOnly: parsed.preferences?.keyboardOnly ?? false
+            }
+          };
+          setLocalProfile(migratedProfile);
+        } catch (error) {
+          console.warn('Failed to parse saved profile, using defaults');
+          setLocalProfile(defaultProfile);
+        }
       }
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, []);
+  }, [user]);
 
-  const updateProfile = (updates: Partial<UserProfile>) => {
-    const newProfile = { ...profile, ...updates };
-    setProfile(newProfile);
-    localStorage.setItem('loglings-user-profile', JSON.stringify(newProfile));
+  const updateProfile = async (updates: Partial<UserProfile>) => {
+    if (user) {
+      // Update Supabase profile
+      await supabaseProfile.updateProfile(updates);
+    } else {
+      // Update local storage
+      const newProfile = { ...localProfile, ...updates };
+      setLocalProfile(newProfile);
+      localStorage.setItem('loglings-user-profile', JSON.stringify(newProfile));
+    }
   };
 
-  const selectMode = (mode: UserMode) => {
-    const modePreferences = {
-      'cozy-everyday': {
-        difficulty: 'beginner' as DifficultyLevel,
-        audioEnabled: true,
-        musicType: 'forest'
-      },
-      'career-pro': {
-        difficulty: 'advanced' as DifficultyLevel,
-        audioEnabled: true,
-        musicType: 'lofi'
-      }
-    };
+  const selectMode = async (mode: UserMode) => {
+    if (user) {
+      await supabaseProfile.selectMode(mode);
+    } else {
+      const modePreferences = {
+        'cozy-everyday': {
+          difficulty: 'beginner' as DifficultyLevel,
+          audioEnabled: true,
+          musicType: 'forest'
+        },
+        'career-pro': {
+          difficulty: 'advanced' as DifficultyLevel,
+          audioEnabled: true,
+          musicType: 'lofi'
+        }
+      };
 
-    updateProfile({
-      mode,
-      hasCompletedOnboarding: true,
-      preferences: {
-        ...profile.preferences,
-        ...modePreferences[mode]
-      }
-    });
+      updateProfile({
+        mode,
+        hasCompletedOnboarding: true,
+        preferences: {
+          ...profile.preferences,
+          ...modePreferences[mode]
+        }
+      });
+    }
   };
 
-  const updatePreferences = (newPreferences: Partial<UserProfile['preferences']>) => {
-    updateProfile({
+  const updatePreferences = async (newPreferences: Partial<UserProfile['preferences']>) => {
+    await updateProfile({
       preferences: { ...profile.preferences, ...newPreferences }
     });
   };
 
-  const updateProgress = (newProgress: Partial<UserProfile['progress']>) => {
-    updateProfile({
+  const updateProgress = async (newProgress: Partial<UserProfile['progress']>) => {
+    await updateProfile({
       progress: { ...profile.progress, ...newProgress }
     });
   };
 
-  const resetOnboarding = () => {
-    updateProfile({ hasCompletedOnboarding: false });
+  const resetOnboarding = async () => {
+    await updateProfile({ hasCompletedOnboarding: false });
   };
 
   return {
     profile,
-    isLoading,
+    isLoading: loading,
     updateProfile,
     selectMode,
     updatePreferences,

@@ -8,6 +8,7 @@ import WaitlistButton from './WaitlistButton';
 import DonationButton from './DonationButton';
 import GameSettings from './GameSettings';
 import LaunchReadinessDashboard from './LaunchReadinessDashboard';
+import AuthButton from './AuthButton';
 
 const GameIntroNavigation = () => {
   const [showLaunchDashboard, setShowLaunchDashboard] = useState(false);
@@ -28,6 +29,7 @@ const GameIntroNavigation = () => {
             <LaunchReadinessDashboard />
           </DialogContent>
         </Dialog>
+        <AuthButton />
         <DonationButton />
         <WaitlistButton />
         <ThemeToggle />

@@ -9,7 +9,168 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      game_sessions: {
+        Row: {
+          correct_answers: number
+          created_at: string
+          difficulty_level: string
+          id: string
+          scenarios_played: Json | null
+          score: number
+          time_elapsed: number
+          total_rounds: number
+          user_id: string
+        }
+        Insert: {
+          correct_answers?: number
+          created_at?: string
+          difficulty_level?: string
+          id?: string
+          scenarios_played?: Json | null
+          score?: number
+          time_elapsed?: number
+          total_rounds?: number
+          user_id: string
+        }
+        Update: {
+          correct_answers?: number
+          created_at?: string
+          difficulty_level?: string
+          id?: string
+          scenarios_played?: Json | null
+          score?: number
+          time_elapsed?: number
+          total_rounds?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          audio_enabled: boolean | null
+          color_blind_mode: string | null
+          created_at: string
+          font_size: string | null
+          high_contrast: boolean | null
+          id: string
+          music_type: string | null
+          music_volume: number | null
+          notifications: boolean | null
+          reduce_motion: boolean | null
+          share_achievements: boolean | null
+          sound_effects_enabled: boolean | null
+          sound_effects_volume: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_enabled?: boolean | null
+          color_blind_mode?: string | null
+          created_at?: string
+          font_size?: string | null
+          high_contrast?: boolean | null
+          id?: string
+          music_type?: string | null
+          music_volume?: number | null
+          notifications?: boolean | null
+          reduce_motion?: boolean | null
+          share_achievements?: boolean | null
+          sound_effects_enabled?: boolean | null
+          sound_effects_volume?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_enabled?: boolean | null
+          color_blind_mode?: string | null
+          created_at?: string
+          font_size?: string | null
+          high_contrast?: boolean | null
+          id?: string
+          music_type?: string | null
+          music_volume?: number | null
+          notifications?: boolean | null
+          reduce_motion?: boolean | null
+          share_achievements?: boolean | null
+          sound_effects_enabled?: boolean | null
+          sound_effects_volume?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_progress: {
+        Row: {
+          achievements: string[] | null
+          correct_answers: number
+          created_at: string
+          current_streak: number
+          difficulty_level: string
+          id: string
+          longest_streak: number
+          total_score: number
+          total_sessions: number
+          unlocked_loglings: string[] | null
+          updated_at: string
+          user_id: string
+          user_mode: string
+        }
+        Insert: {
+          achievements?: string[] | null
+          correct_answers?: number
+          created_at?: string
+          current_streak?: number
+          difficulty_level?: string
+          id?: string
+          longest_streak?: number
+          total_score?: number
+          total_sessions?: number
+          unlocked_loglings?: string[] | null
+          updated_at?: string
+          user_id: string
+          user_mode?: string
+        }
+        Update: {
+          achievements?: string[] | null
+          correct_answers?: number
+          created_at?: string
+          current_streak?: number
+          difficulty_level?: string
+          id?: string
+          longest_streak?: number
+          total_score?: number
+          total_sessions?: number
+          unlocked_loglings?: string[] | null
+          updated_at?: string
+          user_id?: string
+          user_mode?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
