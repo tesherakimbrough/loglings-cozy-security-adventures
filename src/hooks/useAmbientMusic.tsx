@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 
 export type MusicType = 'forest' | 'lofi' | 'cozy-cafe' | 'rain' | 'fireplace' | 'silence' | 'external';
@@ -63,80 +62,212 @@ const audioTracks: AudioTrack[] = [
   }
 ];
 
-// Fallback audio generation for when external URLs fail
+// Generate white noise buffer
+const createWhiteNoise = (audioContext: AudioContext, duration: number = 10) => {
+  const bufferSize = audioContext.sampleRate * duration;
+  const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const output = buffer.getChannelData(0);
+  
+  for (let i = 0; i < bufferSize; i++) {
+    output[i] = Math.random() * 2 - 1;
+  }
+  
+  return buffer;
+};
+
+// Generate pink noise (more natural sounding)
+const createPinkNoise = (audioContext: AudioContext, duration: number = 10) => {
+  const bufferSize = audioContext.sampleRate * duration;
+  const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const output = buffer.getChannelData(0);
+  
+  let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  
+  for (let i = 0; i < bufferSize; i++) {
+    const white = Math.random() * 2 - 1;
+    b0 = 0.99886 * b0 + white * 0.0555179;
+    b1 = 0.99332 * b1 + white * 0.0750759;
+    b2 = 0.96900 * b2 + white * 0.1538520;
+    b3 = 0.86650 * b3 + white * 0.3104856;
+    b4 = 0.55000 * b4 + white * 0.5329522;
+    b5 = -0.7616 * b5 - white * 0.0168980;
+    output[i] = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+    output[i] *= 0.11;
+    b6 = white * 0.115926;
+  }
+  
+  return buffer;
+};
+
+// Fallback audio generation for realistic ambient sounds
 const generateFallbackAudio = (trackId: MusicType, audioContext: AudioContext) => {
   const masterGain = audioContext.createGain();
   masterGain.connect(audioContext.destination);
   masterGain.gain.setValueAtTime(0.3, audioContext.currentTime);
 
   const sources: AudioScheduledSourceNode[] = [];
+  let noiseSource: AudioBufferSourceNode | null = null;
 
-  // Create more realistic layered soundscapes
-  const createLayeredOscillator = (frequencies: number[], type: OscillatorType = 'sine', baseGain: number = 0.1) => {
-    frequencies.forEach((freq, index) => {
-      const osc = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      const filter = audioContext.createBiquadFilter();
-      
-      osc.frequency.setValueAtTime(freq, audioContext.currentTime);
-      osc.type = type;
-      
-      // Add some variation to make it more natural
-      const variation = 1 + (Math.random() - 0.5) * 0.1;
-      osc.frequency.setValueAtTime(freq * variation, audioContext.currentTime);
-      
-      filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(freq * 2, audioContext.currentTime);
-      
-      gain.gain.setValueAtTime(baseGain / (index + 1), audioContext.currentTime);
-      
-      // Add subtle amplitude modulation for more natural sound
-      const lfo = audioContext.createOscillator();
-      const lfoGain = audioContext.createGain();
-      lfo.frequency.setValueAtTime(0.1 + Math.random() * 0.2, audioContext.currentTime);
-      lfo.type = 'sine';
-      lfoGain.gain.setValueAtTime(0.02, audioContext.currentTime);
-      
-      lfo.connect(lfoGain);
-      lfoGain.connect(gain.gain);
-      
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(masterGain);
-      
-      sources.push(osc, lfo);
+  const cleanup = () => {
+    sources.forEach(source => {
+      try { 
+        source.stop(); 
+        source.disconnect();
+      } catch (e) { /* already stopped */ }
     });
+    if (noiseSource) {
+      try {
+        noiseSource.stop();
+        noiseSource.disconnect();
+      } catch (e) { /* already stopped */ }
+    }
   };
 
-  // Generate realistic soundscapes based on track type
+  // Create realistic soundscapes based on track type
   switch (trackId) {
     case 'forest':
-      createLayeredOscillator([80, 120, 200, 300], 'triangle', 0.08);
-      createLayeredOscillator([400, 800, 1200], 'sawtooth', 0.03);
+      // Create wind-like sound using filtered white noise
+      const windNoise = createWhiteNoise(audioContext);
+      noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = windNoise;
+      noiseSource.loop = true;
+      
+      const windFilter = audioContext.createBiquadFilter();
+      windFilter.type = 'lowpass';
+      windFilter.frequency.setValueAtTime(400, audioContext.currentTime);
+      windFilter.Q.setValueAtTime(0.5, audioContext.currentTime);
+      
+      const windGain = audioContext.createGain();
+      windGain.gain.setValueAtTime(0.15, audioContext.currentTime);
+      
+      noiseSource.connect(windFilter);
+      windFilter.connect(windGain);
+      windGain.connect(masterGain);
+      
+      sources.push(noiseSource);
       break;
+
     case 'rain':
-      createLayeredOscillator([200, 400, 800, 1600], 'sawtooth', 0.15);
-      createLayeredOscillator([60, 90], 'sine', 0.05);
+      // Rain sound using high-frequency filtered white noise
+      const rainNoise = createWhiteNoise(audioContext);
+      noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = rainNoise;
+      noiseSource.loop = true;
+      
+      const rainFilter = audioContext.createBiquadFilter();
+      rainFilter.type = 'highpass';
+      rainFilter.frequency.setValueAtTime(1000, audioContext.currentTime);
+      rainFilter.Q.setValueAtTime(0.3, audioContext.currentTime);
+      
+      const rainGain = audioContext.createGain();
+      rainGain.gain.setValueAtTime(0.2, audioContext.currentTime);
+      
+      // Add modulation for rain effect
+      const rainLfo = audioContext.createOscillator();
+      const rainLfoGain = audioContext.createGain();
+      rainLfo.frequency.setValueAtTime(0.5, audioContext.currentTime);
+      rainLfoGain.gain.setValueAtTime(0.05, audioContext.currentTime);
+      
+      rainLfo.connect(rainLfoGain);
+      rainLfoGain.connect(rainGain.gain);
+      
+      noiseSource.connect(rainFilter);
+      rainFilter.connect(rainGain);
+      rainGain.connect(masterGain);
+      
+      sources.push(noiseSource, rainLfo);
       break;
+
     case 'fireplace':
-      createLayeredOscillator([50, 100, 150], 'triangle', 0.1);
-      createLayeredOscillator([300, 600], 'square', 0.05);
+      // Crackling fire using pink noise with low-pass filtering
+      const fireNoise = createPinkNoise(audioContext);
+      noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = fireNoise;
+      noiseSource.loop = true;
+      
+      const fireFilter = audioContext.createBiquadFilter();
+      fireFilter.type = 'lowpass';
+      fireFilter.frequency.setValueAtTime(800, audioContext.currentTime);
+      fireFilter.Q.setValueAtTime(2, audioContext.currentTime);
+      
+      const fireGain = audioContext.createGain();
+      fireGain.gain.setValueAtTime(0.25, audioContext.currentTime);
+      
+      noiseSource.connect(fireFilter);
+      fireFilter.connect(fireGain);
+      fireGain.connect(masterGain);
+      
+      sources.push(noiseSource);
       break;
+
     case 'lofi':
-      createLayeredOscillator([65, 130, 260], 'triangle', 0.12);
-      createLayeredOscillator([520, 1040], 'sine', 0.06);
+      // Simple bass drum pattern
+      const createDrum = (time: number) => {
+        const drumOsc = audioContext.createOscillator();
+        const drumGain = audioContext.createGain();
+        
+        drumOsc.frequency.setValueAtTime(60, audioContext.currentTime + time);
+        drumOsc.frequency.exponentialRampToValueAtTime(40, audioContext.currentTime + time + 0.1);
+        
+        drumGain.gain.setValueAtTime(0, audioContext.currentTime + time);
+        drumGain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + time + 0.01);
+        drumGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + time + 0.3);
+        
+        drumOsc.connect(drumGain);
+        drumGain.connect(masterGain);
+        
+        drumOsc.start(audioContext.currentTime + time);
+        drumOsc.stop(audioContext.currentTime + time + 0.3);
+      };
+      
+      // Create a simple beat pattern
+      const beatInterval = setInterval(() => {
+        createDrum(0);
+        createDrum(0.5);
+      }, 1000);
+      
+      // Clean up interval
+      const originalCleanup = cleanup;
+      cleanup = () => {
+        clearInterval(beatInterval);
+        originalCleanup();
+      };
       break;
+
     case 'cozy-cafe':
-      createLayeredOscillator([100, 200, 400], 'sine', 0.08);
-      createLayeredOscillator([300, 600], 'triangle', 0.04);
+      // Coffee shop ambience using filtered pink noise
+      const cafeNoise = createPinkNoise(audioContext);
+      noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = cafeNoise;
+      noiseSource.loop = true;
+      
+      const cafeFilter = audioContext.createBiquadFilter();
+      cafeFilter.type = 'bandpass';
+      cafeFilter.frequency.setValueAtTime(600, audioContext.currentTime);
+      cafeFilter.Q.setValueAtTime(1, audioContext.currentTime);
+      
+      const cafeGain = audioContext.createGain();
+      cafeGain.gain.setValueAtTime(0.1, audioContext.currentTime);
+      
+      noiseSource.connect(cafeFilter);
+      cafeFilter.connect(cafeGain);
+      cafeGain.connect(masterGain);
+      
+      sources.push(noiseSource);
       break;
   }
 
   return {
-    start: () => sources.forEach(source => source.start()),
-    stop: () => sources.forEach(source => {
-      try { source.stop(); } catch (e) { /* already stopped */ }
-    }),
+    start: () => {
+      sources.forEach(source => {
+        try {
+          source.start();
+        } catch (e) {
+          console.warn('Source already started:', e);
+        }
+      });
+    },
+    stop: cleanup,
     setVolume: (volume: number) => {
       masterGain.gain.setValueAtTime(volume, audioContext.currentTime);
     }
