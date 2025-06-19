@@ -27,10 +27,10 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
               <TreePine className="w-16 h-16 text-primary" />
             </div>
             <div className="space-y-2">
-              <h1 className="text-6xl font-bold forest-gradient bg-clip-text text-transparent">
+              <h1 className="text-6xl font-bold bg-gradient-to-r from-primary via-green-500 to-primary bg-clip-text text-transparent">
                 Loglings
               </h1>
-              <p className="text-xl text-primary/80 font-medium">
+              <p className="text-xl text-primary font-medium">
                 Cozy Security Adventures
               </p>
             </div>
