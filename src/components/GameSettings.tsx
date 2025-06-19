@@ -1,20 +1,34 @@
 
 import { useState } from 'react';
-import { Settings, Volume2, VolumeX, Smartphone, Bell, Share2, X } from 'lucide-react';
+import { Settings, Volume2, VolumeX, Smartphone, Bell, Share2, X, Shield, Heart, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
+import { useUserProfile } from '../hooks/useUserProfile';
 import MusicSelector from './MusicSelector';
 
 const GameSettings = () => {
-  const { progress, updatePreferences } = useEnhancedProgress();
+  const { profile, updatePreferences, resetOnboarding } = useUserProfile();
   const [isOpen, setIsOpen] = useState(false);
 
   const handlePreferenceChange = (key: string, value: any) => {
     updatePreferences({ [key]: value });
   };
+
+  const handleModeSwitch = () => {
+    resetOnboarding();
+    setIsOpen(false);
+  };
+
+  const getModeInfo = () => {
+    return profile.mode === 'cozy-everyday' 
+      ? { name: 'Cozy Everyday Discovery', icon: Heart, color: 'text-green-600' }
+      : { name: 'Career Pro Mode', icon: Shield, color: 'text-blue-600' };
+  };
+
+  const modeInfo = getModeInfo();
+  const ModeIcon = modeInfo.icon;
 
   return (
     <>
@@ -45,6 +59,36 @@ const GameSettings = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6 pb-6">
+              {/* Current Mode Display */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center gap-2 text-sm">
+                  <ModeIcon className={`w-4 h-4 ${modeInfo.color} shrink-0`} />
+                  Current Adventure Mode
+                </h4>
+                <div className="p-4 bg-muted/30 rounded-xl border">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium">{modeInfo.name}</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {profile.mode === 'cozy-everyday' 
+                          ? 'Gentle learning for everyone'
+                          : 'Career-focused skill building'
+                        }
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleModeSwitch}
+                      className="cozy-card"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Switch Mode
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
               {/* Music Selection */}
               <div className="space-y-3">
                 <MusicSelector />
@@ -53,7 +97,7 @@ const GameSettings = () => {
               {/* Audio Settings */}
               <div className="space-y-3">
                 <h4 className="font-semibold flex items-center gap-2 text-sm">
-                  {progress.preferences.audioEnabled ? (
+                  {profile.preferences.audioEnabled ? (
                     <Volume2 className="w-4 h-4 text-accent shrink-0" />
                   ) : (
                     <VolumeX className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -65,7 +109,7 @@ const GameSettings = () => {
                     Game feedback sounds
                   </span>
                   <Switch
-                    checked={progress.preferences.audioEnabled}
+                    checked={profile.preferences.audioEnabled}
                     onCheckedChange={(checked) => handlePreferenceChange('audioEnabled', checked)}
                     className="shrink-0"
                   />
@@ -79,7 +123,7 @@ const GameSettings = () => {
                   Adventure Difficulty
                 </h4>
                 <Select
-                  value={progress.preferences.difficulty}
+                  value={profile.preferences.difficulty}
                   onValueChange={(value) => handlePreferenceChange('difficulty', value)}
                 >
                   <SelectTrigger className="w-full">
@@ -104,7 +148,7 @@ const GameSettings = () => {
                     Gentle learning nudges
                   </span>
                   <Switch
-                    checked={progress.preferences.notifications}
+                    checked={profile.preferences.notifications}
                     onCheckedChange={(checked) => handlePreferenceChange('notifications', checked)}
                     className="shrink-0"
                   />
@@ -122,7 +166,7 @@ const GameSettings = () => {
                     Celebrate with friends
                   </span>
                   <Switch
-                    checked={progress.preferences.shareAchievements}
+                    checked={profile.preferences.shareAchievements}
                     onCheckedChange={(checked) => handlePreferenceChange('shareAchievements', checked)}
                     className="shrink-0"
                   />
