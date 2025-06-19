@@ -245,7 +245,7 @@ To every security professional who's ever thought "there has to be a gentler way
 
 *Made with 🌿 and endless cups of tea for a more accessible cybersecurity world*
 
-**Version**: Open Beta Forest | **Last Updated**: December 2024  
+**Version**: Open Beta Forest | **Last Updated**: June 2025  
 **Creator**: [Teshera Kimbrough](https://github.com/tesherakimbrough) | **Platform**: [Lovable](https://lovable.dev)
 
 </div>
