@@ -177,9 +177,12 @@ export const useGameLogic = (
       setTimeout(() => {
         onEndGame({
           score: score + pointsEarned,
-          totalRounds,
+          accuracy: finalAccuracy,
+          timeElapsed,
           correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
-          timeElapsed
+          totalQuestions: totalRounds,
+          totalRounds,
+          difficulty: calculateOptimalDifficulty()
         });
       }, 2000);
     }

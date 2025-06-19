@@ -16,6 +16,7 @@ export interface GameData {
   timeElapsed: number;
   correctAnswers: number;
   totalQuestions: number;
+  totalRounds: number;
   difficulty: string;
 }
 
@@ -83,8 +84,8 @@ const Index = () => {
           <div className="space-y-8">
             <GameResults 
               gameData={gameData}
-              onPlayAgain={handlePlayAgain}
-              onBackToIntro={handleBackToIntro}
+              onRestart={handlePlayAgain}
+              userMode={selectedMode}
             />
             
             <Tabs defaultValue="progress" className="w-full">
