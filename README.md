@@ -1,4 +1,3 @@
-
 # 🌱 Loglings: Cozy Cybersecurity Forest 🌿
 
 A magical, cozy cybersecurity learning game where you explore the enchanted forest while mastering threat detection and log analysis. Join the Loglings on their journey to protect the digital woodland!
@@ -61,93 +60,6 @@ Your forest wisdom is needed: How suspicious is this? 🤔
 ```
 
 **What happens next?** You'll learn why certain patterns matter, get gentle feedback on your choice, and watch your forest knowledge grow with each scenario!
-
----
-
-## 🚀 Getting Started (Developers)
-
-### Prerequisites
-- **Node.js**: Version 18 or higher ([Download here](https://nodejs.org/))
-- **Package Manager**: npm (included with Node.js) or bun
-- **Browser**: Modern browser for testing (Chrome 80+, Firefox 75+, Safari 13+)
-- **Supabase Account**: For backend features ([Sign up free](https://supabase.com))
-
-### 🛠️ Local Development Setup
-
-```bash
-# 1. Clone the magical forest
-git clone <YOUR_GIT_URL>
-cd loglings-cozy-cybersecurity
-
-# 2. Install forest dependencies
-npm install
-
-# 3. Set up your environment
-cp .env.example .env.local
-
-# 4. Configure Supabase (see step-by-step guide below)
-# Edit .env.local with your Supabase credentials
-
-# 5. Start your local forest
-npm run dev
-
-# 6. Open the enchanted portal
-# Navigate to http://localhost:8080
-```
-
-### 🔐 Environment Configuration
-
-Create a `.env.local` file in your project root:
-
-```env
-VITE_SUPABASE_URL=your-supabase-project-url
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-```
-
-**Step-by-step Supabase setup:**
-
-1. **Create Account**: Visit [supabase.com](https://supabase.com) and sign up for free
-2. **New Project**: Click "New Project" and choose your organization
-3. **Project Settings**: Give it a cozy name like "loglings-forest"
-4. **Get Credentials**: 
-   - Go to Settings → API in your Supabase dashboard
-   - Copy your "Project URL" (starts with `https://`)
-   - Copy your "anon public" key (long string starting with `eyJ`)
-5. **Update Environment**: Paste both values into your `.env.local` file
-6. **Database Setup**: The app will automatically create needed tables on first run
-
-### 🌳 Tech Stack & Architecture
-
-**Frontend Forest**:
-- **Framework**: React 18 with TypeScript
-- **Styling**: Tailwind CSS + Custom Cozy Theme
-- **UI Components**: Shadcn/ui for consistent forest design
-- **Build Tool**: Vite for lightning-fast development
-- **Routing**: React Router for forest navigation
-
-**Backend Woodland**:
-- **Database**: Supabase (PostgreSQL with real-time features)
-- **Authentication**: Supabase Auth (optional - guest play supported)
-- **File Storage**: Supabase Storage for assets
-- **API**: Supabase Edge Functions for custom logic
-
-**Cozy Extras**:
-- **Audio**: Howler.js for ambient forest sounds
-- **Charts**: Recharts for progress visualization  
-- **State Management**: React Query for smooth data fetching
-- **Animations**: Custom CSS animations for magical effects
-
-**Architecture Overview**:
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   React App     │───▶│   Supabase       │───▶│   Game Logic    │
-│   (Frontend)    │    │   (Backend)      │    │   (Scenarios)   │
-│                 │    │                  │    │                 │
-│ • Game UI       │    │ • User Profiles  │    │ • Log Analysis  │
-│ • Progress      │    │ • Progress Data  │    │ • Difficulty    │
-│ • Audio System  │    │ • Game Sessions  │    │ • Achievement   │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
 
 ---
 
@@ -273,19 +185,12 @@ For detailed guidelines, see our [CONTRIBUTING.md](./CONTRIBUTING.md) *(coming s
 - Check our [FAQ section](#faq) below
 - Ask questions in our Discord community
 
-**For Developers**:
-- Review the [troubleshooting section](#troubleshooting) below
-- Check existing GitHub issues before creating new ones
-- Join our Discord for real-time development chat
-- Read the [Lovable Platform Documentation](https://docs.lovable.dev/)
-
 ### Feedback & Bug Reports
 
 We treasure your feedback! Here's how to share it:
 
 - **In-Game**: Use the feedback button (preferred for gameplay issues)
 - **GitHub Issues**: For technical problems or feature requests
-- **Discord**: For community discussion and quick questions
 - **Email**: For sensitive issues or partnership inquiries
 
 ---
@@ -366,40 +271,6 @@ A: The core game is completely free! We're exploring optional premium content fo
 # Verify cookies are enabled
 ```
 
-### Common Developer Issues
-
-**Build fails after git pull:**
-```bash
-# Clear node modules and reinstall
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
-```
-
-**Supabase connection errors:**
-```bash
-# Verify .env.local file exists and has correct format
-# Check Supabase project status at supabase.com
-# Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set
-# Try regenerating anon key in Supabase dashboard
-```
-
-**TypeScript errors:**
-```bash
-# Update TypeScript and restart your editor
-npm install typescript@latest
-# Check for missing type definitions
-npm install @types/node --save-dev
-```
-
-**Performance issues:**
-```bash
-# Check browser dev tools for console errors
-# Disable browser extensions temporarily
-# Close other resource-intensive applications
-# Try incognito/private browsing mode
-```
-
 ---
 
 ## 🌟 Project Origin & Vision
@@ -446,11 +317,11 @@ To every security professional who's ever thought "there has to be a gentler way
 
 **Ready to begin your cozy cybersecurity journey?** 🌱
 
-[🎮 Start Playing Now](https://your-lovable-app-url.lovable.app) | [💬 Join Discord](https://discord.com/channels/1119885301872070706/1280461670979993613) | [🛠️ Contribute on GitHub](https://github.com/your-username/loglings)
+[🎮 Start Playing Now](https://loglings.lovable.app) | [🛠️ Contribute on GitHub](https://github.com/tesherakimbrough/loglings)
 
 *Made with 🌿 and endless cups of tea for a more accessible cybersecurity world*
 
 **Version**: Open Beta Forest | **Last Updated**: December 2024  
-**Creator**: [Teshera Kimbrough](https://github.com/your-profile) | **Platform**: [Lovable](https://lovable.dev)
+**Creator**: [Teshera Kimbrough](https://github.com/tesherakimbrough) | **Platform**: [Lovable](https://lovable.dev)
 
 </div>
