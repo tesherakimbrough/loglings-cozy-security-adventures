@@ -1,77 +1,16 @@
 
 import { useState, useEffect } from 'react';
-import { useEnhancedProgress } from './useEnhancedProgress';
+import { useUserProfile } from './useUserProfile';
+import { generateImprovedDailyChallenge, ImprovedDailyChallenge } from '../utils/improvedDailyChallenges';
 
-export interface DailyChallenge {
-  id: string;
-  date: string;
-  title: string;
-  description: string;
-  emoji: string;
-  type: 'accuracy' | 'speed' | 'streak' | 'category-focus';
-  target: number;
-  progress: number;
-  completed: boolean;
-  reward: {
-    joyPoints: number;
-    achievement?: string;
-    unlockable?: string;
-  };
-}
+export type { ImprovedDailyChallenge as DailyChallenge };
 
-const STORAGE_KEY = 'loglings-daily-challenges';
+const STORAGE_KEY = 'loglings-daily-challenges-v2';
 
 export const useDailyChallenges = () => {
-  const { progress } = useEnhancedProgress();
-  const [challenges, setChallenges] = useState<DailyChallenge[]>([]);
+  const { profile } = useUserProfile();
+  const [challenges, setChallenges] = useState<ImprovedDailyChallenge[]>([]);
   const [streakCount, setStreakCount] = useState(0);
-
-  const generateDailyChallenge = (date: string): DailyChallenge => {
-    const challengeTemplates = [
-      {
-        type: 'accuracy' as const,
-        title: 'Perfect Vision',
-        description: 'Achieve 80% accuracy in a session',
-        emoji: '🎯',
-        target: 8,
-        reward: { joyPoints: 150, achievement: 'daily-perfectionist' }
-      },
-      {
-        type: 'speed' as const,
-        title: 'Quick Thinking',
-        description: 'Complete a 10-round session in under 5 minutes',
-        emoji: '⚡',
-        target: 300, // seconds
-        reward: { joyPoints: 100, unlockable: 'speed-badge' }
-      },
-      {
-        type: 'streak' as const,
-        title: 'Consistency Champion',
-        description: 'Play for 3 days in a row',
-        emoji: '🔥',
-        target: 3,
-        reward: { joyPoints: 200, achievement: 'streak-keeper' }
-      },
-      {
-        type: 'category-focus' as const,
-        title: 'Network Guardian',
-        description: 'Correctly identify 5 network-related logs',
-        emoji: '🌐',
-        target: 5,
-        reward: { joyPoints: 120, unlockable: 'network-expert' }
-      }
-    ];
-
-    const template = challengeTemplates[Math.floor(Math.random() * challengeTemplates.length)];
-    
-    return {
-      id: `daily-${date}`,
-      date,
-      ...template,
-      progress: 0,
-      completed: false
-    };
-  };
 
   const getTodayString = () => {
     return new Date().toISOString().split('T')[0];
@@ -83,20 +22,22 @@ export const useDailyChallenges = () => {
     
     if (saved) {
       const parsed = JSON.parse(saved);
-      const todayChallenge = parsed.find((c: DailyChallenge) => c.date === today);
+      const todayChallenge = parsed.find((c: ImprovedDailyChallenge) => c.date === today);
       
       if (todayChallenge) {
         setChallenges([todayChallenge]);
       } else {
-        // Generate new challenge for today
-        const newChallenge = generateDailyChallenge(today);
-        const updatedChallenges = [...parsed.filter((c: DailyChallenge) => c.date !== today), newChallenge];
+        // Generate new challenge for today based on user level
+        const userLevel = profile.preferences.difficulty;
+        const newChallenge = generateImprovedDailyChallenge(today, userLevel);
+        const updatedChallenges = [...parsed.filter((c: ImprovedDailyChallenge) => c.date !== today), newChallenge];
         setChallenges([newChallenge]);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedChallenges));
       }
     } else {
       // First time - generate today's challenge
-      const newChallenge = generateDailyChallenge(today);
+      const userLevel = profile.preferences.difficulty;
+      const newChallenge = generateImprovedDailyChallenge(today, userLevel);
       setChallenges([newChallenge]);
       localStorage.setItem(STORAGE_KEY, JSON.stringify([newChallenge]));
     }
@@ -114,7 +55,7 @@ export const useDailyChallenges = () => {
     // Save to localStorage
     const saved = localStorage.getItem(STORAGE_KEY) || '[]';
     const allChallenges = JSON.parse(saved);
-    const updated = allChallenges.map((c: DailyChallenge) => {
+    const updated = allChallenges.map((c: ImprovedDailyChallenge) => {
       if (c.id === challengeId) {
         const completed = newProgress >= c.target;
         return { ...c, progress: newProgress, completed };
@@ -129,7 +70,7 @@ export const useDailyChallenges = () => {
     if (!saved) return 0;
     
     const allChallenges = JSON.parse(saved);
-    const completedChallenges = allChallenges.filter((c: DailyChallenge) => c.completed);
+    const completedChallenges = allChallenges.filter((c: ImprovedDailyChallenge) => c.completed);
     
     // Calculate consecutive days
     let streak = 0;
@@ -140,7 +81,7 @@ export const useDailyChallenges = () => {
       checkDate.setDate(today.getDate() - i);
       const dateString = checkDate.toISOString().split('T')[0];
       
-      const dayChallenge = completedChallenges.find((c: DailyChallenge) => c.date === dateString);
+      const dayChallenge = completedChallenges.find((c: ImprovedDailyChallenge) => c.date === dateString);
       if (dayChallenge) {
         streak++;
       } else if (i > 0) {
@@ -154,7 +95,7 @@ export const useDailyChallenges = () => {
   useEffect(() => {
     loadChallenges();
     setStreakCount(checkStreak());
-  }, []);
+  }, [profile.preferences.difficulty]); // Regenerate when difficulty changes
 
   const todaysChallenge = challenges[0] || null;
 

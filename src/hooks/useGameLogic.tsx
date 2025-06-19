@@ -1,9 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { ThreatLevel } from '../utils/logGenerator';
-import { generateProceduralLog } from '../utils/enhancedLogScenarios';
+import { generateExpandedLog } from '../utils/expandedLogScenarios';
 import { useSoundFeedback } from './useSoundFeedback';
 import { useDailyChallenges } from './useDailyChallenges';
+import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../pages/Index';
 
@@ -18,6 +19,8 @@ interface LogEntry {
   threatLevel: ThreatLevel;
   explanation: string;
   category?: string;
+  difficulty?: string;
+  learningTip?: string;
 }
 
 export const useGameLogic = (
@@ -34,9 +37,11 @@ export const useGameLogic = (
   const [gameStartTime] = useState(Date.now());
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [isProMode] = useState(userMode === 'career-pro');
+  const [correctByCategory, setCorrectByCategory] = useState<Record<string, number>>({});
 
   const { playCorrectSound, playIncorrectSound, cleanup } = useSoundFeedback();
   const { todaysChallenge, updateChallengeProgress } = useDailyChallenges();
+  const { calculateOptimalDifficulty, updateMetrics, getEncouragementMessage } = useAdaptiveDifficulty();
   const totalRounds = 10;
 
   useEffect(() => {
@@ -53,7 +58,9 @@ export const useGameLogic = (
   }, [cleanup]);
 
   const generateNewLog = () => {
-    const newLog = generateProceduralLog();
+    // Use adaptive difficulty or user preference
+    const difficulty = calculateOptimalDifficulty();
+    const newLog = generateExpandedLog(difficulty);
     setCurrentLog(newLog as LogEntry);
     setFeedback(null);
     setShowNextRound(false);
@@ -61,34 +68,20 @@ export const useGameLogic = (
   };
 
   const getEnhancedFeedback = (playerChoice: ThreatLevel, log: LogEntry, correct: boolean) => {
-    if (correct) {
-      if (isProMode) {
-        const proMessages = {
-          'safe': `Excellent analysis! This appears to be normal user behavior - ${log.explanation}`,
-          'warning': `Good catch! Your threat detection skills identified this anomaly correctly - ${log.explanation}`,
-          'critical': `Outstanding incident response! You correctly escalated this critical threat - ${log.explanation}`
-        };
-        return proMessages[log.threatLevel];
-      } else {
-        const cozyMessages = {
-          'safe': `Perfect! Pip the Safe Logling is so happy! 🌸 ${log.explanation}`,
-          'warning': `Wonderful! Luna the Curious Logling thanks you for noticing! ✨ ${log.explanation}`,
-          'critical': `Excellent! Sage the Alert Logling is proud of your quick thinking! 🌿 ${log.explanation}`
-        };
-        return cozyMessages[log.threatLevel];
-      }
-    } else {
-      if (isProMode) {
-        const correctAction = {
-          'safe': 'normal activity',
-          'warning': 'suspicious behavior requiring investigation',
-          'critical': 'a critical security incident'
-        }[log.threatLevel];
-        return `Let's review this together. This was actually ${correctAction}. ${log.explanation} Keep practicing - each scenario builds your expertise!`;
-      } else {
-        return `That's okay, dear friend! Every step teaches us something beautiful. 💙 ${log.explanation}`;
-      }
-    }
+    const baseFeedback = correct 
+      ? (isProMode 
+          ? `Excellent analysis! ${log.explanation}`
+          : log.explanation)
+      : (isProMode
+          ? `Let's review: ${log.explanation}`
+          : `That's okay! ${log.explanation}`);
+    
+    // Add learning tip for educational value
+    const learningTip = log.learningTip 
+      ? `\n\n💡 Pro tip: ${log.learningTip}`
+      : '';
+    
+    return baseFeedback + learningTip;
   };
 
   const handleThreatAssessment = (playerChoice: ThreatLevel) => {
@@ -97,26 +90,43 @@ export const useGameLogic = (
     const answerIsCorrect = playerChoice === currentLog.threatLevel;
     let pointsEarned = 0;
 
-    // Play sound feedback
+    // Enhanced scoring system
     if (answerIsCorrect) {
       playCorrectSound();
-      pointsEarned = currentLog.threatLevel === 'critical' ? 100 : 
-                    currentLog.threatLevel === 'warning' ? 75 : 50;
+      const basePoints = currentLog.threatLevel === 'critical' ? 100 : 
+                        currentLog.threatLevel === 'warning' ? 75 : 50;
+      
+      // Bonus for speed (under 30 seconds)
+      const roundTime = timeElapsed - ((currentRound - 1) * 30); // Estimate
+      const speedBonus = roundTime < 30 ? Math.floor(basePoints * 0.2) : 0;
+      
+      pointsEarned = basePoints + speedBonus;
       setCorrectAnswers(prev => prev + 1);
+      
+      // Track category performance
+      if (currentLog.category) {
+        setCorrectByCategory(prev => ({
+          ...prev,
+          [currentLog.category!]: (prev[currentLog.category!] || 0) + 1
+        }));
+      }
     } else {
       playIncorrectSound();
-      pointsEarned = -25;
+      pointsEarned = -10; // Smaller penalty to encourage learning
     }
 
-    // Update daily challenge progress
+    // Update daily challenge progress with more sophisticated tracking
     if (todaysChallenge && answerIsCorrect) {
       if (todaysChallenge.type === 'accuracy') {
-        updateChallengeProgress(todaysChallenge.id, correctAnswers + 1);
+        const currentAccuracy = ((correctAnswers + 1) / currentRound) * 100;
+        updateChallengeProgress(todaysChallenge.id, Math.floor(currentAccuracy));
       } else if (todaysChallenge.type === 'category-focus' && currentLog.category) {
         const challengeCategory = todaysChallenge.description.toLowerCase();
         if (challengeCategory.includes(currentLog.category)) {
           updateChallengeProgress(todaysChallenge.id, todaysChallenge.progress + 1);
         }
+      } else if (todaysChallenge.type === 'threat-specialist' && currentLog.threatLevel === 'critical') {
+        updateChallengeProgress(todaysChallenge.id, todaysChallenge.progress + 1);
       }
     }
 
@@ -132,6 +142,14 @@ export const useGameLogic = (
       if (todaysChallenge && todaysChallenge.type === 'speed' && timeElapsed < todaysChallenge.target) {
         updateChallengeProgress(todaysChallenge.id, todaysChallenge.target);
       }
+      
+      // Update adaptive difficulty metrics
+      const finalAccuracy = ((correctAnswers + (answerIsCorrect ? 1 : 0)) / totalRounds) * 100;
+      updateMetrics({
+        accuracy: finalAccuracy,
+        timeSpent: timeElapsed,
+        correctByCategory
+      });
       
       setTimeout(() => {
         onEndGame({
@@ -161,6 +179,7 @@ export const useGameLogic = (
     isProMode,
     totalRounds,
     todaysChallenge,
+    encouragementMessage: getEncouragementMessage(),
     handleThreatAssessment,
     nextRound
   };
