@@ -5,12 +5,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
-import { generateLogEntry, LogEntry, ThreatLevel } from '../utils/logGenerator';
+import { ThreatLevel } from '../utils/logGenerator';
+import { generateProceduralLog } from '../utils/enhancedLogScenarios';
 import { useSoundFeedback } from '../hooks/useSoundFeedback';
+import { useDailyChallenges } from '../hooks/useDailyChallenges';
 
 interface GamePlayProps {
   onEndGame: (gameData: GameData) => void;
   userMode?: UserMode;
+}
+
+interface LogEntry {
+  timestamp: string;
+  sourceIP: string;
+  eventType: string;
+  user: string;
+  location: string;
+  status: string;
+  details: string;
+  threatLevel: ThreatLevel;
+  explanation: string;
+  category?: string;
 }
 
 const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
@@ -26,6 +41,7 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   const [isProMode] = useState(userMode === 'career-pro');
 
   const { playCorrectSound, playIncorrectSound, cleanup } = useSoundFeedback();
+  const { todaysChallenge, updateChallengeProgress } = useDailyChallenges();
   const totalRounds = 10;
 
   useEffect(() => {
@@ -42,7 +58,8 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   }, [cleanup]);
 
   const generateNewLog = () => {
-    setCurrentLog(generateLogEntry());
+    const newLog = generateProceduralLog();
+    setCurrentLog(newLog as LogEntry);
     setFeedback(null);
     setShowNextRound(false);
     setIsCorrect(null);
@@ -96,6 +113,19 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
       pointsEarned = -25;
     }
 
+    // Update daily challenge progress
+    if (todaysChallenge && answerIsCorrect) {
+      if (todaysChallenge.type === 'accuracy') {
+        updateChallengeProgress(todaysChallenge.id, correctAnswers + 1);
+      } else if (todaysChallenge.type === 'category-focus' && currentLog.category) {
+        // Check if this matches the challenge category
+        const challengeCategory = todaysChallenge.description.toLowerCase();
+        if (challengeCategory.includes(currentLog.category)) {
+          updateChallengeProgress(todaysChallenge.id, todaysChallenge.progress + 1);
+        }
+      }
+    }
+
     const enhancedFeedback = getEnhancedFeedback(playerChoice, currentLog, answerIsCorrect);
     
     setScore(prev => prev + pointsEarned);
@@ -104,6 +134,11 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
     setShowNextRound(true);
 
     if (currentRound >= totalRounds) {
+      // Update speed challenge if applicable
+      if (todaysChallenge && todaysChallenge.type === 'speed' && timeElapsed < todaysChallenge.target) {
+        updateChallengeProgress(todaysChallenge.id, todaysChallenge.target);
+      }
+      
       setTimeout(() => {
         onEndGame({
           score: score + pointsEarned,
@@ -156,6 +191,28 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Daily Challenge Banner */}
+        {todaysChallenge && !todaysChallenge.completed && (
+          <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{todaysChallenge.emoji}</span>
+                <div className="flex-1">
+                  <div className="font-semibold text-amber-700 dark:text-amber-300">
+                    Daily Challenge: {todaysChallenge.title}
+                  </div>
+                  <div className="text-sm text-amber-600 dark:text-amber-400">
+                    {todaysChallenge.description} ({todaysChallenge.progress}/{todaysChallenge.target})
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-amber-600 border-amber-300">
+                  +{todaysChallenge.reward.joyPoints} Joy
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Header Stats - Cozy Style */}
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -183,12 +240,17 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
           </div>
         </div>
 
-        {/* Log Analysis - Cozy Style */}
+        {/* Log Analysis - Enhanced with category info */}
         <Card className="cozy-card cozy-glow">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Sparkles className="w-6 h-6 text-accent animate-sparkle" />
               Chapter {currentRound}: A New Discovery
+              {currentLog.category && (
+                <Badge variant="outline" className="ml-2 text-xs">
+                  {currentLog.category}
+                </Badge>
+              )}
             </CardTitle>
             <p className="text-muted-foreground">
               {isProMode 
