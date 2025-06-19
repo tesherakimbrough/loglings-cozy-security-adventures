@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import GameHeader from './GameHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,6 +54,7 @@ const AdvancedGamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: AdvancedGam
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-6">
         <GameHeader
+          todaysChallenge={null}
           currentRound={currentRound}
           totalRounds={totalRounds}
           score={score}

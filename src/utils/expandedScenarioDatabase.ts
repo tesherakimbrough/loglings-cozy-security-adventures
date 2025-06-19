@@ -1,6 +1,7 @@
-import { LogEntry, ThreatLevel } from './logGenerator';
+import { ThreatLevel } from './logGenerator';
 
-interface LogEntry {
+interface ExpandedLogEntry {
+  id?: string;
   timestamp: string;
   sourceIP: string;
   eventType: string;
@@ -16,10 +17,11 @@ interface LogEntry {
 }
 
 // Massive scenario database with 120+ unique cybersecurity scenarios
-const scenarioDatabase: LogEntry[] = [
+const scenarioDatabase: ExpandedLogEntry[] = [
   // === BEGINNER SCENARIOS (40) ===
   // Authentication & Access Control
   {
+    id: 'auth-001',
     timestamp: '2024-04-01T09:30:00Z',
     sourceIP: '192.168.1.100',
     eventType: 'login_attempt',
@@ -586,9 +588,10 @@ export const generateAdvancedScenario = (
   }
 };
 
-const getScenariosByDifficulty = (difficulty: string): LogEntry[] => {
-  const beginnerScenarios: LogEntry[] = [
+const getScenariosByDifficulty = (difficulty: string): ExpandedLogEntry[] => {
+  const beginnerScenarios: ExpandedLogEntry[] = [
     {
+      id: 'fallback-001',
       sourceIP: '192.168.1.100',
       eventType: 'User Login',
       user: 'alice@company.com',
@@ -603,6 +606,7 @@ const getScenariosByDifficulty = (difficulty: string): LogEntry[] => {
       learningTip: 'Normal authentication logs show expected user behavior patterns.'
     },
     {
+      id: 'fallback-002',
       sourceIP: '203.0.113.45',
       eventType: 'Login Attempt',
       user: 'admin@company.com',
@@ -618,8 +622,9 @@ const getScenariosByDifficulty = (difficulty: string): LogEntry[] => {
     }
   ];
 
-  const intermediateScenarios: LogEntry[] = [
+  const intermediateScenarios: ExpandedLogEntry[] = [
     {
+      id: 'fallback-003',
       sourceIP: '10.0.0.15',
       eventType: 'File Access',
       user: 'bob@company.com',
@@ -635,8 +640,9 @@ const getScenariosByDifficulty = (difficulty: string): LogEntry[] => {
     }
   ];
 
-  const advancedScenarios: LogEntry[] = [
+  const advancedScenarios: ExpandedLogEntry[] = [
     {
+      id: 'fallback-004',
       sourceIP: '172.16.0.8',
       eventType: 'Network Traffic',
       user: 'system',

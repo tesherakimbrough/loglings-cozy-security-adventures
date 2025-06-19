@@ -58,7 +58,7 @@ const Index = () => {
         <>
           <GameResults 
             gameData={gameData} 
-            onPlayAgain={handlePlayAgain}
+            onRestart={handlePlayAgain}
             userMode={userMode}
           />
           <FeedbackCollectionSystem
