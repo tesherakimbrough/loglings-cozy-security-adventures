@@ -1,3 +1,4 @@
+import { DifficultyLevel } from '../types/userTypes';
 
 export interface ImprovedDailyChallenge {
   id: string;
@@ -9,7 +10,7 @@ export interface ImprovedDailyChallenge {
   target: number;
   progress: number;
   completed: boolean;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  difficulty: DifficultyLevel;
   reward: {
     joyPoints: number;
     achievement?: string;
@@ -133,7 +134,7 @@ const challengePool = [
   }
 ];
 
-export const generateImprovedDailyChallenge = (date: string, userLevel: 'beginner' | 'intermediate' | 'advanced' = 'beginner'): ImprovedDailyChallenge => {
+export const generateImprovedDailyChallenge = (date: string, userLevel: DifficultyLevel = 'beginner'): ImprovedDailyChallenge => {
   // Filter challenges by user level
   const availableChallenges = challengePool.filter(challenge => 
     challenge.difficulty === userLevel || 

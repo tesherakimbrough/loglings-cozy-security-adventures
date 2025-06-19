@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useUserProfile } from './useUserProfile';
 import { generateImprovedDailyChallenge, ImprovedDailyChallenge } from '../utils/improvedDailyChallenges';
+import { DifficultyLevel } from '../types/userTypes';
 
 export type { ImprovedDailyChallenge as DailyChallenge };
 
@@ -28,7 +29,7 @@ export const useDailyChallenges = () => {
         setChallenges([todayChallenge]);
       } else {
         // Generate new challenge for today based on user level
-        const userLevel = profile.preferences.difficulty;
+        const userLevel = profile.preferences.difficulty as DifficultyLevel;
         const newChallenge = generateImprovedDailyChallenge(today, userLevel);
         const updatedChallenges = [...parsed.filter((c: ImprovedDailyChallenge) => c.date !== today), newChallenge];
         setChallenges([newChallenge]);
@@ -36,7 +37,7 @@ export const useDailyChallenges = () => {
       }
     } else {
       // First time - generate today's challenge
-      const userLevel = profile.preferences.difficulty;
+      const userLevel = profile.preferences.difficulty as DifficultyLevel;
       const newChallenge = generateImprovedDailyChallenge(today, userLevel);
       setChallenges([newChallenge]);
       localStorage.setItem(STORAGE_KEY, JSON.stringify([newChallenge]));

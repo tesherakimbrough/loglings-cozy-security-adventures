@@ -1,11 +1,12 @@
+
 import { useState, useEffect } from 'react';
-import { UserProfile, UserMode } from '../types/userTypes';
+import { UserProfile, UserMode, DifficultyLevel } from '../types/userTypes';
 
 const defaultProfile: UserProfile = {
   mode: 'cozy-everyday',
   hasCompletedOnboarding: false,
   preferences: {
-    difficulty: 'beginner',
+    difficulty: 'beginner' as DifficultyLevel,
     audioEnabled: true,
     soundEffectsEnabled: true,
     musicType: 'forest',
@@ -42,7 +43,8 @@ export const useUserProfile = () => {
             ...defaultProfile.preferences,
             ...parsed.preferences,
             soundEffectsEnabled: parsed.preferences?.soundEffectsEnabled ?? true,
-            soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4
+            soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4,
+            difficulty: (parsed.preferences?.difficulty as DifficultyLevel) || 'beginner'
           }
         };
         setProfile(migratedProfile);
@@ -63,12 +65,12 @@ export const useUserProfile = () => {
   const selectMode = (mode: UserMode) => {
     const modePreferences = {
       'cozy-everyday': {
-        difficulty: 'beginner',
+        difficulty: 'beginner' as DifficultyLevel,
         audioEnabled: true,
         musicType: 'forest'
       },
       'career-pro': {
-        difficulty: 'advanced',
+        difficulty: 'advanced' as DifficultyLevel,
         audioEnabled: true,
         musicType: 'lofi'
       }

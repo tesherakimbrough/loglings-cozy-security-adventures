@@ -1,10 +1,12 @@
+
 export type UserMode = 'cozy-everyday' | 'career-pro';
+export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 
 export interface UserProfile {
   mode: UserMode;
   hasCompletedOnboarding: boolean;
   preferences: {
-    difficulty: string;
+    difficulty: DifficultyLevel;
     audioEnabled: boolean;
     soundEffectsEnabled: boolean;
     musicType: string;

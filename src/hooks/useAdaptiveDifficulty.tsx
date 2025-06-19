@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUserProfile } from './useUserProfile';
+import { DifficultyLevel } from '../types/userTypes';
 
 interface PerformanceMetrics {
   accuracy: number;
@@ -20,7 +21,7 @@ export const useAdaptiveDifficulty = () => {
     consistentPerformance: false
   });
 
-  const calculateOptimalDifficulty = (): 'beginner' | 'intermediate' | 'advanced' => {
+  const calculateOptimalDifficulty = (): DifficultyLevel => {
     // Start with user's preferred difficulty
     let baseDifficulty = profile.preferences.difficulty;
     
