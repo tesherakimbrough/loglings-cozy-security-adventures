@@ -1,8 +1,6 @@
-
 import { ThreatLevel } from './logGenerator';
 
-export interface ExpandedScenario {
-  id: string;
+interface LogEntry {
   timestamp: string;
   sourceIP: string;
   eventType: string;
@@ -12,274 +10,291 @@ export interface ExpandedScenario {
   details: string;
   threatLevel: ThreatLevel;
   explanation: string;
-  category: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  learningTip: string;
-  tags: string[];
+  category?: string;
+  difficulty?: string;
+  learningTip?: string;
 }
 
-const scenarioTemplates = [
-  // Authentication Scenarios
+const scenarioTemplates: LogEntry[] = [
   {
+    timestamp: '2024-04-01T14:30:00Z',
+    sourceIP: '192.168.1.100',
+    eventType: 'login_attempt',
+    user: 'sarah.johnson',
+    location: 'office',
+    status: 'success',
+    details: 'Normal login during business hours',
+    threatLevel: 'safe',
+    explanation: 'This appears to be a normal login attempt during regular business hours.',
     category: 'authentication',
-    scenarios: [
-      {
-        eventType: 'login_attempt',
-        threatLevel: 'safe' as ThreatLevel,
-        difficulty: 'beginner' as const,
-        template: {
-          user: 'sarah.johnson',
-          location: 'office_network',
-          status: 'success',
-          details: 'Successful login from registered device during business hours',
-          explanation: 'This is a normal login during business hours from a recognized device.',
-          learningTip: 'Regular business hour logins from office networks are typically safe.'
-        }
-      },
-      {
-        eventType: 'failed_login',
-        threatLevel: 'warning' as ThreatLevel,
-        difficulty: 'intermediate' as const,
-        template: {
-          user: 'admin',
-          location: 'external_network',
-          status: 'failed',
-          details: 'Multiple failed login attempts to admin account from unknown IP',
-          explanation: 'Multiple failed attempts on an admin account could indicate a brute force attack.',
-          learningTip: 'Watch for patterns: multiple failures + admin accounts + external IPs = red flags.'
-        }
-      },
-      {
-        eventType: 'privilege_escalation',
-        threatLevel: 'critical' as ThreatLevel,
-        difficulty: 'advanced' as const,
-        template: {
-          user: 'temp_worker',
-          location: 'server_room',
-          status: 'success',
-          details: 'Temporary worker account gained administrative privileges outside normal process',
-          explanation: 'Unauthorized privilege escalation is a critical security incident.',
-          learningTip: 'Privilege changes should always follow documented approval processes.'
-        }
-      }
-    ]
+    difficulty: 'beginner',
+    learningTip: 'Always verify the time and location of login attempts.'
   },
-  
-  // Network Security Scenarios
   {
-    category: 'network',
-    scenarios: [
-      {
-        eventType: 'network_scan',
-        threatLevel: 'warning' as ThreatLevel,
-        difficulty: 'intermediate' as const,
-        template: {
-          user: 'unknown',
-          location: 'external_network',
-          status: 'detected',
-          details: 'Port scanning detected from external IP targeting multiple internal hosts',
-          explanation: 'Network scanning from external sources often precedes attacks.',
-          learningTip: 'Reconnaissance activities like port scans are early indicators of potential attacks.'
-        }
-      },
-      {
-        eventType: 'data_exfiltration',
-        threatLevel: 'critical' as ThreatLevel,
-        difficulty: 'advanced' as const,
-        template: {
-          user: 'database_service',
-          location: 'data_center',
-          status: 'alert',
-          details: 'Large volume of sensitive data accessed and transmitted to external server',
-          explanation: 'Unexpected large data transfers could indicate data theft.',
-          learningTip: 'Monitor for unusual data access patterns and large outbound transfers.'
-        }
-      }
-    ]
+    timestamp: '2024-04-01T03:15:00Z',
+    sourceIP: '203.0.113.45',
+    eventType: 'login_attempt',
+    user: 'mike.chen',
+    location: 'unknown',
+    status: 'failure',
+    details: 'Failed login attempt from unusual location outside business hours',
+    threatLevel: 'warning',
+    explanation: 'The failed login from an unusual location warrants further investigation.',
+    category: 'authentication',
+    difficulty: 'intermediate',
+    learningTip: 'Implement multi-factor authentication to mitigate risks from compromised passwords.'
   },
-
-  // Email Security Scenarios
   {
-    category: 'email',
-    scenarios: [
-      {
-        eventType: 'phishing_attempt',
-        threatLevel: 'warning' as ThreatLevel,
-        difficulty: 'beginner' as const,
-        template: {
-          user: 'marketing_team',
-          location: 'email_server',
-          status: 'quarantined',
-          details: 'Email with suspicious links blocked by security filters',
-          explanation: 'Phishing emails try to steal credentials or install malware.',
-          learningTip: 'Always verify sender identity before clicking links or downloading attachments.'
-        }
-      },
-      {
-        eventType: 'email_forwarding',
-        threatLevel: 'critical' as ThreatLevel,
-        difficulty: 'advanced' as const,
-        template: {
-          user: 'ceo',
-          location: 'email_server',
-          status: 'active',
-          details: 'CEO email account configured to forward all messages to external address',
-          explanation: 'Unauthorized email forwarding could indicate account compromise.',
-          learningTip: 'Executive email forwarding rules should be closely monitored and verified.'
-        }
-      }
-    ]
+    timestamp: '2024-04-01T18:45:00Z',
+    sourceIP: '10.0.0.50',
+    eventType: 'file_access',
+    user: 'alex.rodriguez',
+    location: 'home',
+    status: 'success',
+    details: 'User accessed sensitive financial documents remotely',
+    threatLevel: 'warning',
+    explanation: 'Accessing sensitive documents remotely should be monitored for anomalies.',
+    category: 'data_access',
+    difficulty: 'intermediate',
+    learningTip: 'Ensure sensitive data is encrypted both in transit and at rest.'
   },
-
-  // Malware Scenarios
   {
-    category: 'malware',
-    scenarios: [
-      {
-        eventType: 'file_scan',
-        threatLevel: 'safe' as ThreatLevel,
-        difficulty: 'beginner' as const,
-        template: {
-          user: 'accounting',
-          location: 'workstation',
-          status: 'clean',
-          details: 'Document scanned by antivirus - no threats detected',
-          explanation: 'Regular antivirus scans finding clean files are normal security operations.',
-          learningTip: 'Clean antivirus scans indicate your security tools are working properly.'
-        }
-      },
-      {
-        eventType: 'malware_detected',
-        threatLevel: 'critical' as ThreatLevel,
-        difficulty: 'intermediate' as const,
-        template: {
-          user: 'hr_department',
-          location: 'workstation',
-          status: 'quarantined',
-          details: 'Ransomware detected attempting to encrypt files on HR workstation',
-          explanation: 'Ransomware is a critical threat that can encrypt valuable business data.',
-          learningTip: 'Ransomware incidents require immediate isolation and incident response.'
-        }
-      }
-    ]
+    timestamp: '2024-04-01T22:00:00Z',
+    sourceIP: '172.16.0.200',
+    eventType: 'system_update',
+    user: 'system',
+    location: 'datacenter',
+    status: 'failure',
+    details: 'Attempt to install unauthorized software',
+    threatLevel: 'critical',
+    explanation: 'Unauthorized software installation attempts are a serious security breach.',
+    category: 'system_integrity',
+    difficulty: 'advanced',
+    learningTip: 'Regularly audit system logs for unauthorized software installations.'
   },
-
-  // Access Control Scenarios
   {
+    timestamp: '2024-04-02T09:00:00Z',
+    sourceIP: '198.51.100.33',
+    eventType: 'email_received',
+    user: 'emma.davis',
+    location: 'office',
+    status: 'success',
+    details: 'User received a phishing email with a malicious link',
+    threatLevel: 'warning',
+    explanation: 'Phishing emails can lead to malware infections or credential theft.',
+    category: 'phishing',
+    difficulty: 'intermediate',
+    learningTip: 'Train users to identify and report phishing emails.'
+  },
+  {
+    timestamp: '2024-04-02T11:30:00Z',
+    sourceIP: '192.0.2.146',
+    eventType: 'network_scan',
+    user: 'unknown',
+    location: 'internet',
+    status: 'detected',
+    details: 'External network scan detected targeting internal servers',
+    threatLevel: 'critical',
+    explanation: 'Network scans are often precursors to more serious attacks.',
+    category: 'network_security',
+    difficulty: 'advanced',
+    learningTip: 'Implement intrusion detection and prevention systems to block malicious traffic.'
+  },
+  {
+    timestamp: '2024-04-02T15:45:00Z',
+    sourceIP: '10.10.10.10',
+    eventType: 'login_attempt',
+    user: 'john.smith',
+    location: 'office',
+    status: 'success',
+    details: 'Successful login after multiple failed attempts',
+    threatLevel: 'warning',
+    explanation: 'Multiple failed login attempts followed by a successful one may indicate a brute-force attack.',
+    category: 'authentication',
+    difficulty: 'intermediate',
+    learningTip: 'Implement account lockout policies to prevent brute-force attacks.'
+  },
+  {
+    timestamp: '2024-04-02T17:00:00Z',
+    sourceIP: '172.20.0.5',
+    eventType: 'data_exfiltration',
+    user: 'lisa.wang',
+    location: 'home',
+    status: 'detected',
+    details: 'Large amount of data being transferred to an external drive',
+    threatLevel: 'critical',
+    explanation: 'Unusual data transfers to external devices can indicate data theft.',
+    category: 'data_loss_prevention',
+    difficulty: 'advanced',
+    learningTip: 'Monitor and control data transfers to prevent data exfiltration.'
+  },
+  {
+    timestamp: '2024-04-03T08:00:00Z',
+    sourceIP: '192.168.1.105',
+    eventType: 'application_error',
+    user: 'david.brown',
+    location: 'office',
+    status: 'failure',
+    details: 'Critical application crashed due to a memory leak',
+    threatLevel: 'warning',
+    explanation: 'Application crashes can lead to data loss and system instability.',
+    category: 'system_integrity',
+    difficulty: 'intermediate',
+    learningTip: 'Regularly patch and update applications to prevent vulnerabilities.'
+  },
+  {
+    timestamp: '2024-04-03T10:30:00Z',
+    sourceIP: '203.0.113.50',
+    eventType: 'malware_detected',
+    user: 'anna.garcia',
+    location: 'internet',
+    status: 'blocked',
+    details: 'Malware detected in an incoming email attachment',
+    threatLevel: 'critical',
+    explanation: 'Malware infections can compromise entire systems and networks.',
+    category: 'malware_detection',
+    difficulty: 'advanced',
+    learningTip: 'Use anti-malware software and regularly scan systems for infections.'
+  },
+  {
+    timestamp: '2024-04-03T14:00:00Z',
+    sourceIP: '10.0.0.55',
+    eventType: 'unauthorized_access',
+    user: 'guest',
+    location: 'datacenter',
+    status: 'failure',
+    details: 'Unauthorized access attempt to a restricted server',
+    threatLevel: 'critical',
+    explanation: 'Unauthorized access attempts should be immediately investigated.',
     category: 'access_control',
-    scenarios: [
-      {
-        eventType: 'file_access',
-        threatLevel: 'safe' as ThreatLevel,
-        difficulty: 'beginner' as const,
-        template: {
-          user: 'project_manager',
-          location: 'file_server',
-          status: 'success',
-          details: 'Project manager accessed project files during normal work hours',
-          explanation: 'Authorized users accessing appropriate files during business hours is normal.',
-          learningTip: 'Look for the right person, accessing the right files, at the right time.'
-        }
-      },
-      {
-        eventType: 'unauthorized_access',
-        threatLevel: 'critical' as ThreatLevel,
-        difficulty: 'advanced' as const,
-        template: {
-          user: 'intern',
-          location: 'finance_server',
-          status: 'success',
-          details: 'Intern account accessed confidential financial records outside normal duties',
-          explanation: 'Users accessing data outside their role indicates potential insider threat.',
-          learningTip: 'Monitor for access that doesn\'t match job responsibilities or need-to-know basis.'
-        }
-      }
-    ]
+    difficulty: 'advanced',
+    learningTip: 'Implement strong access control policies and regularly audit user permissions.'
   },
-
-  // System Security Scenarios
   {
-    category: 'system',
-    scenarios: [
-      {
-        eventType: 'system_update',
-        threatLevel: 'safe' as ThreatLevel,
-        difficulty: 'beginner' as const,
-        template: {
-          user: 'system_admin',
-          location: 'server_room',
-          status: 'completed',
-          details: 'Scheduled security patches applied to production servers',
-          explanation: 'Regular security updates are essential for maintaining system security.',
-          learningTip: 'Scheduled maintenance and patching are signs of good security hygiene.'
-        }
-      },
-      {
-        eventType: 'configuration_change',
-        threatLevel: 'warning' as ThreatLevel,
-        difficulty: 'intermediate' as const,
-        template: {
-          user: 'unknown',
-          location: 'firewall',
-          status: 'modified',
-          details: 'Firewall rules modified to allow unrestricted outbound connections',
-          explanation: 'Unauthorized firewall changes could create security vulnerabilities.',
-          learningTip: 'All security configuration changes should be documented and approved.'
-        }
-      }
-    ]
+    timestamp: '2024-04-03T16:45:00Z',
+    sourceIP: '172.16.0.205',
+    eventType: 'suspicious_activity',
+    user: 'sarah.johnson',
+    location: 'home',
+    status: 'detected',
+    details: 'User account exhibiting unusual behavior patterns',
+    threatLevel: 'warning',
+    explanation: 'Unusual user behavior can indicate a compromised account.',
+    category: 'anomaly_detection',
+    difficulty: 'intermediate',
+    learningTip: 'Use machine learning algorithms to detect anomalous user behavior.'
+  },
+  {
+    timestamp: '2024-04-04T09:30:00Z',
+    sourceIP: '198.51.100.38',
+    eventType: 'denial_of_service',
+    user: 'system',
+    location: 'internet',
+    status: 'ongoing',
+    details: 'Denial-of-service attack targeting the company website',
+    threatLevel: 'critical',
+    explanation: 'Denial-of-service attacks can disrupt critical business operations.',
+    category: 'network_security',
+    difficulty: 'advanced',
+    learningTip: 'Use content delivery networks (CDNs) and DDoS mitigation services to protect against attacks.'
+  },
+  {
+    timestamp: '2024-04-04T11:00:00Z',
+    sourceIP: '192.0.2.151',
+    eventType: 'vulnerability_scan',
+    user: 'unknown',
+    location: 'internet',
+    status: 'detected',
+    details: 'External vulnerability scan detected targeting web applications',
+    threatLevel: 'warning',
+    explanation: 'Vulnerability scans can identify weaknesses in web applications.',
+    category: 'vulnerability_management',
+    difficulty: 'intermediate',
+    learningTip: 'Regularly scan web applications for vulnerabilities and apply patches promptly.'
+  },
+  {
+    timestamp: '2024-04-04T14:15:00Z',
+    sourceIP: '10.10.10.15',
+    eventType: 'password_reset',
+    user: 'mike.chen',
+    location: 'office',
+    status: 'success',
+    details: 'User initiated a password reset request',
+    threatLevel: 'safe',
+    explanation: 'Password reset requests are normal but should be monitored for suspicious patterns.',
+    category: 'authentication',
+    difficulty: 'beginner',
+    learningTip: 'Implement strong password policies and multi-factor authentication.'
+  },
+  {
+    timestamp: '2024-04-04T17:30:00Z',
+    sourceIP: '172.20.0.10',
+    eventType: 'data_backup',
+    user: 'system',
+    location: 'datacenter',
+    status: 'success',
+    details: 'Successful completion of the daily data backup',
+    threatLevel: 'safe',
+    explanation: 'Regular data backups are essential for disaster recovery.',
+    category: 'data_loss_prevention',
+    difficulty: 'beginner',
+    learningTip: 'Regularly test data backups to ensure they can be restored successfully.'
   }
 ];
 
-export const generateExpandedScenario = (): ExpandedScenario => {
-  const category = scenarioTemplates[Math.floor(Math.random() * scenarioTemplates.length)];
-  const scenario = category.scenarios[Math.floor(Math.random() * category.scenarios.length)];
+export const generateExpandedScenario = (difficulty: string = 'beginner') => {
+  const availableScenarios = scenarioTemplates.filter(template => 
+    !template.difficulty || template.difficulty === difficulty || difficulty === 'mixed'
+  );
   
-  const ipRanges = ['192.168.1', '10.0.0', '172.16.0', '203.0.113', '198.51.100'];
-  const sourceIP = `${ipRanges[Math.floor(Math.random() * ipRanges.length)]}.${Math.floor(Math.random() * 255)}`;
+  const template = availableScenarios[Math.floor(Math.random() * availableScenarios.length)];
   
-  const timestamp = new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString();
+  const variations = {
+    sourceIP: generateRandomIP(),
+    user: generateRandomUser(),
+    timestamp: generateRecentTimestamp(),
+    location: generateRandomLocation()
+  };
   
   return {
-    id: `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    timestamp,
-    sourceIP,
-    eventType: scenario.eventType,
-    user: scenario.template.user,
-    location: scenario.template.location,
-    status: scenario.template.status,
-    details: scenario.template.details,
-    threatLevel: scenario.threatLevel,
-    explanation: scenario.template.explanation,
-    category: category.category,
-    difficulty: scenario.difficulty,
-    learningTip: scenario.template.learningTip,
-    tags: [category.category, scenario.difficulty, scenario.threatLevel]
+    ...template,
+    sourceIP: variations.sourceIP,
+    user: variations.user,
+    timestamp: variations.timestamp,
+    location: variations.location,
+    details: template.details.replace(/\{(\w+)\}/g, (match, key) => variations[key] || match)
   };
 };
 
-export const getScenariosByCategory = (category: string): ExpandedScenario[] => {
-  const categoryData = scenarioTemplates.find(c => c.category === category);
-  if (!categoryData) return [];
-  
-  return categoryData.scenarios.map(scenario => ({
-    id: `${category}_${scenario.eventType}`,
-    timestamp: new Date().toISOString(),
-    sourceIP: '192.168.1.100',
-    eventType: scenario.eventType,
-    user: scenario.template.user,
-    location: scenario.template.location,
-    status: scenario.template.status,
-    details: scenario.template.details,
-    threatLevel: scenario.threatLevel,
-    explanation: scenario.template.explanation,
-    category,
-    difficulty: scenario.difficulty,
-    learningTip: scenario.template.learningTip,
-    tags: [category, scenario.difficulty, scenario.threatLevel]
-  }));
+const generateRandomIP = () => {
+  const ips = [
+    '192.168.1.100', '10.0.0.50', '172.16.0.200', '203.0.113.45',
+    '198.51.100.33', '192.0.2.146', '10.10.10.10', '172.20.0.5'
+  ];
+  return ips[Math.floor(Math.random() * ips.length)];
 };
 
-export const generateMultipleScenarios = (count: number): ExpandedScenario[] => {
-  return Array.from({ length: count }, () => generateExpandedScenario());
+const generateRandomUser = () => {
+  const users = [
+    'sarah.johnson', 'mike.chen', 'alex.rodriguez', 'emma.davis',
+    'john.smith', 'lisa.wang', 'david.brown', 'anna.garcia'
+  ];
+  return users[Math.floor(Math.random() * users.length)];
+};
+
+const generateRecentTimestamp = () => {
+  const now = new Date();
+  const randomHours = Math.floor(Math.random() * 24);
+  const randomMinutes = Math.floor(Math.random() * 60);
+  now.setHours(now.getHours() - randomHours);
+  now.setMinutes(randomMinutes);
+  return now.toISOString();
+};
+
+const generateRandomLocation = () => {
+  const locations = [
+    'office', 'home', 'coffee_shop', 'airport', 'hotel',
+    'coworking_space', 'library', 'mobile'
+  ];
+  return locations[Math.floor(Math.random() * locations.length)];
 };
