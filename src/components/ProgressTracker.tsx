@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Sparkles, TreePine, Star, Award, Leaf } from 'lucide-react';
+import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 
 interface Achievement {
   id: string;
@@ -14,33 +15,25 @@ interface Achievement {
   maxProgress?: number;
 }
 
-interface ProgressData {
-  totalSessions: number;
-  totalScore: number;
-  correctAnswers: number;
-  loglingsFriended: string[];
-  achievements: Achievement[];
-  currentStreak: number;
-  longestStreak: number;
-}
-
 const ProgressTracker = () => {
-  const [progress, setProgress] = useState<ProgressData>({
-    totalSessions: 0,
-    totalScore: 0,
-    correctAnswers: 0,
-    loglingsFriended: [],
-    achievements: [],
-    currentStreak: 0,
-    longestStreak: 0
-  });
+  const { progress } = useEnhancedProgress();
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
 
   useEffect(() => {
-    const savedProgress = localStorage.getItem('loglings-progress');
-    if (savedProgress) {
-      setProgress(JSON.parse(savedProgress));
+    // Load achievements from enhanced progress or initialize defaults
+    if (progress.achievements.length > 0) {
+      const mappedAchievements = progress.achievements.map(ach => ({
+        id: ach.id,
+        name: ach.name,
+        description: ach.description,
+        icon: getIconComponent(ach.icon),
+        unlocked: ach.unlocked,
+        progress: ach.progress,
+        maxProgress: ach.maxProgress
+      }));
+      setAchievements(mappedAchievements);
     } else {
-      // Initialize with default achievements
+      // Initialize with default achievements if none exist
       const defaultAchievements: Achievement[] = [
         {
           id: 'first-friend',
@@ -93,18 +86,24 @@ const ProgressTracker = () => {
           maxProgress: 3
         }
       ];
-      
-      setProgress(prev => ({ ...prev, achievements: defaultAchievements }));
+      setAchievements(defaultAchievements);
     }
-  }, []);
+  }, [progress.achievements]);
 
-  const saveProgress = (newProgress: ProgressData) => {
-    localStorage.setItem('loglings-progress', JSON.stringify(newProgress));
-    setProgress(newProgress);
+  const getIconComponent = (iconName: string) => {
+    switch (iconName) {
+      case '❤️': case 'heart': return Heart;
+      case '✨': case 'sparkles': return Sparkles;
+      case '🌲': case 'tree': return TreePine;
+      case '⭐': case 'star': return Star;
+      case '🏆': case 'award': return Award;
+      case '🍃': case 'leaf': return Leaf;
+      default: return Heart;
+    }
   };
 
-  const unlockedCount = progress.achievements.filter(a => a.unlocked).length;
-  const totalAchievements = progress.achievements.length;
+  const unlockedCount = achievements.filter(a => a.unlocked).length;
+  const totalAchievements = achievements.length;
 
   return (
     <Card className="cozy-card cozy-glow candlelit-warmth">
@@ -133,7 +132,7 @@ const ProgressTracker = () => {
             <div className="text-xs text-muted-foreground">Correct Choices</div>
           </div>
           <div className="text-center space-y-1">
-            <div className="text-2xl font-bold text-blue-600">{progress.currentStreak}</div>
+            <div className="text-2xl font-bold text-blue-600">{progress.streakData.current}</div>
             <div className="text-xs text-muted-foreground">Day Streak</div>
           </div>
         </div>
@@ -148,7 +147,7 @@ const ProgressTracker = () => {
           </div>
           
           <div className="grid gap-3">
-            {progress.achievements.map((achievement) => {
+            {achievements.map((achievement) => {
               const Icon = achievement.icon;
               return (
                 <div
