@@ -26,22 +26,23 @@ const LaunchFeedbackCollector = ({
   const { trackLaunchInteraction } = useLaunchAnalytics();
 
   useEffect(() => {
-    // Auto-determine feedback type and timing
     if (showType === 'auto' && !hasShownFeedback) {
-      // Show soft launch feedback after 3+ sessions or high score
+      const hasSeenFeedback = localStorage.getItem('loglings-has-seen-feedback');
+      if (hasSeenFeedback) {
+        setHasShownFeedback(true);
+        return;
+      }
+
       if (userSessions >= 3 || currentScore >= 150) {
         setFeedbackType('soft-launch');
         
-        // Delay showing feedback to not interrupt gameplay
         const timer = setTimeout(() => {
           setShowFeedback(true);
           trackLaunchInteraction('auto_feedback_prompt', 'soft_launch');
         }, 2000);
         
         return () => clearTimeout(timer);
-      }
-      // Show launch feedback after 1+ sessions
-      else if (userSessions >= 1) {
+      } else if (userSessions >= 1) {
         setFeedbackType('launch');
         
         const timer = setTimeout(() => {
@@ -61,7 +62,8 @@ const LaunchFeedbackCollector = ({
     setHasShownFeedback(true);
     setShowFeedback(false);
     
-    // Store feedback with additional context
+    localStorage.setItem('loglings-has-seen-feedback', 'true');
+    
     const enhancedFeedback = {
       ...feedback,
       userSessions,
@@ -85,6 +87,7 @@ const LaunchFeedbackCollector = ({
   const handleSkip = () => {
     setHasShownFeedback(true);
     setShowFeedback(false);
+    localStorage.setItem('loglings-has-seen-feedback', 'true');
     trackLaunchInteraction('feedback_skipped', feedbackType);
   };
 
@@ -93,21 +96,19 @@ const LaunchFeedbackCollector = ({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        {feedbackType === 'soft-launch' ? (
-          <SoftLaunchFeedback 
-            onSubmit={handleFeedbackSubmit}
-            onSkip={handleSkip}
-          />
-        ) : (
-          <LaunchFeedbackForm 
-            onSubmit={handleFeedbackSubmit}
-            onSkip={handleSkip}
-          />
-        )}
-      </div>
-    </div>
+    <>
+      {feedbackType === 'soft-launch' ? (
+        <SoftLaunchFeedback 
+          onSubmit={handleFeedbackSubmit}
+          onSkip={handleSkip}
+        />
+      ) : (
+        <LaunchFeedbackForm 
+          onSubmit={handleFeedbackSubmit}
+          onSkip={handleSkip}
+        />
+      )}
+    </>
   );
 };
 
