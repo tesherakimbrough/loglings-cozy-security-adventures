@@ -24,28 +24,28 @@ const BetaLaunchBanner = () => {
   if (!isVisible) return null;
 
   return (
-    <Card className="mb-6 bg-gradient-to-r from-purple-50 via-pink-50 to-orange-50 dark:from-purple-950/20 dark:via-pink-950/20 dark:to-orange-950/20 border-purple-200 dark:border-purple-800">
+    <Card className="mb-6 cozy-card bg-gradient-to-r from-cozy-cream/80 via-cozy-moss/20 to-cozy-amber/30 dark:from-forest-night/80 dark:via-tree-shadow/40 dark:to-moss-glow/20 border-cozy-sage/30 dark:border-moss-glow/30 shadow-lg backdrop-blur-sm">
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 bg-gradient-to-br from-cozy-sage to-cozy-forest rounded-full flex items-center justify-center shadow-sm">
+              <Sparkles className="w-4 h-4 text-cozy-cream animate-sparkle" />
             </div>
           </div>
           
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold text-purple-800 dark:text-purple-200">
-                Welcome to Loglings Beta! 🌱
+              <h3 className="font-cozy font-semibold text-cozy-forest dark:text-moss-glow">
+                Welcome to the Logling Forest Beta! 🌱
               </h3>
-              <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
-                Early Access
+              <Badge variant="secondary" className="text-xs bg-cozy-sage/20 text-cozy-forest border-cozy-sage/30 font-cozy">
+                Early Grove Access
               </Badge>
             </div>
             
-            <p className="text-sm text-purple-700 dark:text-purple-300 mb-3">
-              You're exploring an early version of our cozy cybersecurity adventure! 
-              Your feedback helps our forest grow stronger. Expect some rough edges as we polish the experience together.
+            <p className="text-sm text-cozy-warm/80 dark:text-sage-whisper mb-3 font-body leading-relaxed">
+              You're exploring an early growth of our cozy cybersecurity forest! 
+              Your gentle feedback helps our woodland community flourish. Expect some growing pains as we nurture this magical space together.
             </p>
             
             <div className="flex flex-wrap gap-2">
@@ -53,10 +53,10 @@ const BetaLaunchBanner = () => {
                 size="sm" 
                 variant="outline" 
                 onClick={handleFeedback}
-                className="text-xs bg-white/50 hover:bg-white/80 border-purple-300"
+                className="text-xs bg-cozy-cream/60 hover:bg-cozy-cream/80 border-cozy-sage/40 text-cozy-forest hover:text-cozy-warm transition-all duration-300 shadow-sm hover:shadow-md"
               >
                 <MessageSquare className="w-3 h-3 mr-1" />
-                Share Feedback
+                Share Forest Wisdom
               </Button>
               
               <Button 
@@ -65,12 +65,12 @@ const BetaLaunchBanner = () => {
                 onClick={() => {
                   const bugReports = localStorage.getItem('loglings-bug-reports') || '[]';
                   console.log('Bug Reports:', JSON.parse(bugReports));
-                  alert('Bug reports logged to console. Thank you for testing!');
+                  alert('Forest reports logged to console. Thank you for helping our grove grow! 🌿');
                 }}
-                className="text-xs bg-white/50 hover:bg-white/80 border-purple-300"
+                className="text-xs bg-cozy-amber/40 hover:bg-cozy-amber/60 border-cozy-rose/40 text-cozy-forest hover:text-cozy-warm transition-all duration-300 shadow-sm hover:shadow-md"
               >
                 <Bug className="w-3 h-3 mr-1" />
-                Report Issues
+                Report Growing Pains
               </Button>
             </div>
           </div>
@@ -79,12 +79,16 @@ const BetaLaunchBanner = () => {
             variant="ghost"
             size="sm"
             onClick={handleDismiss}
-            className="flex-shrink-0 h-8 w-8 p-0 hover:bg-white/20"
+            className="flex-shrink-0 h-8 w-8 p-0 hover:bg-cozy-sage/20 text-cozy-warm/60 hover:text-cozy-forest transition-colors duration-200"
             aria-label="Dismiss beta banner"
           >
             <X className="w-4 h-4" />
           </Button>
         </div>
+        
+        {/* Decorative forest elements */}
+        <div className="absolute top-2 right-12 w-1.5 h-1.5 bg-cozy-sage/40 rounded-full animate-sparkle animation-delay-500" />
+        <div className="absolute bottom-3 left-12 w-1 h-1 bg-cozy-amber/50 rounded-full animate-sparkle animation-delay-1000" />
       </CardContent>
     </Card>
   );
