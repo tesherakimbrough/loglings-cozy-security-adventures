@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Heart, Sparkles, TreePine, Mail, Check } from 'lucide-react';
+import { Heart, Sparkles, TreePine, Mail } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import FeedbackForm, { FeedbackData } from '@/components/FeedbackForm';
+import WaitlistCelebration from '@/components/WaitlistCelebration';
 import { toast } from 'sonner';
 
 const Waitlist = () => {
@@ -13,6 +14,7 @@ const Waitlist = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   // Check for premium upgrade context
   const urlParams = new URLSearchParams(window.location.search);
@@ -47,11 +49,10 @@ const Waitlist = () => {
     
     setIsLoading(false);
     setIsSubmitted(true);
+    setShowCelebration(true);
     
-    toast.success('Welcome to our cozy forest! 🌸');
-    
-    // Show feedback form after a brief delay
-    setTimeout(() => setShowFeedback(true), 1500);
+    // Show feedback form after celebration
+    setTimeout(() => setShowFeedback(true), 6000);
   };
 
   const handleFeedbackSubmit = (feedback: FeedbackData) => {
@@ -61,6 +62,10 @@ const Waitlist = () => {
 
   const handleFeedbackSkip = () => {
     setShowFeedback(false);
+  };
+
+  const handleCelebrationContinue = () => {
+    setShowCelebration(false);
   };
 
   if (isSubmitted) {
@@ -88,38 +93,19 @@ const Waitlist = () => {
             onSubmit={handleFeedbackSubmit}
             onSkip={handleFeedbackSkip}
           />
+        ) : showCelebration ? (
+          <WaitlistCelebration
+            userName={firstName}
+            email={email}
+            onContinue={handleCelebrationContinue}
+          />
         ) : (
-          <Card className="w-full max-w-md cozy-card animate-scale-in relative z-10">
-            <CardHeader className="text-center pb-6">
-              <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-green-400 to-amber-400 rounded-full flex items-center justify-center animate-gentle-bounce">
-                <Check className="w-8 h-8 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-green-700 dark:text-green-300 mb-2">
-                {isPremiumSignup ? "Premium access request received! 🌟" : "You're on the list! 🌸"}
-              </h1>
-              <p className="text-muted-foreground leading-relaxed">
-                {isPremiumSignup 
-                  ? "We'll reach out soon about premium features and early access opportunities!"
-                  : "We'll send you a gentle hello when it's your turn to explore Loglings. Thank you for joining our cozy digital forest!"
-                }
-              </p>
-            </CardHeader>
-            
-            <CardContent className="text-center">
-              <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 mb-6">
-                <p className="text-sm text-amber-700 dark:text-amber-300">
-                  💝 Check your email for a special surprise wallpaper!
-                </p>
-              </div>
-              
-              <Button
-                onClick={() => window.location.href = '/'}
-                className="logling-button w-full"
-              >
-                Continue Exploring
-              </Button>
-            </CardContent>
-          </Card>
+          <Button
+            onClick={() => window.location.href = '/'}
+            className="logling-button"
+          >
+            Continue Exploring the Forest
+          </Button>
         )}
       </div>
     );
