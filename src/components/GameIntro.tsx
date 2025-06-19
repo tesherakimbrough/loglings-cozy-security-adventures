@@ -12,6 +12,9 @@ import GameIntroNavigation from './GameIntroNavigation';
 import EnhancedUserOnboarding from './EnhancedUserOnboarding';
 import LaunchFeedbackCollector from './LaunchFeedbackCollector';
 import SoftLaunchReadinessChecker from './SoftLaunchReadinessChecker';
+import EarlyAccessBanner from './EarlyAccessBanner';
+import LaunchReadinessModal from './LaunchReadinessModal';
+import { useUserProfile } from '../hooks/useUserProfile';
 
 interface GameIntroProps {
   onStartGame: () => void;
@@ -20,12 +23,19 @@ interface GameIntroProps {
 
 const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) => {
   const isProMode = userMode === 'career-pro';
+  const { profile } = useUserProfile();
 
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Enhanced Header with Navigation */}
-        <GameIntroNavigation />
+        {/* Enhanced Header with Navigation and Launch Readiness */}
+        <div className="flex items-center justify-between">
+          <GameIntroNavigation />
+          <LaunchReadinessModal />
+        </div>
+
+        {/* Early Access Banner for new users */}
+        {profile.progress.totalSessions < 3 && <EarlyAccessBanner />}
 
         {/* Main Header */}
         <GameIntroHeader userMode={userMode} />
@@ -44,6 +54,11 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
 
         {/* Enhanced Features Preview */}
         <GameIntroNewFeatures />
+
+        {/* Soft Launch Readiness for experienced users */}
+        {profile.progress.totalSessions >= 5 && (
+          <SoftLaunchReadinessChecker />
+        )}
 
         {/* Start Adventure Button */}
         <div className="text-center">
@@ -70,6 +85,13 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
             Where learning cybersecurity feels like a warm hug 🤗
           </p>
         </div>
+
+        {/* Enhanced User Onboarding and Feedback Collection */}
+        <EnhancedUserOnboarding />
+        <LaunchFeedbackCollector 
+          userSessions={profile.progress.totalSessions}
+          currentScore={profile.progress.totalScore}
+        />
       </div>
     </div>
   );
