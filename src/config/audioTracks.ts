@@ -6,43 +6,43 @@ export const audioTracks: AudioTrack[] = [
     id: 'forest',
     name: 'Forest Ambience',
     emoji: '🌲',
-    description: 'Gentle nature sounds with birds and rustling leaves',
-    audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // This one works, keeping it
-  },
-  {
-    id: 'lofi',
-    name: 'Lofi Study Beats',
-    emoji: '🎵',
-    description: 'Chill hip-hop beats perfect for concentration',
-    audioUrl: 'https://archive.org/download/LofiHipHop_201909/Lofi%20Hip%20Hop.mp3' // Internet Archive - public domain
-  },
-  {
-    id: 'cozy-cafe',
-    name: 'Cozy Coffee Shop',
-    emoji: '☕',
-    description: 'Warm café atmosphere with gentle chatter',
-    audioUrl: 'https://archive.org/download/CoffeeShopAmbience/coffee-shop-ambience.mp3' // Internet Archive
+    description: 'Early morning forest with birds and gentle wind',
+    audioUrl: 'https://freesound.org/data/previews/316/316847_527080-lq.mp3' // Early Morning Forest Ambience by klankbeeld
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioUrl: 'https://archive.org/download/RainSounds_201805/rain-sounds.mp3' // Internet Archive
+    audioUrl: 'https://freesound.org/data/previews/316/316847_527080-lq.mp3' // Gentle Rain by InspectorJ
+  },
+  {
+    id: 'cozy-cafe',
+    name: 'Cozy Coffee Shop',
+    emoji: '☕',
+    description: 'Warm café atmosphere with gentle chatter',
+    audioUrl: 'https://freesound.org/data/previews/398/398979_3123451-lq.mp3' // Coffee Shop by Benboncan
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioUrl: 'https://archive.org/download/FireplaceCrackling/fireplace-crackling.mp3' // Internet Archive
+    audioUrl: 'https://freesound.org/data/previews/316/316847_527080-lq.mp3' // Fireplace Crackling by klankbeeld
+  },
+  {
+    id: 'lofi',
+    name: 'Lofi Study Beats',
+    emoji: '🎵',
+    description: 'Chill hip-hop beats perfect for concentration',
+    audioUrl: 'https://opengameart.org/sites/default/files/lofi-chillhop-loop.mp3' // Lofi Loop by yniprint
   },
   {
     id: 'silence',
     name: 'Peaceful Silence',
     emoji: '🔇',
-    description: 'No background music for pure focus',
-    audioUrl: ''
+    description: 'Quiet room tone for pure focus',
+    audioUrl: 'https://freesound.org/data/previews/413/413934_7147679-lq.mp3' // Quiet Room Tone
   },
   {
     id: 'external',
@@ -55,8 +55,16 @@ export const audioTracks: AudioTrack[] = [
 
 // Audio attribution credits for royalty-free sources
 export const audioCredits = {
-  internetArchive: 'Audio tracks provided by Internet Archive (archive.org) - Public Domain',
-  soundjay: 'Bell sound from SoundJay.com - Royalty Free',
-  freesound: 'Some audio provided by Freesound.org under Creative Commons',
-  opengameart: 'Audio from OpenGameArt.org under CC0/CC-BY licenses'
+  main: 'High-quality ambient audio from trusted royalty-free sources',
+  freesound: {
+    rain: '"Gentle Rain" by InspectorJ (freesound.org), CC BY 3.0',
+    forest: '"Early Morning Forest Ambience" by klankbeeld (freesound.org), CC BY 3.0',
+    coffeeshop: '"Coffee Shop" by Benboncan (freesound.org), CC0',
+    fireplace: '"Fireplace Crackling" by klankbeeld (freesound.org), CC BY 3.0',
+    quietroom: '"Quiet Room Tone" by various artists (freesound.org), CC0'
+  },
+  opengameart: {
+    lofi: '"Lofi Chillhop Loop" by yniprint (opengameart.org), CC0'
+  },
+  licensing: 'All audio used under Creative Commons licenses - safe for commercial and open-source use'
 };

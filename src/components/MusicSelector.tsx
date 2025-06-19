@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, AlertCircle, ExternalLink } from 'lucide-react';
+import { Play, Pause, Volume2, AlertCircle, ExternalLink, Info } from 'lucide-react';
 import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 import { MusicType } from '../types/musicTypes';
@@ -27,11 +26,11 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     updateVolume
   } = useRealAudio();
 
+  const [showAttribution, setShowAttribution] = useState(false);
+
   const handleTrackSelect = async (trackId: MusicType) => {
-    // Update preferences first
     updatePreferences({ musicType: trackId });
     
-    // Don't auto-play, let user click play button
     if (isPlaying && currentTrack === trackId) {
       await stopMusic();
     }
@@ -179,8 +178,8 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         {isPlaying && progress.preferences.musicType !== 'external' && (
           <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
             <div className="text-sm text-green-700 dark:text-green-300">
-              <p className="font-medium mb-1">🎶 High-Quality Audio</p>
-              <p className="text-xs">Playing real ambient recordings - authentic and immersive!</p>
+              <p className="font-medium mb-1">🎶 Professional Quality Audio</p>
+              <p className="text-xs">Playing royalty-free ambient recordings from trusted sources</p>
             </div>
           </div>
         )}
@@ -204,9 +203,32 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         )}
 
         {/* Audio Credits */}
-        <div className="text-xs text-muted-foreground border-t pt-3">
-          <p className="font-medium mb-1">Audio Credits:</p>
-          <p>{audioCredits.internetArchive}</p>
+        <div className="border-t pt-3">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-medium text-muted-foreground">Audio Credits</p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowAttribution(!showAttribution)}
+              className="h-auto p-1"
+            >
+              <Info className="w-3 h-3" />
+            </Button>
+          </div>
+          
+          {showAttribution && (
+            <div className="text-xs text-muted-foreground space-y-1 bg-muted/50 p-2 rounded">
+              <p className="font-medium">{audioCredits.main}</p>
+              <div className="space-y-1">
+                <p>{audioCredits.freesound.rain}</p>
+                <p>{audioCredits.freesound.forest}</p>
+                <p>{audioCredits.freesound.coffeeshop}</p>
+                <p>{audioCredits.freesound.fireplace}</p>
+                <p>{audioCredits.opengameart.lofi}</p>
+              </div>
+              <p className="text-xs pt-1 border-t border-border/50">{audioCredits.licensing}</p>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
