@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Settings, Volume2, VolumeX, Smartphone, Bell, Share2, X, Shield, Heart, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,8 +17,13 @@ const GameSettings = () => {
   };
 
   const handleModeSwitch = () => {
-    resetOnboarding();
+    // Close settings modal first
     setIsOpen(false);
+    
+    // Small delay to ensure modal closes, then reset onboarding
+    setTimeout(() => {
+      resetOnboarding();
+    }, 100);
   };
 
   const getModeInfo = () => {
