@@ -1,11 +1,10 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { MusicType } from '../types/musicTypes';
 import { audioTracks } from '../config/audioTracks';
 import { generateFallbackAudio } from '../utils/fallbackAudio';
 import { playSuccessSound } from '../utils/successSound';
 
-export { MusicType } from '../types/musicTypes';
+export type { MusicType } from '../types/musicTypes';
 
 export const useAmbientMusic = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicType>('forest');
