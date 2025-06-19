@@ -55,7 +55,7 @@ export const useKeyboardNavigation = () => {
     if ((event.key === ' ' || event.key === 'Enter') && 
         event.target instanceof HTMLElement && 
         event.target.getAttribute('role') === 'button' && 
-        !event.target.disabled) {
+        !(event.target as HTMLButtonElement | HTMLInputElement).disabled) {
       event.preventDefault();
       event.target.click();
     }
