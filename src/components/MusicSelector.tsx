@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, Volume2, AlertCircle } from 'lucide-react';
-import { useAmbientMusic, MusicType } from '../hooks/useAmbientMusic';
+import { Play, Pause, Volume2, AlertCircle, ExternalLink } from 'lucide-react';
+import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
+import { MusicType } from '../types/musicTypes';
+import { audioCredits } from '../config/audioTracks';
 
 interface MusicSelectorProps {
   compact?: boolean;
@@ -17,20 +19,20 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     audioTracks,
     isPlaying,
     isLoading,
-    usingFallback,
     error,
+    currentTrack,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
     updateVolume
-  } = useAmbientMusic();
+  } = useRealAudio();
 
   const handleTrackSelect = async (trackId: MusicType) => {
     // Update preferences first
     updatePreferences({ musicType: trackId });
     
     // Don't auto-play, let user click play button
-    if (isPlaying) {
+    if (isPlaying && currentTrack === trackId) {
       await stopMusic();
     }
   };
@@ -60,7 +62,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           variant="outline"
           size="sm"
           onClick={togglePlayPause}
-          disabled={isLoading || progress.preferences.musicType === 'silence' || progress.preferences.musicType === 'external'}
+          disabled={isLoading || progress.preferences.musicType === 'silence'}
           className="cozy-card"
         >
           {isLoading ? (
@@ -87,13 +89,13 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
       <CardContent className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="font-semibold flex items-center gap-2">
-            🎵 Choose Your Vibe
+            🎵 Choose Your Cozy Vibe
           </h4>
           <Button
             variant="outline"
             size="sm"
             onClick={togglePlayPause}
-            disabled={isLoading || progress.preferences.musicType === 'silence' || progress.preferences.musicType === 'external'}
+            disabled={isLoading || progress.preferences.musicType === 'silence'}
             className="cozy-card"
           >
             {isLoading ? (
@@ -127,7 +129,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
                   {progress.preferences.musicType === 'external' 
                     ? 'Using external music app' 
                     : isPlaying 
-                      ? 'Playing generated ambient audio'
+                      ? 'Playing high-quality ambient audio'
                       : 'Click play to start'}
                 </div>
               </div>
@@ -146,7 +148,8 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
               className="h-auto p-3 flex flex-col items-center gap-1 cozy-card hover:scale-105 transition-all"
             >
               <span className="text-lg">{track.emoji}</span>
-              <span className="text-xs font-medium">{track.name}</span>
+              <span className="text-xs font-medium text-center">{track.name}</span>
+              <span className="text-xs text-muted-foreground text-center">{track.description}</span>
             </Button>
           ))}
         </div>
@@ -172,12 +175,12 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
           </div>
         )}
 
-        {/* Enhanced audio info */}
-        {usingFallback && progress.preferences.musicType !== 'external' && isPlaying && (
+        {/* High-Quality Audio Notice */}
+        {isPlaying && progress.preferences.musicType !== 'external' && (
           <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
             <div className="text-sm text-green-700 dark:text-green-300">
-              <p className="font-medium mb-1">🎶 DMCA-Safe Audio</p>
-              <p className="text-xs">Playing procedurally generated ambient sounds - completely copyright-free!</p>
+              <p className="font-medium mb-1">🎶 High-Quality Audio</p>
+              <p className="text-xs">Playing real ambient recordings - authentic and immersive!</p>
             </div>
           </div>
         )}
@@ -186,11 +189,25 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         {progress.preferences.musicType === 'external' && (
           <div className="p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
             <div className="text-sm text-blue-700 dark:text-blue-300">
-              <p className="font-medium mb-1">🎧 External Music Mode</p>
-              <p className="text-xs">Open Apple Music, Spotify, or any music app and start playing your preferred playlist.</p>
+              <p className="font-medium mb-1 flex items-center gap-1">
+                🎧 External Music Mode 
+                <ExternalLink className="w-3 h-3" />
+              </p>
+              <p className="text-xs mb-2">Open your favorite music app and start playing your preferred playlist.</p>
+              <div className="text-xs space-y-1">
+                <p>• <strong>Spotify:</strong> Lofi Hip Hop playlists</p>
+                <p>• <strong>YouTube:</strong> Rain/Nature sounds</p>
+                <p>• <strong>Apple Music:</strong> Ambient/Study playlists</p>
+              </div>
             </div>
           </div>
         )}
+
+        {/* Audio Credits */}
+        <div className="text-xs text-muted-foreground border-t pt-3">
+          <p className="font-medium mb-1">Audio Credits:</p>
+          <p>{audioCredits.pixabay}</p>
+        </div>
       </CardContent>
     </Card>
   );

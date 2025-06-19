@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2 } from 'lucide-react';
-import { useAmbientMusic } from '../hooks/useAmbientMusic';
+import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 
 const MusicControlBar = () => {
@@ -13,7 +13,7 @@ const MusicControlBar = () => {
     getCurrentTrackInfo,
     playTrack,
     stopMusic
-  } = useAmbientMusic();
+  } = useRealAudio();
 
   const togglePlayPause = async () => {
     if (isPlaying) {
@@ -59,7 +59,7 @@ const MusicControlBar = () => {
                 <div className="text-sm font-medium">{currentTrackInfo.name}</div>
                 <div className="text-xs text-muted-foreground">
                   {!hasUserInteracted ? 'Click play to start' : 
-                   isPlaying ? 'Now playing' : 'Ready to play'}
+                   isPlaying ? 'Playing real audio' : 'Ready to play'}
                 </div>
               </div>
             </div>
