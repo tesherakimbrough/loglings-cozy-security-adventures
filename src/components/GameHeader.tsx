@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { DailyChallenge } from '../hooks/useDailyChallenges';
 import GameStats from './GameStats';
+import InGameNavigation from './InGameNavigation';
 
 interface GameHeaderProps {
   todaysChallenge: DailyChallenge | null;
@@ -10,6 +11,11 @@ interface GameHeaderProps {
   totalRounds: number;
   score: number;
   timeElapsed: number;
+  onBackToHome?: () => void;
+  onOpenSettings?: () => void;
+  onPause?: () => void;
+  onResume?: () => void;
+  isPaused?: boolean;
 }
 
 const GameHeader = ({ 
@@ -17,10 +23,33 @@ const GameHeader = ({
   currentRound, 
   totalRounds, 
   score, 
-  timeElapsed 
+  timeElapsed,
+  onBackToHome,
+  onOpenSettings,
+  onPause,
+  onResume,
+  isPaused = false
 }: GameHeaderProps) => {
   return (
     <div className="space-y-6">
+      {/* Navigation Controls */}
+      {onBackToHome && onOpenSettings && onPause && onResume && (
+        <div className="flex justify-between items-center">
+          <InGameNavigation
+            onBackToHome={onBackToHome}
+            onOpenSettings={onOpenSettings}
+            onPause={onPause}
+            onResume={onResume}
+            isPaused={isPaused}
+            currentRound={currentRound}
+            totalRounds={totalRounds}
+          />
+          <div className="text-sm text-muted-foreground">
+            Chapter {currentRound} of {totalRounds}
+          </div>
+        </div>
+      )}
+
       {/* Daily Challenge Banner */}
       {todaysChallenge && !todaysChallenge.completed && (
         <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border-amber-200 dark:border-amber-800">

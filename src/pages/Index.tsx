@@ -41,6 +41,12 @@ const Index = () => {
     setGameState('intro');
   };
 
+  const handleBackToHome = () => {
+    // Save any current progress if needed
+    setGameData(null);
+    setGameState('intro');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Onboarding Tutorial */}
@@ -51,7 +57,11 @@ const Index = () => {
       )}
       
       {gameState === 'playing' && (
-        <AdvancedGamePlay onEndGame={handleEndGame} userMode={userMode} />
+        <AdvancedGamePlay 
+          onEndGame={handleEndGame} 
+          onBackToHome={handleBackToHome}
+          userMode={userMode} 
+        />
       )}
       
       {gameState === 'results' && gameData && (
