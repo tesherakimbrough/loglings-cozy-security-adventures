@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GameData } from '../pages/Index';
 import SocialSharing from './SocialSharing';
+import EnhancedSocialSharing from './EnhancedSocialSharing';
 
 interface GameResultsProps {
   gameData: GameData;
@@ -141,7 +142,7 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
           )}
         </div>
 
-        {/* Results and Social Sharing Grid */}
+        {/* Results and Enhanced Social Sharing Grid */}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Joy Collected Card */}
           <Card className="cozy-card cozy-glow candlelit-warmth">
@@ -175,8 +176,11 @@ const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
             </CardContent>
           </Card>
 
-          {/* Social Sharing */}
-          <SocialSharing gameData={gameData} />
+          {/* Enhanced Social Sharing */}
+          <EnhancedSocialSharing 
+            gameData={gameData} 
+            achievements={['Forest Guardian', 'Wisdom Keeper']}
+          />
         </div>
 
         {/* Detailed Garden Stats */}

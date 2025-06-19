@@ -1,10 +1,10 @@
-
 import { Heart, Sparkles, TreePine, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ThemeToggle from './ThemeToggle';
 import ProgressTracker from './ProgressTracker';
 import DailyChallenge from './DailyChallenge';
+import GameSettings from './GameSettings';
 
 interface GameIntroProps {
   onStartGame: () => void;
@@ -14,9 +14,9 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
   return (
     <div className="min-h-screen p-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header with Theme Toggle */}
+        {/* Header with Theme Toggle and Settings */}
         <div className="flex items-center justify-between">
-          <div></div>
+          <GameSettings />
           <ThemeToggle />
         </div>
 
@@ -157,6 +157,38 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
           </CardContent>
         </Card>
 
+        {/* Enhanced Features Preview */}
+        <Card className="cozy-card cozy-glow candlelit-warmth">
+          <CardHeader>
+            <CardTitle className="text-center text-2xl text-primary">✨ New Cozy Features ✨</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-6 text-center">
+              <div className="space-y-2">
+                <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float">
+                  <Sparkles className="w-6 h-6 text-accent" />
+                </div>
+                <h4 className="font-semibold text-accent">Forest Sounds</h4>
+                <p className="text-sm text-muted-foreground">Gentle ambient audio and cheerful feedback chimes</p>
+              </div>
+              <div className="space-y-2">
+                <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-300">
+                  <TreePine className="w-6 h-6 text-primary" />
+                </div>
+                <h4 className="font-semibold text-primary">Adaptive Difficulty</h4>
+                <p className="text-sm text-muted-foreground">Content that grows with your learning journey</p>
+              </div>
+              <div className="space-y-2">
+                <div className="w-12 h-12 bg-green-200 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto animate-gentle-float animation-delay-600">
+                  <Heart className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h4 className="font-semibold text-green-600 dark:text-green-400">Enhanced Sharing</h4>
+                <p className="text-sm text-muted-foreground">Beautiful cards to celebrate your achievements</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Start Adventure Button */}
         <div className="text-center">
           <Button 
@@ -165,7 +197,7 @@ const GameIntro = ({ onStartGame }: GameIntroProps) => {
             className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
           >
             <Play className="w-8 h-8 mr-3" />
-            Begin Our Cozy Adventure
+            Begin Our Enhanced Adventure
           </Button>
         </div>
 
