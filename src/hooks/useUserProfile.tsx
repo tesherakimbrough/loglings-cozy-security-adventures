@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { UserProfile, UserMode, DifficultyLevel } from '../types/userTypes';
 
@@ -13,7 +12,16 @@ const defaultProfile: UserProfile = {
     musicVolume: 0.3,
     soundEffectsVolume: 0.4,
     notifications: true,
-    shareAchievements: false
+    shareAchievements: false,
+    // Accessibility defaults
+    highContrast: false,
+    reduceMotion: false,
+    fontSize: 'medium',
+    colorBlindMode: 'default',
+    audioDescriptions: false,
+    screenReaderMode: false,
+    enhancedFocus: false,
+    keyboardOnly: false
   },
   progress: {
     totalSessions: 0,
@@ -35,7 +43,7 @@ export const useUserProfile = () => {
     if (savedProfile) {
       try {
         const parsed = JSON.parse(savedProfile);
-        // Migrate old profiles that don't have new sound properties
+        // Migrate old profiles that don't have new accessibility properties
         const migratedProfile = {
           ...defaultProfile,
           ...parsed,
@@ -44,7 +52,16 @@ export const useUserProfile = () => {
             ...parsed.preferences,
             soundEffectsEnabled: parsed.preferences?.soundEffectsEnabled ?? true,
             soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4,
-            difficulty: (parsed.preferences?.difficulty as DifficultyLevel) || 'beginner'
+            difficulty: (parsed.preferences?.difficulty as DifficultyLevel) || 'beginner',
+            // Ensure accessibility properties have defaults
+            highContrast: parsed.preferences?.highContrast ?? false,
+            reduceMotion: parsed.preferences?.reduceMotion ?? false,
+            fontSize: parsed.preferences?.fontSize ?? 'medium',
+            colorBlindMode: parsed.preferences?.colorBlindMode ?? 'default',
+            audioDescriptions: parsed.preferences?.audioDescriptions ?? false,
+            screenReaderMode: parsed.preferences?.screenReaderMode ?? false,
+            enhancedFocus: parsed.preferences?.enhancedFocus ?? false,
+            keyboardOnly: parsed.preferences?.keyboardOnly ?? false
           }
         };
         setProfile(migratedProfile);
