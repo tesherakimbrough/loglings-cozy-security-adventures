@@ -1,10 +1,12 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import GameIntro from '../components/GameIntro';
 import AdvancedGamePlay from '../components/AdvancedGamePlay';
 import GameResults from '../components/GameResults';
 import OnboardingTutorial from '../components/OnboardingTutorial';
 import FeedbackCollectionSystem from '../components/FeedbackCollectionSystem';
+import GameErrorBoundary from '../components/GameErrorBoundary';
+import BetaLaunchBanner from '../components/BetaLaunchBanner';
 import { UserMode } from '../types/userTypes';
 import { useUserProfile } from '../hooks/useUserProfile';
 
@@ -24,6 +26,7 @@ const Index = () => {
   const [gameState, setGameState] = useState<GameState>('intro');
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [userMode, setUserMode] = useState<UserMode>('cozy-everyday');
+  const [showFeedback, setShowFeedback] = useState(false);
   const { profile } = useUserProfile();
 
   const handleStartGame = (mode: UserMode) => {
@@ -47,37 +50,78 @@ const Index = () => {
     setGameState('intro');
   };
 
+  const handleGameError = (error: Error, errorInfo: any) => {
+    console.error('Game error caught by boundary:', error, errorInfo);
+    
+    // Save current state for recovery
+    const recoveryData = {
+      gameState,
+      userMode,
+      gameData,
+      timestamp: new Date().toISOString(),
+      error: error.message
+    };
+    localStorage.setItem('loglings-error-recovery', JSON.stringify(recoveryData));
+  };
+
+  // Listen for feedback trigger events
+  React.useEffect(() => {
+    const handleFeedbackEvent = () => {
+      setShowFeedback(true);
+    };
+    
+    window.addEventListener('loglings-open-feedback', handleFeedbackEvent);
+    return () => window.removeEventListener('loglings-open-feedback', handleFeedbackEvent);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Onboarding Tutorial */}
-      <OnboardingTutorial />
-      
-      {gameState === 'intro' && (
-        <GameIntro onStartGame={handleStartGame} userMode={userMode} />
-      )}
-      
-      {gameState === 'playing' && (
-        <AdvancedGamePlay 
-          onEndGame={handleEndGame} 
-          onBackToHome={handleBackToHome}
-          userMode={userMode} 
-        />
-      )}
-      
-      {gameState === 'results' && gameData && (
-        <>
-          <GameResults 
-            gameData={gameData} 
-            onRestart={handlePlayAgain}
-            userMode={userMode}
-          />
+      {/* Global Error Boundary */}
+      <GameErrorBoundary onError={handleGameError}>
+        {/* Onboarding Tutorial */}
+        <OnboardingTutorial />
+        
+        {/* Beta Launch Banner */}
+        {gameState === 'intro' && <div className="p-4"><BetaLaunchBanner /></div>}
+        
+        {gameState === 'intro' && (
+          <GameIntro onStartGame={handleStartGame} userMode={userMode} />
+        )}
+        
+        {gameState === 'playing' && (
+          <GameErrorBoundary onError={handleGameError}>
+            <AdvancedGamePlay 
+              onEndGame={handleEndGame} 
+              onBackToHome={handleBackToHome}
+              userMode={userMode} 
+            />
+          </GameErrorBoundary>
+        )}
+        
+        {gameState === 'results' && gameData && (
+          <GameErrorBoundary onError={handleGameError}>
+            <GameResults 
+              gameData={gameData} 
+              onRestart={handlePlayAgain}
+              userMode={userMode}
+            />
+            <FeedbackCollectionSystem
+              trigger="post-session"
+              onSubmit={() => {}}
+              onClose={() => {}}
+            />
+          </GameErrorBoundary>
+        )}
+
+        {/* Global Feedback System */}
+        {showFeedback && (
           <FeedbackCollectionSystem
-            trigger="post-session"
-            onSubmit={() => {}}
-            onClose={() => {}}
+            trigger="manual"
+            onSubmit={() => setShowFeedback(false)}
+            onClose={() => setShowFeedback(false)}
           />
-        </>
-      )}
+        )}
+      </GameErrorBoundary>
     </div>
   );
 };

@@ -25,7 +25,7 @@ export const useAdvancedGameLogic = (
 
   const { playSuccessSound, playErrorSound } = useAudioSystem();
   const { logError } = useEnhancedErrorHandling();
-  const totalRounds = 20; // Increased for richer experience
+  const totalRounds = 20;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -54,22 +54,30 @@ export const useAdvancedGameLogic = (
 
   const generateNewScenario = useCallback(() => {
     try {
+      console.log('Generating new scenario with difficulty:', difficulty);
       const newScenario = generateContextualScenario(difficulty, usedScenarioIds);
+      
+      if (!newScenario || !newScenario.id) {
+        throw new Error('Failed to generate valid scenario');
+      }
+      
+      console.log('Generated scenario:', newScenario.id);
       setCurrentScenario(newScenario);
       setUsedScenarioIds(prev => [...prev, newScenario.id]);
       setFeedback(null);
       setShowNextRound(false);
       setIsCorrect(null);
     } catch (error) {
+      console.error('Error generating scenario:', error);
       logError(error as Error, {
         component: 'AdvancedGameLogic',
         action: 'generateScenario',
         additionalData: { difficulty, usedScenarioIds: usedScenarioIds.length }
       }, 'high');
       
-      // Fallback scenario
-      setCurrentScenario({
-        id: 'fallback-001',
+      // Create a reliable fallback scenario
+      const fallbackScenario: AdvancedScenario = {
+        id: `fallback-${Date.now()}`,
         category: 'authentication',
         threatLevel: 'safe',
         difficulty: 'beginner',
@@ -79,12 +87,15 @@ export const useAdvancedGameLogic = (
         user: 'user@company.com',
         location: 'Office',
         status: 'SUCCESS',
-        details: 'User logged in normally during business hours.',
-        explanation: 'This appears to be normal activity.',
-        learningTip: 'Look for patterns in user behavior.',
-        nextSteps: 'Continue monitoring.',
-        realWorldContext: 'Normal authentication is the baseline for security.'
-      });
+        details: 'User logged in normally during business hours from their usual location.',
+        explanation: 'This appears to be normal authentication activity from a trusted location.',
+        learningTip: 'Normal logins should happen during expected hours from known locations.',
+        nextSteps: 'Continue monitoring for any unusual patterns.',
+        realWorldContext: 'Regular authentication patterns help establish baselines for detecting anomalies.'
+      };
+      
+      setCurrentScenario(fallbackScenario);
+      setUsedScenarioIds(prev => [...prev, fallbackScenario.id]);
     }
   }, [difficulty, usedScenarioIds, logError]);
 
@@ -131,17 +142,22 @@ export const useAdvancedGameLogic = (
     scenario: AdvancedScenario,
     correct: boolean
   ): string => {
-    let feedback = correct ? scenario.explanation : 
-      `${scenario.explanation}\n\n💡 Learning insight: ${scenario.learningTip}`;
+    if (!scenario) return 'Something went wrong, but great job trying!';
     
-    feedback += `\n\n🔍 Next steps: ${scenario.nextSteps}`;
-    feedback += `\n\n🌍 Real-world context: ${scenario.realWorldContext}`;
+    let feedback = correct ? scenario.explanation : 
+      `${scenario.explanation}\n\n💡 Learning insight: ${scenario.learningTip || 'Keep practicing!'}`;
+    
+    feedback += `\n\n🔍 Next steps: ${scenario.nextSteps || 'Continue learning!'}`;
+    feedback += `\n\n🌍 Real-world context: ${scenario.realWorldContext || 'Every scenario teaches us something valuable.'}`;
     
     return feedback;
   };
 
   const handleThreatAssessment = useCallback((playerChoice: string) => {
-    if (!currentScenario) return;
+    if (!currentScenario) {
+      console.error('No current scenario available');
+      return;
+    }
 
     const responseTime = timeElapsed - ((currentRound - 1) * 45);
     const answerIsCorrect = playerChoice === currentScenario.threatLevel;
@@ -199,12 +215,13 @@ export const useAdvancedGameLogic = (
         }, 3000);
       }
     } catch (error) {
+      console.error('Error in threat assessment:', error);
       logError(error as Error, {
         component: 'AdvancedGameLogic',
         action: 'handleThreatAssessment',
         additionalData: { 
           playerChoice, 
-          scenarioId: currentScenario.id,
+          scenarioId: currentScenario?.id,
           currentRound 
         }
       }, 'high');
