@@ -12,13 +12,13 @@ const ThreatAssessmentButtons = ({ onAssessment, isProMode }: ThreatAssessmentBu
   return (
     <div className="space-y-6">
       <div className="text-center space-y-3">
-        <h3 className="text-xl font-semibold text-primary">
+        <h3 className="text-xl font-semibold cozy-heading">
           {isProMode 
             ? "What's your assessment?" 
             : "Which Logling friend feels right about this?"
           }
         </h3>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-text-cozy max-w-2xl mx-auto cozy-body">
           {isProMode
             ? "Analyze the log data and select the appropriate threat level based on your security expertise."
             : "Take your time and trust your instincts. The Loglings are here to support you, no matter what you choose."
@@ -29,29 +29,29 @@ const ThreatAssessmentButtons = ({ onAssessment, isProMode }: ThreatAssessmentBu
         <Button 
           onClick={() => onAssessment('safe')}
           variant="outline"
-          className="safe-logling hover:scale-105 transition-all duration-200 p-6 flex flex-col items-center gap-2 min-w-[140px]"
+          className="safe-logling gentle-hover p-6 flex flex-col items-center gap-2 min-w-[140px] bg-transparent"
         >
-          <Heart className="w-8 h-8" />
-          <span className="font-semibold">{isProMode ? "Safe" : "Pip Says"}</span>
-          <span className="text-sm">{isProMode ? "Normal activity" : '"All is well!"'}</span>
+          <Heart className="w-8 h-8 text-leaf-glow" />
+          <span className="font-semibold text-leaf-glow">{isProMode ? "Safe" : "Pip Says"}</span>
+          <span className="text-sm text-text-cozy">{isProMode ? "Normal activity" : '"All is well!"'}</span>
         </Button>
         <Button 
           onClick={() => onAssessment('warning')}
           variant="outline"
-          className="curious-logling hover:scale-105 transition-all duration-200 p-6 flex flex-col items-center gap-2 min-w-[140px]"
+          className="curious-logling gentle-hover p-6 flex flex-col items-center gap-2 min-w-[140px] bg-transparent"
         >
-          <Sparkles className="w-8 h-8" />
-          <span className="font-semibold">{isProMode ? "Warning" : "Luna Says"}</span>
-          <span className="text-sm">{isProMode ? "Needs investigation" : '"Hmm, curious..."'}</span>
+          <Sparkles className="w-8 h-8 text-warm-amber" />
+          <span className="font-semibold text-warm-amber">{isProMode ? "Warning" : "Luna Says"}</span>
+          <span className="text-sm text-text-cozy">{isProMode ? "Needs investigation" : '"Hmm, curious..."'}</span>
         </Button>
         <Button 
           onClick={() => onAssessment('critical')}
           variant="outline"
-          className="alert-logling hover:scale-105 transition-all duration-200 p-6 flex flex-col items-center gap-2 min-w-[140px]"
+          className="alert-logling gentle-hover p-6 flex flex-col items-center gap-2 min-w-[140px] bg-transparent"
         >
-          <TreePine className="w-8 h-8" />
-          <span className="font-semibold">{isProMode ? "Critical" : "Sage Says"}</span>
-          <span className="text-sm">{isProMode ? "Immediate action" : '"Needs care!"'}</span>
+          <TreePine className="w-8 h-8 text-berry-blush" />
+          <span className="font-semibold text-berry-blush">{isProMode ? "Critical" : "Sage Says"}</span>
+          <span className="text-sm text-text-cozy">{isProMode ? "Immediate action" : '"Needs care!"'}</span>
         </Button>
       </div>
     </div>

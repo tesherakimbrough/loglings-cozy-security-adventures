@@ -19,7 +19,12 @@ const CozyFloatingElements = () => {
     const generateElements = () => {
       const newElements: FloatingElement[] = [];
       const icons: Array<'sparkle' | 'heart' | 'tree'> = ['sparkle', 'heart', 'tree'];
-      const colors = ['text-cozy-sage/20', 'text-cozy-warm/20', 'text-cozy-amber/20', 'text-cozy-forest/20'];
+      const colors = [
+        'text-leaf-glow/20', 
+        'text-warm-amber/20', 
+        'text-sage-whisper/20', 
+        'text-spring-moss/20'
+      ];
 
       for (let i = 0; i < 15; i++) {
         newElements.push({
@@ -42,7 +47,7 @@ const CozyFloatingElements = () => {
     const iconSize = `${size}px`;
     const iconProps = { 
       style: { width: iconSize, height: iconSize },
-      className: 'opacity-30'
+      className: 'opacity-20 firefly-twinkle'
     };
 
     switch (type) {
@@ -69,10 +74,12 @@ const CozyFloatingElements = () => {
         </div>
       ))}
       
-      {/* Subtle background gradients */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cozy-mint/5 via-transparent to-cozy-peach/5 pointer-events-none" />
-      <div className="absolute top-1/4 right-0 w-96 h-96 bg-cozy-sage/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-cozy-warm/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Cozy forest background gradients with new colors */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-leaf-glow/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-warm-amber/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-sage-whisper/3 rounded-full blur-3xl" />
+      </div>
     </div>
   );
 };

@@ -24,9 +24,9 @@ const LoadingSpinner = ({
 
   const getCozyIcon = () => {
     switch (cozyVariant) {
-      case 'forest': return <TreePine className="w-6 h-6 text-cozy-forest animate-gentle-float" />;
-      case 'warm': return <Heart className="w-6 h-6 text-cozy-warm animate-cozy-pulse" />;
-      default: return <Sparkles className="w-6 h-6 text-cozy-sage animate-sparkle" />;
+      case 'forest': return <TreePine className="w-6 h-6 text-leaf-glow animate-gentle-float firefly-twinkle" />;
+      case 'warm': return <Heart className="w-6 h-6 text-warm-amber animate-cozy-pulse" />;
+      default: return <Sparkles className="w-6 h-6 text-sage-whisper animate-sparkle" />;
     }
   };
 
@@ -51,7 +51,7 @@ const LoadingSpinner = ({
         <div 
           className={cn(
             "border-4 rounded-full animate-spin",
-            "border-cozy-sage/30 border-t-cozy-forest",
+            "border-moss-glow/30 border-t-leaf-glow",
             sizeClasses[size]
           )}
         />
@@ -62,13 +62,13 @@ const LoadingSpinner = ({
       
       {message !== undefined && (
         <div className="text-center space-y-2">
-          <p className="text-cozy-forest dark:text-cozy-sage font-cozy font-medium animate-cozy-pulse">
+          <p className="text-leaf-glow font-cozy font-medium animate-cozy-pulse cozy-body">
             {getCozyMessages()}
           </p>
           <div className="flex justify-center gap-1">
-            <div className="w-2 h-2 bg-cozy-sage rounded-full animate-gentle-bounce"></div>
-            <div className="w-2 h-2 bg-cozy-forest rounded-full animate-gentle-bounce animation-delay-300"></div>
-            <div className="w-2 h-2 bg-cozy-warm rounded-full animate-gentle-bounce animation-delay-600"></div>
+            <div className="w-2 h-2 bg-sage-whisper rounded-full animate-gentle-bounce firefly-twinkle"></div>
+            <div className="w-2 h-2 bg-leaf-glow rounded-full animate-gentle-bounce animation-delay-300 firefly-twinkle"></div>
+            <div className="w-2 h-2 bg-warm-amber rounded-full animate-gentle-bounce animation-delay-600 firefly-twinkle"></div>
           </div>
         </div>
       )}

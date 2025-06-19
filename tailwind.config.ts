@@ -79,7 +79,23 @@ export default {
 					lavender: '#E6E6FA',
 					peach: '#FFCBA4',
 					mint: '#F0FFF0'
-				}
+				},
+				// New Cozy Forest Colors
+				'forest-night': 'var(--forest-night)',
+				'tree-shadow': 'var(--tree-shadow)',
+				'moss-glow': 'var(--moss-glow)',
+				'firefly-light': 'var(--firefly-light)',
+				'sage-whisper': 'var(--sage-whisper)',
+				'forest-breath': 'var(--forest-breath)',
+				'leaf-glow': 'var(--leaf-glow)',
+				'spring-moss': 'var(--spring-moss)',
+				'warm-amber': 'var(--warm-amber)',
+				'sunset-peach': 'var(--sunset-peach)',
+				'berry-blush': 'var(--berry-blush)',
+				'moonbeam': 'var(--moonbeam)',
+				'text-primary': 'var(--text-primary)',
+				'text-cozy': 'var(--text-cozy)',
+				'text-whisper': 'var(--text-whisper)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -150,6 +166,10 @@ export default {
 					'50%': {
 						boxShadow: '0 8px 25px -2px rgba(139, 69, 19, 0.2)'
 					}
+				},
+				'twinkle': {
+					'0%': { opacity: '0.6' },
+					'100%': { opacity: '1' }
 				}
 			},
 			animation: {
@@ -159,13 +179,15 @@ export default {
 				'cozy-pulse': 'cozy-pulse 2s ease-in-out infinite',
 				'sparkle': 'sparkle 2s ease-in-out infinite',
 				'gentle-bounce': 'gentle-bounce 2s ease-in-out infinite',
-				'cozy-glow': 'cozy-glow 4s ease-in-out infinite'
+				'cozy-glow': 'cozy-glow 4s ease-in-out infinite',
+				'twinkle': 'twinkle 3s ease-in-out infinite alternate'
 			},
 			backgroundImage: {
 				'cozy-gradient': 'linear-gradient(135deg, #F0FFF0 0%, #E6E6FA 50%, #FFCBA4 100%)',
 				'forest-gradient': 'linear-gradient(135deg, #87A96B 0%, #355E3B 100%)',
 				'warm-gradient': 'linear-gradient(135deg, #D2B48C 0%, #D4A574 100%)',
 				'cozy-texture': 'radial-gradient(circle at 1px 1px, rgba(139, 69, 19, 0.15) 1px, transparent 0)',
+				'forest-night-gradient': 'radial-gradient(ellipse at center top, rgba(45, 59, 50, 0.3) 0%, rgba(26, 37, 32, 0.8) 50%, var(--forest-night) 100%)'
 			}
 		}
 	},
