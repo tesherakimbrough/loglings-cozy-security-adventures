@@ -7,35 +7,35 @@ export const audioTracks: AudioTrack[] = [
     name: 'Forest Ambience',
     emoji: '🌲',
     description: 'Early morning forest with birds and gentle wind',
-    audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // Temporary working URL for testing
+    audioUrl: '' // Generated procedurally
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // Temporary working URL for testing
+    audioUrl: '' // Generated procedurally
   },
   {
     id: 'cozy-cafe',
     name: 'Cozy Coffee Shop',
     emoji: '☕',
     description: 'Warm café atmosphere with gentle chatter',
-    audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // Temporary working URL for testing
+    audioUrl: '' // Generated procedurally
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // Temporary working URL for testing
+    audioUrl: '' // Generated procedurally
   },
   {
     id: 'lofi',
     name: 'Lofi Study Beats',
     emoji: '🎵',
     description: 'Chill hip-hop beats perfect for concentration',
-    audioUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav' // Temporary working URL for testing
+    audioUrl: '' // Generated procedurally
   },
   {
     id: 'silence',
@@ -53,18 +53,37 @@ export const audioTracks: AudioTrack[] = [
   }
 ];
 
-// Audio attribution credits for royalty-free sources
-export const audioCredits = {
-  main: 'Audio temporarily using test sounds - working on implementing proper ambient tracks',
-  note: 'We are working on integrating high-quality ambient audio from trusted royalty-free sources',
-  licensing: 'All audio will be used under Creative Commons licenses - safe for commercial and open-source use',
-  freesound: {
-    rain: 'Rain: "Gentle Rain" by InspectorJ (freesound.org), CC BY 3.0',
-    forest: 'Forest: "Early Morning Forest Ambience" by klankbeeld (freesound.org), CC BY 3.0',
-    coffeeshop: 'Coffee Shop: "Coffee Shop" by Benboncan (freesound.org), CC0',
-    fireplace: 'Fireplace: "Fireplace Crackling" by klankbeeld (freesound.org), CC BY 3.0'
+// Preset combinations for enhanced user experience
+export const audioPresets = [
+  {
+    id: 'rainy-forest-cabin',
+    name: 'Rainy Forest Cabin',
+    emoji: '🏡',
+    description: 'Perfect storm sounds with crackling fire',
+    tracks: ['rain', 'fireplace'],
+    volumes: { rain: 0.6, fireplace: 0.4 }
   },
-  opengameart: {
-    lofi: 'Lo-fi Loop: "Lofi Chillhop Loop" by user yniprint (opengameart.org), CC0'
+  {
+    id: 'cozy-study-night',
+    name: 'Cozy Study Night',
+    emoji: '📚',
+    description: 'Gentle rain with soft lofi beats',
+    tracks: ['rain', 'lofi'],
+    volumes: { rain: 0.3, lofi: 0.5 }
+  },
+  {
+    id: 'morning-cafe',
+    name: 'Morning Café',
+    emoji: '🌅',
+    description: 'Coffee shop vibes with gentle background',
+    tracks: ['cozy-cafe'],
+    volumes: { 'cozy-cafe': 0.6 }
   }
+];
+
+// Audio attribution for legal compliance
+export const audioCredits = {
+  main: 'All audio generated procedurally using Web Audio API - 100% original and royalty-free',
+  licensing: 'Procedurally generated audio is safe for commercial and open-source use',
+  technical: 'Built with Tone.js and Web Audio API for high-quality, browser-native sound synthesis'
 };
