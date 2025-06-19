@@ -11,17 +11,21 @@ const MusicControlBar = () => {
     currentTrack,
     isPlaying,
     isLoading,
+    hasUserInteracted,
     getCurrentTrackInfo,
     playTrack,
     stopMusic
   } = useAmbientMusic();
 
-  // Auto-start user's preferred music when component mounts
+  // Only auto-start music after user has interacted with the page
   useEffect(() => {
-    if (progress.preferences.audioEnabled && progress.preferences.musicType !== 'silence') {
+    if (hasUserInteracted && 
+        progress.preferences.audioEnabled && 
+        progress.preferences.musicType !== 'silence' && 
+        !isPlaying) {
       playTrack(progress.preferences.musicType, progress.preferences.musicVolume);
     }
-  }, [progress.preferences.audioEnabled, progress.preferences.musicType]);
+  }, [hasUserInteracted, progress.preferences.audioEnabled, progress.preferences.musicType]);
 
   const togglePlayPause = async () => {
     if (isPlaying) {
@@ -63,7 +67,8 @@ const MusicControlBar = () => {
               <div className="hidden sm:block">
                 <div className="text-sm font-medium">{currentTrackInfo.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {isPlaying ? 'Now playing' : 'Ready to play'}
+                  {!hasUserInteracted ? 'Click play to start' : 
+                   isPlaying ? 'Now playing' : 'Ready to play'}
                 </div>
               </div>
             </div>

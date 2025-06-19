@@ -8,7 +8,7 @@ interface AudioTrack {
   name: string;
   emoji: string;
   description: string;
-  audioData: string;
+  audioUrl: string;
 }
 
 const audioTracks: AudioTrack[] = [
@@ -17,42 +17,42 @@ const audioTracks: AudioTrack[] = [
     name: 'Forest Ambience',
     emoji: '🌲',
     description: 'Gentle nature sounds with birds and rustling leaves',
-    audioData: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ'
+    audioUrl: 'https://www.soundjay.com/misc/sounds-807.mp3'
   },
   {
     id: 'lofi',
     name: 'Lofi Study Beats',
     emoji: '🎵',
     description: 'Chill hip-hop beats perfect for concentration',
-    audioData: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ'
+    audioUrl: 'https://www.soundjay.com/misc/sounds-808.mp3'
   },
   {
     id: 'cozy-cafe',
     name: 'Cozy Coffee Shop',
     emoji: '☕',
     description: 'Warm café atmosphere with gentle chatter',
-    audioData: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ'
+    audioUrl: 'https://www.soundjay.com/misc/sounds-809.mp3'
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioData: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ'
+    audioUrl: 'https://www.soundjay.com/misc/sounds-810.mp3'
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioData: 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ'
+    audioUrl: 'https://www.soundjay.com/misc/sounds-811.mp3'
   },
   {
     id: 'silence',
     name: 'Peaceful Silence',
     emoji: '🔇',
     description: 'No background music for pure focus',
-    audioData: ''
+    audioUrl: ''
   }
 ];
 
@@ -61,8 +61,70 @@ export const useAmbientMusic = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout>();
+
+  // Create a simple oscillator-based ambient sound generator
+  const createAmbientAudio = (trackId: MusicType): HTMLAudioElement => {
+    // Create audio context for generating ambient sounds
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    // Configure based on track type
+    switch (trackId) {
+      case 'forest':
+        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+        oscillator.type = 'sawtooth';
+        break;
+      case 'rain':
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+        oscillator.type = 'triangle';
+        break;
+      case 'fireplace':
+        oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+        oscillator.type = 'square';
+        break;
+      case 'lofi':
+        oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+        oscillator.type = 'sine';
+        break;
+      case 'cozy-cafe':
+        oscillator.frequency.setValueAtTime(250, audioContext.currentTime);
+        oscillator.type = 'triangle';
+        break;
+      default:
+        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+        oscillator.type = 'sine';
+    }
+
+    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    // Create a mock audio element that represents our generated sound
+    const mockAudio = {
+      play: () => {
+        oscillator.start();
+        return Promise.resolve();
+      },
+      pause: () => {
+        try {
+          oscillator.stop();
+        } catch (e) {
+          // Oscillator may already be stopped
+        }
+      },
+      currentTime: 0,
+      volume: volume,
+      loop: true,
+      addEventListener: () => {},
+      removeEventListener: () => {}
+    } as any;
+
+    return mockAudio;
+  };
 
   const getCurrentTrackInfo = () => {
     return audioTracks.find(track => track.id === currentTrack) || audioTracks[0];
@@ -71,9 +133,12 @@ export const useAmbientMusic = () => {
   const stopMusic = async (): Promise<void> => {
     return new Promise((resolve) => {
       if (audioRef.current) {
-        const audio = audioRef.current;
-        audio.pause();
-        audio.currentTime = 0;
+        try {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        } catch (error) {
+          console.warn('Error stopping audio:', error);
+        }
         audioRef.current = null;
       }
       setIsPlaying(false);
@@ -97,34 +162,23 @@ export const useAmbientMusic = () => {
       // Stop current track
       await stopMusic();
 
-      // Load new track
-      const track = audioTracks.find(t => t.id === trackId);
-      if (track && track.audioData) {
-        const audio = new Audio(track.audioData);
-        audio.loop = true;
-        audio.volume = newVolume;
-        
-        audioRef.current = audio;
-        
-        audio.addEventListener('canplaythrough', () => {
-          setIsLoading(false);
-          setCurrentTrack(trackId);
-          setIsPlaying(true);
-          setVolume(newVolume);
-        });
+      // Mark that user has interacted
+      setHasUserInteracted(true);
 
-        audio.addEventListener('ended', () => {
-          setIsPlaying(false);
-        });
-
-        audio.addEventListener('error', (e) => {
-          console.warn('Audio error:', e);
-          setIsLoading(false);
-          setIsPlaying(false);
-        });
-        
-        await audio.play();
-      }
+      // Create ambient audio for the selected track
+      const audio = createAmbientAudio(trackId);
+      audio.volume = newVolume;
+      
+      audioRef.current = audio;
+      
+      // Start playing
+      await audio.play();
+      
+      setIsLoading(false);
+      setCurrentTrack(trackId);
+      setIsPlaying(true);
+      setVolume(newVolume);
+      
     } catch (error) {
       console.warn('Audio playback failed:', error);
       setIsLoading(false);
@@ -140,11 +194,27 @@ export const useAmbientMusic = () => {
   };
 
   const playSuccessSound = () => {
-    // Simple success chime that plays over the ambient music
+    if (!hasUserInteracted) return;
+    
     try {
-      const successAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+D2u2kdBi2E1PLbeSIFK4fH8dyJOAcEYLHy6JlKEQ');
-      successAudio.volume = 0.6;
-      successAudio.play().catch(console.warn);
+      // Create a simple success beep
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.3);
     } catch (error) {
       console.warn('Success sound failed:', error);
     }
@@ -157,7 +227,11 @@ export const useAmbientMusic = () => {
         clearTimeout(fadeTimeoutRef.current);
       }
       if (audioRef.current) {
-        audioRef.current.pause();
+        try {
+          audioRef.current.pause();
+        } catch (error) {
+          console.warn('Cleanup error:', error);
+        }
         audioRef.current = null;
       }
     };
@@ -169,6 +243,7 @@ export const useAmbientMusic = () => {
     isPlaying,
     isLoading,
     volume,
+    hasUserInteracted,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
