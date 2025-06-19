@@ -9,6 +9,9 @@ import GameIntroGuides from './GameIntroGuides';
 import GameIntroFeatures from './GameIntroFeatures';
 import GameIntroNewFeatures from './GameIntroNewFeatures';
 import GameIntroNavigation from './GameIntroNavigation';
+import EnhancedUserOnboarding from './EnhancedUserOnboarding';
+import LaunchFeedbackCollector from './LaunchFeedbackCollector';
+import SoftLaunchReadinessChecker from './SoftLaunchReadinessChecker';
 
 interface GameIntroProps {
   onStartGame: () => void;
