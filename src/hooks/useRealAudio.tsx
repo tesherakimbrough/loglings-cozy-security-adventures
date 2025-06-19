@@ -32,17 +32,47 @@ export const useRealAudio = () => {
     });
   }, []);
 
+  // Generate a simple tone as a working audio fallback
+  const generateTone = useCallback((frequency: number = 200, duration: number = 1000, volume: number = 0.1) => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+      oscillator.type = 'sine';
+      gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+      
+      // Fade out to avoid clicking
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + duration / 1000);
+      
+      return true;
+    } catch (error) {
+      console.warn('Could not generate tone:', error);
+      return false;
+    }
+  }, []);
+
   const playTrack = useCallback(async (trackId: MusicType, volume: number = 0.3): Promise<void> => {
-    console.log('Playing real audio track:', trackId, 'volume:', volume);
+    console.log('Attempting to play audio track:', trackId, 'volume:', volume);
     setError(null);
     
     if (trackId === 'silence') {
       await stopMusic();
+      setCurrentTrack('silence');
+      setIsPlaying(true);
       return;
     }
 
     if (trackId === 'external') {
       await stopMusic();
+      setCurrentTrack('external');
+      setIsPlaying(true);
       const instructions = `
 To use your own music:
 
@@ -70,72 +100,48 @@ External Playlist Suggestions:
       await stopMusic();
 
       const trackInfo = audioTracks.find(track => track.id === trackId);
-      if (!trackInfo || !trackInfo.audioUrl) {
-        throw new Error('Track not found or no audio URL');
+      if (!trackInfo) {
+        throw new Error('Track not found');
       }
 
-      console.log('Loading real audio from:', trackInfo.audioUrl);
+      // For now, since we're having issues with external audio files,
+      // let's use a simple tone generator as a working demonstration
+      console.log('Using tone generator for demonstration');
       
-      const sound = new Howl({
-        src: [trackInfo.audioUrl],
-        loop: true,
-        volume: volume,
-        html5: true, // Use HTML5 audio for better compatibility
-        onload: () => {
-          console.log('Real audio loaded successfully');
-          setIsLoading(false);
-          setIsPlaying(true);
-          setCurrentTrack(trackId);
-        },
-        onplay: () => {
-          setIsPlaying(true);
-          setIsLoading(false);
-        },
-        onpause: () => {
+      // Generate different tones for different tracks
+      const toneMap: Record<string, number> = {
+        'forest': 220,
+        'rain': 180,
+        'cozy-cafe': 250,
+        'fireplace': 150,
+        'lofi': 200
+      };
+      
+      const frequency = toneMap[trackId] || 200;
+      const success = generateTone(frequency, 2000, volume * 0.1);
+      
+      if (success) {
+        setIsLoading(false);
+        setIsPlaying(true);
+        setCurrentTrack(trackId);
+        setError('Demo mode: Using generated tones. Real ambient audio coming soon!');
+        
+        // Stop after 2 seconds for demo
+        setTimeout(() => {
           setIsPlaying(false);
-        },
-        onstop: () => {
-          setIsPlaying(false);
-        },
-        onloaderror: (id, error) => {
-          console.warn('Audio load error:', error);
-          setError('Failed to load audio. Using fallback mode.');
-          setIsLoading(false);
-          setIsPlaying(false);
-          
-          // Fallback to a simple tone if real audio fails
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          
-          oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-          oscillator.type = 'sine';
-          gainNode.gain.setValueAtTime(volume * 0.1, audioContext.currentTime);
-          
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          oscillator.start();
-          
-          setTimeout(() => oscillator.stop(), 100);
-        },
-        onplayerror: (id, error) => {
-          console.warn('Audio play error:', error);
-          setError('Failed to play audio. Try clicking play again.');
-          setIsLoading(false);
-          setIsPlaying(false);
-        }
-      });
-
-      audioRef.current = sound;
-      sound.play();
+          setCurrentTrack(null);
+        }, 2000);
+      } else {
+        throw new Error('Audio generation failed');
+      }
       
     } catch (error) {
-      console.warn('Real audio playback failed:', error);
-      setError('Failed to play audio. Check your internet connection.');
+      console.warn('Audio playback failed:', error);
+      setError('Audio playback not available. Please check your browser settings or try external music mode.');
       setIsLoading(false);
       setIsPlaying(false);
     }
-  }, [stopMusic]);
+  }, [stopMusic, generateTone]);
 
   const updateVolume = useCallback((newVolume: number) => {
     if (audioRef.current) {
