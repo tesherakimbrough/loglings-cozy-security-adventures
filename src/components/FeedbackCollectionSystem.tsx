@@ -141,19 +141,30 @@ const FeedbackCollectionSystem = ({
     }
   };
 
+  const handleStarClick = (starValue: number) => {
+    console.log('Star clicked:', starValue);
+    setRating(starValue);
+  };
+
   const StarRating = () => (
-    <div className="flex gap-1 justify-center">
+    <div className="flex gap-2 justify-center">
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
-          onClick={() => setRating(star)}
-          className="p-1 transition-all duration-200 hover:scale-110"
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleStarClick(star);
+          }}
+          className="p-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-md cursor-pointer"
+          aria-label={`Rate ${star} out of 5 stars`}
         >
           <Star 
-            className={`w-6 h-6 ${
+            className={`w-8 h-8 transition-colors ${
               star <= rating 
-                ? 'text-warm-amber fill-warm-amber' 
-                : 'text-gray-300 dark:text-gray-600'
+                ? 'text-yellow-400 fill-yellow-400' 
+                : 'text-gray-300 dark:text-gray-600 hover:text-yellow-300'
             }`}
           />
         </button>
@@ -181,7 +192,7 @@ const FeedbackCollectionSystem = ({
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label className="block text-sm font-medium">How do you feel? *</label>
             <StarRating />
             {rating > 0 && (
@@ -210,7 +221,10 @@ const FeedbackCollectionSystem = ({
           <div className="flex gap-3">
             <Button
               variant="outline"
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false);
+                if (onClose) onClose();
+              }}
               className="flex-1"
             >
               Maybe Later
