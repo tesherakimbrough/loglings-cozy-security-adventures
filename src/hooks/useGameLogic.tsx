@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { ThreatLevel } from '../utils/logGenerator';
-import { generateExpandedLog } from '../utils/expandedLogScenarios';
+import { generateExpandedScenario } from '../utils/expandedScenarioLibrary';
 import { useSoundFeedback } from './useSoundFeedback';
 import { useDailyChallenges } from './useDailyChallenges';
 import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
@@ -63,7 +62,7 @@ export const useGameLogic = (
     try {
       // Use adaptive difficulty or user preference
       const difficulty = calculateOptimalDifficulty();
-      const newLog = generateExpandedLog(difficulty);
+      const newLog = generateExpandedScenario(difficulty);
       setCurrentLog(newLog as LogEntry);
       setFeedback(null);
       setShowNextRound(false);

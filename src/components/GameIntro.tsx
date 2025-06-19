@@ -1,4 +1,3 @@
-
 import { Play, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserMode } from '../types/userTypes';
@@ -14,6 +13,9 @@ import LaunchFeedbackCollector from './LaunchFeedbackCollector';
 import SoftLaunchReadinessChecker from './SoftLaunchReadinessChecker';
 import EarlyAccessBanner from './EarlyAccessBanner';
 import LaunchReadinessModal from './LaunchReadinessModal';
+import LevelProgressionSystem from './LevelProgressionSystem';
+import LearningPaths from './LearningPaths';
+import AchievementSystem from './AchievementSystem';
 import { useUserProfile } from '../hooks/useUserProfile';
 
 interface GameIntroProps {
@@ -24,6 +26,7 @@ interface GameIntroProps {
 const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) => {
   const isProMode = userMode === 'career-pro';
   const { profile } = useUserProfile();
+  const achievementSystem = AchievementSystem();
 
   const handleStartClick = () => {
     onStartGame(userMode);
@@ -44,11 +47,17 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         {/* Main Header */}
         <GameIntroHeader userMode={userMode} />
 
-        {/* Daily Challenge and Progress in a grid */}
+        {/* Enhanced Progress Section */}
         <div className="grid lg:grid-cols-2 gap-6">
           <DailyChallenge />
-          <ProgressTracker />
+          <LevelProgressionSystem />
         </div>
+
+        {/* Learning Paths Section */}
+        <LearningPaths />
+
+        {/* Achievements Section */}
+        <achievementSystem.AchievementDisplay />
 
         {/* Meet Your Guides */}
         <GameIntroGuides userMode={userMode} />
