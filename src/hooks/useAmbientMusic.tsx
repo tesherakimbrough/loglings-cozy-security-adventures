@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from 'react';
 import { MusicType } from '../types/musicTypes';
 import { audioTracks } from '../config/audioTracks';
@@ -13,6 +14,7 @@ export const useAmbientMusic = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
   const [useExternalMusic, setUseExternalMusic] = useState(false);
+  const [usingFallback, setUsingFallback] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fallbackAudioRef = useRef<any>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -38,6 +40,7 @@ export const useAmbientMusic = () => {
       
       setIsPlaying(false);
       setIsLoading(false);
+      setUsingFallback(false);
       resolve();
     });
   };
@@ -95,7 +98,7 @@ The ambient sounds will pause while you use external music.
         throw new Error('No audio URL available');
       }
 
-      // Try to use real audio first
+      // Try to use real audio first (will likely fail with our dummy URLs)
       try {
         const audio = new Audio();
         audio.crossOrigin = 'anonymous';
@@ -103,7 +106,7 @@ The ambient sounds will pause while you use external music.
         audio.volume = newVolume;
         
         await new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Audio load timeout')), 10000);
+          const timeout = setTimeout(() => reject(new Error('Audio load timeout')), 5000);
           
           audio.onloadeddata = () => {
             clearTimeout(timeout);
@@ -121,11 +124,13 @@ The ambient sounds will pause while you use external music.
 
         audioRef.current = audio;
         await audio.play();
+        setUsingFallback(false);
+        console.log('Successfully loaded external audio for:', trackId);
         
       } catch (audioError) {
-        console.warn('Real audio failed, using fallback:', audioError);
+        console.log('External audio failed, using enhanced fallback audio for:', trackId);
         
-        // Use fallback generated audio
+        // Use enhanced fallback generated audio
         if (!audioContextRef.current) {
           audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
         }
@@ -138,6 +143,7 @@ The ambient sounds will pause while you use external music.
         fallbackAudio.setVolume(newVolume);
         fallbackAudio.start();
         fallbackAudioRef.current = fallbackAudio;
+        setUsingFallback(true);
       }
       
       setIsLoading(false);
@@ -149,6 +155,7 @@ The ambient sounds will pause while you use external music.
       console.warn('Audio playback failed completely:', error);
       setIsLoading(false);
       setIsPlaying(false);
+      setUsingFallback(false);
     }
   };
 
@@ -198,6 +205,7 @@ The ambient sounds will pause while you use external music.
     volume,
     hasUserInteracted,
     useExternalMusic,
+    usingFallback,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,

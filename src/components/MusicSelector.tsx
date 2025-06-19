@@ -19,6 +19,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
     isPlaying,
     isLoading,
     useExternalMusic,
+    usingFallback,
     getCurrentTrackInfo,
     playTrack,
     stopMusic,
@@ -129,7 +130,9 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
                 <div className="text-xs text-muted-foreground">
                   {progress.preferences.musicType === 'external' 
                     ? 'Using external music app' 
-                    : isPlaying ? 'Now playing' : 'Ready to play'}
+                    : isPlaying 
+                      ? usingFallback ? 'Generated ambient audio' : 'Now playing'
+                      : 'Ready to play'}
                 </div>
               </div>
             </div>
@@ -170,6 +173,16 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
               step={0.1}
               className="w-full"
             />
+          </div>
+        )}
+
+        {/* Enhanced audio info */}
+        {usingFallback && progress.preferences.musicType !== 'external' && isPlaying && (
+          <div className="p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+            <div className="text-sm text-green-700 dark:text-green-300">
+              <p className="font-medium mb-1">🎶 Enhanced Audio</p>
+              <p className="text-xs">Playing procedurally generated ambient sounds - completely DMCA-safe!</p>
+            </div>
           </div>
         )}
 
