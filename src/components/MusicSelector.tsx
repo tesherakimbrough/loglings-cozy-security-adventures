@@ -206,7 +206,7 @@ const MusicSelector = ({ compact = false }: MusicSelectorProps) => {
         {/* Audio Credits */}
         <div className="text-xs text-muted-foreground border-t pt-3">
           <p className="font-medium mb-1">Audio Credits:</p>
-          <p>{audioCredits.pixabay}</p>
+          <p>{audioCredits.internetArchive}</p>
         </div>
       </CardContent>
     </Card>
