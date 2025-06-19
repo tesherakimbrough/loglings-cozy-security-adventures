@@ -1,4 +1,3 @@
-
 import { Heart, Sparkles, TreePine, Play, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -264,7 +263,6 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
               <Heart className="w-4 h-4" />
               Teshera Kimbrough
             </span>
-            - AI Security Engineer
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             Where learning cybersecurity feels like a warm hug 🤗
