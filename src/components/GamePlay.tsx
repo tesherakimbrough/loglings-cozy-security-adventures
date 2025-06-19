@@ -1,17 +1,18 @@
-
 import { useState, useEffect } from 'react';
 import { Heart, Clock, Sparkles, TreePine, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GameData } from '../pages/Index';
+import { UserMode } from '../types/userTypes';
 import { generateLogEntry, LogEntry, ThreatLevel } from '../utils/logGenerator';
 
 interface GamePlayProps {
   onEndGame: (gameData: GameData) => void;
+  userMode?: UserMode;
 }
 
-const GamePlay = ({ onEndGame }: GamePlayProps) => {
+const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   const [currentRound, setCurrentRound] = useState(1);
   const [score, setScore] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);

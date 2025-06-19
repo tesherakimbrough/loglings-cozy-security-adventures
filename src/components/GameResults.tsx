@@ -4,15 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { GameData } from '../pages/Index';
+import { UserMode } from '../types/userTypes';
 import SocialSharing from './SocialSharing';
 import EnhancedSocialSharing from './EnhancedSocialSharing';
 
 interface GameResultsProps {
   gameData: GameData;
   onRestart: () => void;
+  userMode?: UserMode;
 }
 
-const GameResults = ({ gameData, onRestart }: GameResultsProps) => {
+const GameResults = ({ gameData, onRestart, userMode = 'cozy-everyday' }: GameResultsProps) => {
   const [bestScore, setBestScore] = useState<number>(0);
 
   useEffect(() => {
