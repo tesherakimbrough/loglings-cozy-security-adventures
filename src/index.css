@@ -112,11 +112,20 @@
 
 @layer components {
   .cozy-glow {
-    box-shadow: 0 4px 20px rgba(142, 115, 140, 0.15);
+    box-shadow: 0 8px 32px rgba(142, 115, 140, 0.2), 0 4px 16px rgba(255, 215, 160, 0.1);
+    transition: box-shadow 0.3s ease;
   }
   
   .dark .cozy-glow {
-    box-shadow: 0 4px 20px rgba(255, 215, 160, 0.15);
+    box-shadow: 0 8px 32px rgba(255, 215, 160, 0.2), 0 4px 16px rgba(142, 115, 140, 0.1);
+  }
+  
+  .cozy-glow:hover {
+    box-shadow: 0 12px 40px rgba(142, 115, 140, 0.3), 0 6px 20px rgba(255, 215, 160, 0.2);
+  }
+  
+  .dark .cozy-glow:hover {
+    box-shadow: 0 12px 40px rgba(255, 215, 160, 0.3), 0 6px 20px rgba(142, 115, 140, 0.2);
   }
   
   .forest-gradient {
@@ -158,17 +167,46 @@
   }
 
   .cozy-card {
-    @apply bg-card/80 backdrop-blur-sm border-2 border-border/50 rounded-2xl shadow-lg;
+    @apply bg-gradient-to-br from-white/90 to-green-50/50 dark:from-gray-800/90 dark:to-green-950/50 
+           backdrop-blur-sm border-2 border-green-200/50 dark:border-green-800/50 
+           rounded-2xl shadow-lg transition-all duration-300;
+  }
+
+  .cozy-card:hover {
+    @apply border-green-300/70 dark:border-green-700/70;
   }
 
   .logling-button {
-    @apply bg-gradient-to-r from-primary/80 to-primary hover:from-primary hover:to-primary/90 
-           text-primary-foreground rounded-full px-6 py-3 font-medium 
-           transform hover:scale-105 transition-all duration-200 shadow-lg;
+    @apply bg-gradient-to-r from-green-600/90 to-emerald-600/90 hover:from-green-600 hover:to-emerald-600
+           text-white rounded-full px-6 py-3 font-semibold 
+           transform hover:scale-105 transition-all duration-300 shadow-xl
+           border-2 border-green-500/50 hover:border-green-400;
   }
 
   .candlelit-warmth {
     @apply dark:shadow-[0_0_30px_rgba(255,215,160,0.3)];
+  }
+
+  /* Enhanced ambient audio styling */
+  .ambient-track {
+    @apply relative overflow-hidden bg-gradient-to-br from-white/80 to-amber-50/60 
+           dark:from-gray-800/80 dark:to-amber-950/40
+           border-2 border-amber-200/50 dark:border-amber-800/50
+           rounded-xl p-4 transition-all duration-300
+           hover:shadow-xl hover:scale-105;
+  }
+
+  .ambient-track.active {
+    @apply bg-gradient-to-br from-green-100 to-emerald-50 
+           dark:from-green-900/50 dark:to-emerald-950/50
+           border-green-400/70 dark:border-green-600/70
+           shadow-xl shadow-green-200/50 dark:shadow-green-900/50;
+  }
+
+  .volume-slider {
+    @apply relative h-3 bg-gradient-to-r from-amber-100 to-green-100 
+           dark:from-amber-900/50 dark:to-green-900/50
+           rounded-full overflow-hidden border border-amber-200 dark:border-amber-800;
   }
 }
 
@@ -177,45 +215,54 @@
     transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px) rotate(1deg);
+    transform: translateY(-6px) rotate(1deg);
   }
 }
 
 @keyframes sparkle {
   0%, 100% {
-    opacity: 0;
-    transform: scale(0.8);
+    opacity: 0.6;
+    transform: scale(0.9) rotate(0deg);
   }
   50% {
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.1) rotate(180deg);
   }
 }
 
 @keyframes cozy-pulse {
   0%, 100% {
-    box-shadow: 0 0 10px rgba(142, 115, 140, 0.3);
+    box-shadow: 0 0 20px rgba(142, 115, 140, 0.3);
   }
   50% {
-    box-shadow: 0 0 25px rgba(142, 115, 140, 0.5);
+    box-shadow: 0 0 35px rgba(142, 115, 140, 0.6);
   }
 }
 
 @keyframes candlelit-pulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(255, 215, 160, 0.4);
+    box-shadow: 0 0 25px rgba(255, 215, 160, 0.4);
   }
   50% {
-    box-shadow: 0 0 30px rgba(255, 215, 160, 0.6);
+    box-shadow: 0 0 40px rgba(255, 215, 160, 0.7);
+  }
+}
+
+@keyframes ambient-wave {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
 }
 
 .animate-gentle-float {
-  animation: gentle-float 3s ease-in-out infinite;
+  animation: gentle-float 4s ease-in-out infinite;
 }
 
 .animate-sparkle {
-  animation: sparkle 2s ease-in-out infinite;
+  animation: sparkle 3s ease-in-out infinite;
 }
 
 .animate-cozy-pulse {
@@ -224,4 +271,26 @@
 
 .dark .animate-cozy-pulse {
   animation: candlelit-pulse 2s ease-in-out infinite;
+}
+
+.animate-ambient-wave {
+  animation: ambient-wave 8s ease-in-out infinite;
+  background-size: 300% 300%;
+}
+
+/* Custom scrollbar for cozy feeling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-green-50 dark:bg-green-950/50;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-green-300 dark:bg-green-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-green-400 dark:bg-green-600;
 }
