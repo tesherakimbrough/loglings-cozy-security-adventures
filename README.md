@@ -94,88 +94,11 @@ These aren't made-up scenarios - they're based on **real security incidents** fr
 
 ---
 
-## 🤝 Contributing to the Forest
-
-### 🌱 For New Contributors
-
-We'd love your help growing our cozy forest! Here's how to get involved:
-
-```bash
-# 1. Fork the repository on GitHub
-# 2. Clone your fork locally
-git clone https://github.com/YOUR-USERNAME/loglings-cozy-cybersecurity.git
-
-# 3. Create a feature branch
-git checkout -b feature/your-cozy-feature
-
-# 4. Make your changes and test locally
-npm run dev
-
-# 5. Commit with descriptive messages
-git commit -m "Add cozy feature: gentle log tooltips"
-
-# 6. Push to your fork and create a Pull Request
-git push origin feature/your-cozy-feature
-```
-
-### 🎨 Ways to Contribute
-
-**For Developers**:
-- 🐛 Fix bugs and improve performance
-- ✨ Add new cozy UI features  
-- 🎵 Enhance audio and visual effects
-- ♿ Improve accessibility features
-- 📱 Optimize mobile experience
-
-**For Security Professionals**:
-- 📝 Create realistic log scenarios
-- 🎓 Develop learning paths for specific topics
-- 🔍 Review content for technical accuracy
-- 📚 Suggest new cybersecurity concepts to cover
-
-**For Designers & Artists**:
-- 🎨 Enhance cozy aesthetic elements
-- 🌿 Create new forest characters and elements
-- 🎪 Design achievement badges and celebrations
-- 📱 Improve user experience flows
-
-**For Educators**:
-- 🏫 Develop curriculum integration guides
-- 📖 Create lesson plans around scenarios
-- 🎯 Design assessment rubrics
-- 👥 Suggest classroom-friendly features
-
-### 📋 Contribution Guidelines
-
-**Code Style**:
-- TypeScript for all new code
-- Follow existing naming conventions (`camelCase` for variables, `PascalCase` for components)
-- Use Tailwind CSS classes for styling
-- Keep components small and focused (under 100 lines when possible)
-
-**Cozy Principles**:
-- Maintain welcoming, non-intimidating language
-- Ensure accessibility (screen readers, keyboard navigation)
-- Test on mobile devices
-- Keep loading times fast for a smooth experience
-
-**Before Submitting**:
-- [ ] Test your changes locally (`npm run dev`)
-- [ ] Ensure the app builds without errors (`npm run build`)
-- [ ] Check for TypeScript errors
-- [ ] Test core functionality (gameplay, navigation, audio)
-- [ ] Write clear commit messages
-
-For detailed guidelines, see our [CONTRIBUTING.md](./CONTRIBUTING.md) *(coming soon!)*
-
----
-
 ## 🌍 Community & Support
 
 ### Join Our Cozy Community!
 
-- 💬 **Discord**: [Lovable Community](https://discord.com/channels/1119885301872070706/1280461670979993613) - Chat with other forest adventurers!
-- 🐙 **GitHub**: [Issues & Discussions](https://github.com/your-username/loglings) - Report bugs or suggest features
+- 🐙 **GitHub**: [Issues & Discussions](https://github.com/tesherakimbrough/loglings-cozy-security-adventures) - Report bugs or suggest features
 - 🐦 **Updates**: Follow our progress and announcements *(coming soon!)*
 - 📧 **Direct Contact**: Reach out through the in-game feedback system
 
@@ -318,7 +241,7 @@ To every security professional who's ever thought "there has to be a gentler way
 
 **Ready to begin your cozy cybersecurity journey?** 🌱
 
-[🎮 Start Playing Now](https://loglings.lovable.app) | [🛠️ Contribute on GitHub](https://github.com/tesherakimbrough/loglings)
+[🎮 Start Playing Now](https://loglings.lovable.app) | [🛠️ Contribute on GitHub](https://github.com/tesherakimbrough/loglings-cozy-security-adventures)
 
 *Made with 🌿 and endless cups of tea for a more accessible cybersecurity world*
 
