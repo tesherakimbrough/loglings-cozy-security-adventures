@@ -1,3 +1,4 @@
+
 import { Heart, Sparkles, TreePine, Play, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +8,7 @@ import WaitlistButton from './WaitlistButton';
 import ProgressTracker from './ProgressTracker';
 import DailyChallenge from './DailyChallenge';
 import GameSettings from './GameSettings';
+import EarlyAccessBanner from './EarlyAccessBanner';
 
 interface GameIntroProps {
   onStartGame: () => void;
@@ -107,6 +109,9 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
             <ThemeToggle />
           </div>
         </div>
+
+        {/* Early Access Banner */}
+        <EarlyAccessBanner />
 
         {/* Main Header */}
         <div className="text-center space-y-6">

@@ -1,6 +1,6 @@
 
 import { Button } from '@/components/ui/button';
-import { Play, Pause, Volume2 } from 'lucide-react';
+import { Play, Pause, Volume2, Loader2 } from 'lucide-react';
 import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
 
@@ -10,6 +10,7 @@ const MusicControlBar = () => {
     isPlaying,
     isLoading,
     hasUserInteracted,
+    currentTrack,
     getCurrentTrackInfo,
     playTrack,
     stopMusic
@@ -31,22 +32,35 @@ const MusicControlBar = () => {
   }
 
   const currentTrackInfo = getCurrentTrackInfo(progress.preferences.musicType);
+  const isInSilenceMode = currentTrack === 'silence';
 
   return (
     <div className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-40">
       <div className="bg-background/95 backdrop-blur-sm border border-border/50 rounded-xl p-3 cozy-card cozy-glow shadow-lg">
+        {/* Audio Coming Soon Notice */}
+        {isInSilenceMode && (
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-lg p-2 mb-3">
+            <div className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 text-amber-600 dark:text-amber-400 animate-spin" />
+              <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
+                🎵 Cozy audio coming soon!
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
               onClick={togglePlayPause}
-              disabled={isLoading}
+              disabled={isLoading || isInSilenceMode}
               className="cozy-card"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              ) : isPlaying ? (
+              ) : isPlaying && !isInSilenceMode ? (
                 <Pause className="w-4 h-4" />
               ) : (
                 <Play className="w-4 h-4" />
@@ -58,7 +72,8 @@ const MusicControlBar = () => {
               <div className="hidden sm:block">
                 <div className="text-sm font-medium">{currentTrackInfo.name}</div>
                 <div className="text-xs text-muted-foreground">
-                  {!hasUserInteracted ? 'Click play to start' : 
+                  {isInSilenceMode ? 'Audio in development' :
+                   !hasUserInteracted ? 'Click play to start' : 
                    isLoading ? 'Loading...' :
                    isPlaying ? 'Playing ambient audio' : 'Ready to play'}
                 </div>
@@ -69,7 +84,7 @@ const MusicControlBar = () => {
           <div className="flex items-center gap-2">
             <Volume2 className="w-4 h-4 text-muted-foreground" />
             <div className="text-xs text-muted-foreground">
-              {Math.round(progress.preferences.musicVolume * 100)}%
+              {isInSilenceMode ? '🔇' : `${Math.round(progress.preferences.musicVolume * 100)}%`}
             </div>
           </div>
         </div>
