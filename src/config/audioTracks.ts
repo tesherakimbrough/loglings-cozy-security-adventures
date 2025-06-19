@@ -7,42 +7,42 @@ export const audioTracks: AudioTrack[] = [
     name: 'Forest Ambience',
     emoji: '🌲',
     description: 'Early morning forest with birds and gentle wind',
-    audioUrl: '/sounds/forest-ambience.mp3'
+    audioUrl: '/forest-ambience.wav'
   },
   {
     id: 'rain',
     name: 'Gentle Rain',
     emoji: '🌧️',
     description: 'Soft rainfall sounds for deep focus',
-    audioUrl: '/sounds/gentle-rain.mp3'
+    audioUrl: '/gentle-rain.wav'
   },
   {
     id: 'cozy-cafe',
     name: 'Cozy Coffee Shop',
     emoji: '☕',
     description: 'Warm café atmosphere with gentle chatter',
-    audioUrl: '/sounds/cozy-cafe.mp3'
+    audioUrl: '/cozy-cafe.mp3'
   },
   {
     id: 'fireplace',
     name: 'Crackling Fireplace',
     emoji: '🔥',
     description: 'Warm, cozy fire sounds for comfort',
-    audioUrl: '/sounds/fireplace.mp3'
+    audioUrl: '/fireplace.mp3'
   },
   {
     id: 'lofi',
     name: 'Lofi Study Beats',
     emoji: '🎵',
     description: 'Chill hip-hop beats perfect for concentration',
-    audioUrl: '/sounds/lofi-beats.mp3'
+    audioUrl: '/lofi-beats.mp3'
   },
   {
     id: 'silence',
     name: 'Peaceful Silence',
     emoji: '🔇',
     description: 'Quiet room tone for pure focus',
-    audioUrl: '/sounds/silence.mp3'
+    audioUrl: '/silence.wav'
   },
   {
     id: 'external',
