@@ -12,7 +12,7 @@ export const englishTranslations: Translations = {
   language: "Language",
   tutorial: "Tutorial",
   beginAdventure: "Begin Adventure",
-  gameSubtitle: "Game Subtitle",
+  gameSubtitle: "Where learning cybersecurity feels like a warm hug 🤗",
   chapter: "Chapter",
   analystPip: "Analyst Pip",
   detectiveLuna: "Detective Luna",
