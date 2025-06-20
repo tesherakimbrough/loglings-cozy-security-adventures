@@ -1,9 +1,17 @@
+
 import { useState, useEffect, useCallback } from 'react';
-import { generateContextualScenario, AdvancedScenario } from '../utils/advancedScenarioDatabase';
+import { AdvancedScenario } from '../utils/advancedScenarioDatabase';
 import { useAudioSystem } from './useAudioSystem';
 import { useEnhancedErrorHandling } from './useEnhancedErrorHandling';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../pages/Index';
+import { 
+  generateScenarioWithFallbacks, 
+  createUltimateFallbackScenario,
+  ScenarioGenerationOptions 
+} from '../utils/scenarioGenerator';
+import { calculateEnhancedScore, ScoringOptions } from '../utils/gameScoring';
+import { getEnhancedFeedback } from '../utils/gameFeedback';
 
 export const useAdvancedGameLogic = (
   userMode: UserMode,
@@ -53,64 +61,15 @@ export const useAdvancedGameLogic = (
 
   const generateNewScenario = useCallback(() => {
     try {
-      console.log('Generating new scenario with difficulty:', difficulty);
-      console.log('Used scenario IDs:', usedScenarioIds.length);
+      const options: ScenarioGenerationOptions = {
+        difficulty,
+        usedScenarioIds,
+        currentRound,
+        totalRounds
+      };
+
+      const newScenario = generateScenarioWithFallbacks(options);
       
-      // Reset used scenarios if we've used too many (prevents getting stuck)
-      let currentUsedIds = usedScenarioIds;
-      if (usedScenarioIds.length > 15) {
-        console.log('Resetting used scenarios to prevent exhaustion');
-        currentUsedIds = [];
-        setUsedScenarioIds([]);
-      }
-      
-      let attempts = 0;
-      let newScenario = null;
-      
-      // Try to generate a unique scenario, with fallback logic
-      while (attempts < 5) {
-        try {
-          newScenario = generateContextualScenario(difficulty, currentUsedIds);
-          
-          if (newScenario && newScenario.id && !currentUsedIds.includes(newScenario.id)) {
-            break; // Found a valid, unused scenario
-          } else if (newScenario && newScenario.id) {
-            // If we got a used scenario, allow it if we've tried multiple times
-            if (attempts >= 3) {
-              console.log('Allowing repeated scenario after multiple attempts');
-              break;
-            }
-          }
-        } catch (generationError) {
-          console.error('Scenario generation attempt failed:', generationError);
-        }
-        
-        attempts++;
-      }
-      
-      // Final fallback if all attempts failed
-      if (!newScenario || !newScenario.id) {
-        console.log('All generation attempts failed, creating emergency fallback');
-        newScenario = {
-          id: `emergency-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          category: 'authentication',
-          threatLevel: 'safe',
-          difficulty: 'beginner',
-          timestamp: new Date().toISOString(),
-          sourceIP: '192.168.1.100',
-          eventType: 'Normal Login',
-          user: 'user@company.com',
-          location: 'Office',
-          status: 'SUCCESS',
-          details: 'User logged in normally during business hours from their usual location.',
-          explanation: 'This appears to be normal authentication activity from a trusted location.',
-          learningTip: 'Normal logins should happen during expected hours from known locations.',
-          nextSteps: 'Continue monitoring for any unusual patterns.',
-          realWorldContext: 'Regular authentication patterns help establish baselines for detecting anomalies.'
-        };
-      }
-      
-      console.log('Generated scenario:', newScenario.id);
       setCurrentScenario(newScenario);
       setUsedScenarioIds(prev => [...prev, newScenario.id]);
       setFeedback(null);
@@ -130,83 +89,11 @@ export const useAdvancedGameLogic = (
         }
       }, 'high');
       
-      // Ultimate fallback scenario that should always work
-      const ultimateFallback: AdvancedScenario = {
-        id: `fallback-${Date.now()}`,
-        category: 'authentication',
-        threatLevel: 'safe',
-        difficulty: 'beginner',
-        timestamp: new Date().toISOString(),
-        sourceIP: '192.168.1.100',
-        eventType: 'Normal Login',
-        user: 'user@company.com',
-        location: 'Office',
-        status: 'SUCCESS',
-        details: 'User logged in normally during business hours from their usual location.',
-        explanation: 'This appears to be normal authentication activity from a trusted location.',
-        learningTip: 'Normal logins should happen during expected hours from known locations.',
-        nextSteps: 'Continue monitoring for any unusual patterns.',
-        realWorldContext: 'Regular authentication patterns help establish baselines for detecting anomalies.'
-      };
-      
+      const ultimateFallback = createUltimateFallbackScenario();
       setCurrentScenario(ultimateFallback);
       setUsedScenarioIds(prev => [...prev, ultimateFallback.id]);
     }
   }, [difficulty, usedScenarioIds, logError, currentRound, totalRounds]);
-
-  const calculateEnhancedScore = (
-    playerChoice: string,
-    scenario: AdvancedScenario,
-    correct: boolean,
-    responseTime: number
-  ): number => {
-    if (!correct) return -10;
-
-    let basePoints = {
-      'beginner': 50,
-      'intermediate': 75,
-      'advanced': 100
-    }[scenario.difficulty];
-
-    // Threat level bonus
-    const threatBonus = {
-      'safe': 1.0,
-      'warning': 1.3,
-      'critical': 1.5
-    }[scenario.threatLevel];
-
-    basePoints *= threatBonus;
-
-    // Speed bonus (under 30 seconds)
-    if (responseTime < 30) {
-      basePoints *= 1.5;
-    } else if (responseTime < 60) {
-      basePoints *= 1.2;
-    }
-
-    // Streak bonus
-    if (streakCount >= 3) {
-      basePoints *= 1.3;
-    }
-
-    return Math.floor(basePoints);
-  };
-
-  const getEnhancedFeedback = (
-    playerChoice: string,
-    scenario: AdvancedScenario,
-    correct: boolean
-  ): string => {
-    if (!scenario) return 'Something went wrong, but great job trying!';
-    
-    let feedback = correct ? scenario.explanation : 
-      `${scenario.explanation}\n\n💡 Learning insight: ${scenario.learningTip || 'Keep practicing!'}`;
-    
-    feedback += `\n\n🔍 Next steps: ${scenario.nextSteps || 'Continue learning!'}`;
-    feedback += `\n\n🌍 Real-world context: ${scenario.realWorldContext || 'Every scenario teaches us something valuable.'}`;
-    
-    return feedback;
-  };
 
   const handleThreatAssessment = useCallback((playerChoice: string) => {
     if (!currentScenario) {
@@ -218,12 +105,15 @@ export const useAdvancedGameLogic = (
     const answerIsCorrect = playerChoice === currentScenario.threatLevel;
     
     try {
-      const pointsEarned = calculateEnhancedScore(
-        playerChoice, 
-        currentScenario, 
-        answerIsCorrect, 
-        responseTime
-      );
+      const scoringOptions: ScoringOptions = {
+        playerChoice,
+        scenario: currentScenario,
+        correct: answerIsCorrect,
+        responseTime,
+        streakCount
+      };
+
+      const pointsEarned = calculateEnhancedScore(scoringOptions);
 
       if (answerIsCorrect) {
         playSuccessSound();
