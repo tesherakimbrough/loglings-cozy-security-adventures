@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -98,10 +97,13 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
+    // Generate a consistent user identifier based on session data
+    const userId = `anonymous_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
     const completeFeedback: SoftLaunchFeedback = {
       ...feedback,
       sessionCount: profile.progress.totalSessions,
-      userId: profile.id || 'anonymous',
+      userId,
       timestamp: new Date().toISOString(),
     } as SoftLaunchFeedback;
 
