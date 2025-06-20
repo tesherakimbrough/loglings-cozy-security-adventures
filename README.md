@@ -26,7 +26,7 @@ Loglings transforms the traditionally intimidating world of cybersecurity into a
 ## 🎮 Quick Start for Players
 
 ### Ready to Play Right Now?
-1. **Visit**: [loglings.lovable.app](https://loglings.lovable.app)
+1. **Visit**: [https://loglings-cozy-security-adventures.lovable.app/](https://loglings-cozy-security-adventures.lovable.app/)
 2. **Choose Your Adventure**:
    - 🏠 **Cozy Everyday**: Gentle learning with extended time limits (perfect for beginners)
    - ⚡ **Forest Challenge**: Faster-paced scenarios for confident learners
@@ -241,7 +241,7 @@ To every security professional who's ever thought "there has to be a gentler way
 
 **Ready to begin your cozy cybersecurity journey?** 🌱
 
-[🎮 Start Playing Now](https://loglings.lovable.app) | [🛠️ Contribute on GitHub](https://github.com/tesherakimbrough/loglings-cozy-security-adventures)
+[🎮 Start Playing Now](https://loglings-cozy-security-adventures.lovable.app/) | [🛠️ Contribute on GitHub](https://github.com/tesherakimbrough/loglings-cozy-security-adventures)
 
 *Made with 🌿 and endless cups of tea for a more accessible cybersecurity world*
 
