@@ -19,6 +19,47 @@ const cleanupAuthState = () => {
   });
 };
 
+// Input validation utilities
+const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const validatePassword = (password: string): { isValid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+  
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+  if (!/\d/.test(password)) {
+    errors.push('Password must contain at least one number');
+  }
+  
+  return { isValid: errors.length === 0, errors };
+};
+
+const validateDisplayName = (displayName: string): { isValid: boolean; errors: string[] } => {
+  const errors: string[] = [];
+  
+  if (displayName.length < 2) {
+    errors.push('Display name must be at least 2 characters long');
+  }
+  if (displayName.length > 50) {
+    errors.push('Display name must be less than 50 characters');
+  }
+  if (!/^[a-zA-Z0-9\s._-]+$/.test(displayName)) {
+    errors.push('Display name contains invalid characters');
+  }
+  
+  return { isValid: errors.length === 0, errors };
+};
+
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -28,7 +69,7 @@ export const useAuth = () => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('Auth state changed:', event);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -45,13 +86,13 @@ export const useAuth = () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('Error getting session');
         }
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
       } catch (error) {
-        console.error('Exception getting session:', error);
+        console.error('Exception getting session');
         setLoading(false);
       }
     };
@@ -63,12 +104,29 @@ export const useAuth = () => {
 
   const signUp = async (email: string, password: string, displayName?: string) => {
     try {
+      // Validate inputs
+      if (!validateEmail(email)) {
+        return { error: { message: 'Invalid email format' } };
+      }
+      
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.isValid) {
+        return { error: { message: passwordValidation.errors.join(', ') } };
+      }
+      
+      if (displayName) {
+        const displayNameValidation = validateDisplayName(displayName);
+        if (!displayNameValidation.isValid) {
+          return { error: { message: displayNameValidation.errors.join(', ') } };
+        }
+      }
+      
       // Clean up any existing auth state
       cleanupAuthState();
       
       // Get the current origin for redirect
       const redirectUrl = `${window.location.origin}/`;
-      console.log('Sign up redirect URL:', redirectUrl);
+      console.log('Sign up initiated');
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -82,20 +140,29 @@ export const useAuth = () => {
       });
       
       if (error) {
-        console.error('Sign up error:', error);
+        console.error('Sign up failed');
         return { error };
       }
       
-      console.log('Sign up successful:', data);
+      console.log('Sign up successful');
       return { error: null, data };
     } catch (error) {
-      console.error('Sign up exception:', error);
+      console.error('Sign up exception');
       return { error: error as any };
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Validate inputs
+      if (!validateEmail(email)) {
+        return { error: { message: 'Invalid email format' } };
+      }
+      
+      if (password.length < 1) {
+        return { error: { message: 'Password is required' } };
+      }
+      
       // Clean up existing state
       cleanupAuthState();
       
@@ -104,7 +171,7 @@ export const useAuth = () => {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
         // Continue even if this fails
-        console.warn('Could not sign out globally:', err);
+        console.warn('Could not sign out globally');
       }
       
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -113,20 +180,19 @@ export const useAuth = () => {
       });
       
       if (error) {
-        console.error('Sign in error:', error);
+        console.error('Sign in failed');
         return { error };
       }
       
-      console.log('Sign in successful:', data);
+      console.log('Sign in successful');
       
-      // Force page reload for clean state
-      if (data.user) {
-        window.location.href = '/';
-      }
+      // Update state immediately instead of forcing page reload
+      setSession(data.session);
+      setUser(data.user);
       
       return { error: null, data };
     } catch (error) {
-      console.error('Sign in exception:', error);
+      console.error('Sign in exception');
       return { error: error as any };
     }
   };
@@ -140,15 +206,16 @@ export const useAuth = () => {
       try {
         await supabase.auth.signOut({ scope: 'global' });
       } catch (err) {
-        console.warn('Could not sign out globally:', err);
+        console.warn('Could not sign out globally');
       }
       
-      // Force page reload for clean state
-      window.location.href = '/';
+      // Update state immediately
+      setSession(null);
+      setUser(null);
       
       return { error: null };
     } catch (error) {
-      console.error('Sign out error:', error);
+      console.error('Sign out error');
       return { error: error as any };
     }
   };
@@ -159,6 +226,10 @@ export const useAuth = () => {
     loading,
     signUp,
     signIn,
-    signOut
+    signOut,
+    // Export validation utilities for use in components
+    validateEmail,
+    validatePassword,
+    validateDisplayName
   };
 };

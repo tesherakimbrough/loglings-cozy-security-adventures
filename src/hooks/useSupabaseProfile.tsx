@@ -45,6 +45,15 @@ interface UserPreferences {
   updated_at: string;
 }
 
+// Input sanitization utilities
+const sanitizeStringInput = (input: string, maxLength: number = 255): string => {
+  return input.trim().slice(0, maxLength);
+};
+
+const sanitizeArrayInput = (input: string[]): string[] => {
+  return input.filter(item => typeof item === 'string' && item.trim().length > 0);
+};
+
 export const useSupabaseProfile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -77,7 +86,7 @@ export const useSupabaseProfile = () => {
         .maybeSingle();
 
       if (profileError) {
-        console.error('Error loading profile:', profileError);
+        console.error('Error loading profile data');
       }
 
       // Load progress
@@ -88,7 +97,7 @@ export const useSupabaseProfile = () => {
         .maybeSingle();
 
       if (progressError) {
-        console.error('Error loading progress:', progressError);
+        console.error('Error loading progress data');
       }
 
       // Load preferences
@@ -99,14 +108,14 @@ export const useSupabaseProfile = () => {
         .maybeSingle();
 
       if (preferencesError) {
-        console.error('Error loading preferences:', preferencesError);
+        console.error('Error loading preferences data');
       }
 
       setProfile(profileData);
       setProgress(progressData);
       setPreferences(preferencesData);
     } catch (error) {
-      console.error('Exception loading user data:', error);
+      console.error('Exception loading user data');
     } finally {
       setLoading(false);
     }
@@ -116,9 +125,24 @@ export const useSupabaseProfile = () => {
     if (!user || !progress) return;
 
     try {
+      // Sanitize inputs
+      const sanitizedUpdates = { ...updates };
+      if (sanitizedUpdates.user_mode) {
+        sanitizedUpdates.user_mode = sanitizeStringInput(sanitizedUpdates.user_mode, 50);
+      }
+      if (sanitizedUpdates.difficulty_level) {
+        sanitizedUpdates.difficulty_level = sanitizeStringInput(sanitizedUpdates.difficulty_level, 50);
+      }
+      if (sanitizedUpdates.unlocked_loglings) {
+        sanitizedUpdates.unlocked_loglings = sanitizeArrayInput(sanitizedUpdates.unlocked_loglings);
+      }
+      if (sanitizedUpdates.achievements) {
+        sanitizedUpdates.achievements = sanitizeArrayInput(sanitizedUpdates.achievements);
+      }
+
       const { data, error } = await supabase
         .from('user_progress')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...sanitizedUpdates, updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
         .select()
         .maybeSingle();
@@ -128,7 +152,7 @@ export const useSupabaseProfile = () => {
       }
       return { data, error };
     } catch (error) {
-      console.error('Exception updating progress:', error);
+      console.error('Exception updating progress');
       return { data: null, error };
     }
   };
@@ -137,9 +161,21 @@ export const useSupabaseProfile = () => {
     if (!user || !preferences) return;
 
     try {
+      // Sanitize inputs
+      const sanitizedUpdates = { ...updates };
+      if (sanitizedUpdates.music_type) {
+        sanitizedUpdates.music_type = sanitizeStringInput(sanitizedUpdates.music_type, 50);
+      }
+      if (sanitizedUpdates.font_size) {
+        sanitizedUpdates.font_size = sanitizeStringInput(sanitizedUpdates.font_size, 20);
+      }
+      if (sanitizedUpdates.color_blind_mode) {
+        sanitizedUpdates.color_blind_mode = sanitizeStringInput(sanitizedUpdates.color_blind_mode, 50);
+      }
+
       const { data, error } = await supabase
         .from('user_preferences')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...sanitizedUpdates, updated_at: new Date().toISOString() })
         .eq('user_id', user.id)
         .select()
         .maybeSingle();
@@ -149,7 +185,7 @@ export const useSupabaseProfile = () => {
       }
       return { data, error };
     } catch (error) {
-      console.error('Exception updating preferences:', error);
+      console.error('Exception updating preferences');
       return { data: null, error };
     }
   };
@@ -165,16 +201,26 @@ export const useSupabaseProfile = () => {
     if (!user) return;
 
     try {
+      // Sanitize inputs
+      const sanitizedData = {
+        ...sessionData,
+        difficulty_level: sanitizeStringInput(sessionData.difficulty_level, 50),
+        score: Math.max(0, Math.min(sessionData.score, 999999)),
+        correct_answers: Math.max(0, Math.min(sessionData.correct_answers, 999999)),
+        total_rounds: Math.max(0, Math.min(sessionData.total_rounds, 999999)),
+        time_elapsed: Math.max(0, Math.min(sessionData.time_elapsed, 999999))
+      };
+
       const { data, error } = await supabase
         .from('game_sessions')
         .insert({
           user_id: user.id,
-          ...sessionData
+          ...sanitizedData
         });
 
       return { data, error };
     } catch (error) {
-      console.error('Exception saving game session:', error);
+      console.error('Exception saving game session');
       return { data: null, error };
     }
   };

@@ -17,6 +17,17 @@ interface GameSession {
   created_at: string;
 }
 
+// Input sanitization for game data
+const sanitizeGameData = (gameData: GameData): GameData => {
+  return {
+    score: Math.max(0, Math.min(gameData.score, 999999)),
+    correctAnswers: Math.max(0, Math.min(gameData.correctAnswers, 999999)),
+    totalRounds: Math.max(0, Math.min(gameData.totalRounds, 999999)),
+    timeElapsed: Math.max(0, Math.min(gameData.timeElapsed, 999999)),
+    difficulty: gameData.difficulty || 'beginner'
+  };
+};
+
 export const useSupabaseGameData = () => {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
@@ -27,9 +38,10 @@ export const useSupabaseGameData = () => {
     if (!user) {
       console.log('No user logged in, saving to localStorage as fallback');
       try {
+        const sanitizedData = sanitizeGameData(gameData);
         const existingData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
         const sessionData = {
-          ...gameData,
+          ...sanitizedData,
           id: crypto.randomUUID(),
           user_id: 'anonymous',
           created_at: new Date().toISOString()
@@ -37,39 +49,41 @@ export const useSupabaseGameData = () => {
         existingData.push(sessionData);
         localStorage.setItem('loglings-game-history', JSON.stringify(existingData));
       } catch (error) {
-        console.error('Error saving to localStorage:', error);
+        console.error('Error saving to localStorage');
       }
       return;
     }
 
     setIsLoading(true);
     try {
+      const sanitizedData = sanitizeGameData(gameData);
+      
       const { data, error } = await supabase
         .from('game_sessions')
         .insert({
           user_id: user.id,
-          score: gameData.score,
-          correct_answers: gameData.correctAnswers,
-          total_rounds: gameData.totalRounds,
-          time_elapsed: gameData.timeElapsed,
-          difficulty_level: gameData.difficulty,
+          score: sanitizedData.score,
+          correct_answers: sanitizedData.correctAnswers,
+          total_rounds: sanitizedData.totalRounds,
+          time_elapsed: sanitizedData.timeElapsed,
+          difficulty_level: sanitizedData.difficulty,
           scenarios_played: []
         })
         .select()
         .maybeSingle();
 
       if (error) {
-        console.error('Error saving game session:', error);
+        console.error('Error saving game session');
         toast.error('Failed to save game progress');
         return;
       }
 
-      console.log('Game session saved successfully:', data);
+      console.log('Game session saved successfully');
       await loadGameHistory();
       toast.success('Game progress saved! 🌟');
       
     } catch (error) {
-      console.error('Exception saving game session:', error);
+      console.error('Exception saving game session');
       toast.error('Failed to save game progress');
     } finally {
       setIsLoading(false);
@@ -83,7 +97,7 @@ export const useSupabaseGameData = () => {
         const localData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
         setGameHistory(localData);
       } catch (error) {
-        console.error('Error loading from localStorage:', error);
+        console.error('Error loading from localStorage');
         setGameHistory([]);
       }
       return;
@@ -99,7 +113,7 @@ export const useSupabaseGameData = () => {
         .limit(50);
 
       if (error) {
-        console.error('Error loading game history:', error);
+        console.error('Error loading game history');
         return;
       }
 
@@ -111,7 +125,7 @@ export const useSupabaseGameData = () => {
       setGameHistory(transformedData);
       
     } catch (error) {
-      console.error('Exception loading game history:', error);
+      console.error('Exception loading game history');
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +136,8 @@ export const useSupabaseGameData = () => {
     if (!user) return;
 
     try {
+      const sanitizedData = sanitizeGameData(gameData);
+      
       const { data: currentProgress, error: fetchError } = await supabase
         .from('user_progress')
         .select('*')
@@ -129,14 +145,14 @@ export const useSupabaseGameData = () => {
         .maybeSingle();
 
       if (fetchError) {
-        console.error('Error fetching current progress:', fetchError);
+        console.error('Error fetching current progress');
         return;
       }
 
       if (currentProgress) {
         const newTotalSessions = currentProgress.total_sessions + 1;
-        const newTotalScore = currentProgress.total_score + gameData.score;
-        const newCorrectAnswers = currentProgress.correct_answers + gameData.correctAnswers;
+        const newTotalScore = currentProgress.total_score + sanitizedData.score;
+        const newCorrectAnswers = currentProgress.correct_answers + sanitizedData.correctAnswers;
         
         const lastSessionDate = new Date(currentProgress.updated_at).toDateString();
         const today = new Date().toDateString();
@@ -164,13 +180,13 @@ export const useSupabaseGameData = () => {
           .eq('user_id', user.id);
 
         if (updateError) {
-          console.error('Error updating user progress:', updateError);
+          console.error('Error updating user progress');
         } else {
           console.log('User progress updated successfully');
         }
       }
     } catch (error) {
-      console.error('Exception updating user progress:', error);
+      console.error('Exception updating user progress');
     }
   };
 
