@@ -26,15 +26,19 @@ export const useSupabaseGameData = () => {
   const saveGameSession = async (gameData: GameData) => {
     if (!user) {
       console.log('No user logged in, saving to localStorage as fallback');
-      const existingData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
-      const sessionData = {
-        ...gameData,
-        id: crypto.randomUUID(),
-        user_id: 'anonymous',
-        created_at: new Date().toISOString()
-      };
-      existingData.push(sessionData);
-      localStorage.setItem('loglings-game-history', JSON.stringify(existingData));
+      try {
+        const existingData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
+        const sessionData = {
+          ...gameData,
+          id: crypto.randomUUID(),
+          user_id: 'anonymous',
+          created_at: new Date().toISOString()
+        };
+        existingData.push(sessionData);
+        localStorage.setItem('loglings-game-history', JSON.stringify(existingData));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
       return;
     }
 
@@ -49,10 +53,10 @@ export const useSupabaseGameData = () => {
           total_rounds: gameData.totalRounds,
           time_elapsed: gameData.timeElapsed,
           difficulty_level: gameData.difficulty,
-          scenarios_played: [] // We'll enhance this later
+          scenarios_played: []
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error saving game session:', error);
@@ -61,7 +65,7 @@ export const useSupabaseGameData = () => {
       }
 
       console.log('Game session saved successfully:', data);
-      await loadGameHistory(); // Refresh history
+      await loadGameHistory();
       toast.success('Game progress saved! 🌟');
       
     } catch (error) {
@@ -75,9 +79,13 @@ export const useSupabaseGameData = () => {
   // Load game history from Supabase
   const loadGameHistory = async () => {
     if (!user) {
-      // Load from localStorage as fallback
-      const localData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
-      setGameHistory(localData);
+      try {
+        const localData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
+        setGameHistory(localData);
+      } catch (error) {
+        console.error('Error loading from localStorage:', error);
+        setGameHistory([]);
+      }
       return;
     }
 
@@ -95,7 +103,6 @@ export const useSupabaseGameData = () => {
         return;
       }
 
-      // Transform the data to ensure scenarios_played is properly handled
       const transformedData = data?.map(session => ({
         ...session,
         scenarios_played: session.scenarios_played || []
@@ -115,20 +122,22 @@ export const useSupabaseGameData = () => {
     if (!user) return;
 
     try {
-      // Get current progress
-      const { data: currentProgress } = await supabase
+      const { data: currentProgress, error: fetchError } = await supabase
         .from('user_progress')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('Error fetching current progress:', fetchError);
+        return;
+      }
 
       if (currentProgress) {
-        // Calculate new progress values
         const newTotalSessions = currentProgress.total_sessions + 1;
         const newTotalScore = currentProgress.total_score + gameData.score;
         const newCorrectAnswers = currentProgress.correct_answers + gameData.correctAnswers;
         
-        // Update streak logic
         const lastSessionDate = new Date(currentProgress.updated_at).toDateString();
         const today = new Date().toDateString();
         const yesterday = new Date(Date.now() - 86400000).toDateString();
@@ -137,13 +146,12 @@ export const useSupabaseGameData = () => {
         if (lastSessionDate === yesterday || lastSessionDate === today) {
           newCurrentStreak = lastSessionDate === yesterday ? newCurrentStreak + 1 : newCurrentStreak;
         } else {
-          newCurrentStreak = 1; // Reset streak
+          newCurrentStreak = 1;
         }
         
         const newLongestStreak = Math.max(currentProgress.longest_streak, newCurrentStreak);
 
-        // Update progress
-        const { error } = await supabase
+        const { error: updateError } = await supabase
           .from('user_progress')
           .update({
             total_sessions: newTotalSessions,
@@ -155,8 +163,8 @@ export const useSupabaseGameData = () => {
           })
           .eq('user_id', user.id);
 
-        if (error) {
-          console.error('Error updating user progress:', error);
+        if (updateError) {
+          console.error('Error updating user progress:', updateError);
         } else {
           console.log('User progress updated successfully');
         }
@@ -166,12 +174,10 @@ export const useSupabaseGameData = () => {
     }
   };
 
-  // Load game history when user changes
   useEffect(() => {
     loadGameHistory();
   }, [user]);
 
-  // Calculate statistics from game history
   const getGameStatistics = () => {
     if (gameHistory.length === 0) {
       return {
@@ -186,7 +192,6 @@ export const useSupabaseGameData = () => {
 
     const totalGames = gameHistory.length;
     const totalScore = gameHistory.reduce((sum, game) => sum + game.score, 0);
-    // Calculate accuracy from correct_answers and total_rounds
     const totalAccuracy = gameHistory.reduce((sum, game) => 
       sum + (game.total_rounds > 0 ? (game.correct_answers / game.total_rounds) * 100 : 0), 0);
     const totalTime = gameHistory.reduce((sum, game) => sum + game.time_elapsed, 0);
@@ -195,7 +200,6 @@ export const useSupabaseGameData = () => {
     const averageScore = totalScore / totalGames;
     const averageAccuracy = totalAccuracy / totalGames;
     
-    // Calculate improvement trend (last 5 games vs previous 5)
     let improvementTrend: 'improving' | 'declining' | 'stable' = 'stable';
     if (totalGames >= 6) {
       const recent5 = gameHistory.slice(0, 5).reduce((sum, game) => sum + game.score, 0) / 5;

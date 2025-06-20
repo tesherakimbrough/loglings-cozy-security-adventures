@@ -36,21 +36,27 @@ export const useAuth = () => {
         // Handle successful email verification
         if (event === 'SIGNED_IN' && session) {
           console.log('User signed in successfully');
-          // Defer data loading to prevent deadlocks
-          setTimeout(() => {
-            // User profile will be created automatically by the trigger
-            console.log('Auth flow completed for:', session.user.email);
-          }, 0);
         }
       }
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const getInitialSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.error('Exception getting session:', error);
+        setLoading(false);
+      }
+    };
+
+    getInitialSession();
 
     return () => subscription.unsubscribe();
   }, []);

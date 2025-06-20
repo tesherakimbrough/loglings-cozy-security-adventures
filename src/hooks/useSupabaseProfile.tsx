@@ -70,31 +70,43 @@ export const useSupabaseProfile = () => {
       setLoading(true);
 
       // Load profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error loading profile:', profileError);
+      }
 
       // Load progress
-      const { data: progressData } = await supabase
+      const { data: progressData, error: progressError } = await supabase
         .from('user_progress')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (progressError) {
+        console.error('Error loading progress:', progressError);
+      }
 
       // Load preferences
-      const { data: preferencesData } = await supabase
+      const { data: preferencesData, error: preferencesError } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (preferencesError) {
+        console.error('Error loading preferences:', preferencesError);
+      }
 
       setProfile(profileData);
       setProgress(progressData);
       setPreferences(preferencesData);
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error('Exception loading user data:', error);
     } finally {
       setLoading(false);
     }
@@ -103,33 +115,43 @@ export const useSupabaseProfile = () => {
   const updateProgress = async (updates: Partial<UserProgress>) => {
     if (!user || !progress) return;
 
-    const { data, error } = await supabase
-      .from('user_progress')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .select()
+        .maybeSingle();
 
-    if (!error && data) {
-      setProgress(data);
+      if (!error && data) {
+        setProgress(data);
+      }
+      return { data, error };
+    } catch (error) {
+      console.error('Exception updating progress:', error);
+      return { data: null, error };
     }
-    return { data, error };
   };
 
   const updatePreferences = async (updates: Partial<UserPreferences>) => {
     if (!user || !preferences) return;
 
-    const { data, error } = await supabase
-      .from('user_preferences')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('user_id', user.id)
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .select()
+        .maybeSingle();
 
-    if (!error && data) {
-      setPreferences(data);
+      if (!error && data) {
+        setPreferences(data);
+      }
+      return { data, error };
+    } catch (error) {
+      console.error('Exception updating preferences:', error);
+      return { data: null, error };
     }
-    return { data, error };
   };
 
   const saveGameSession = async (sessionData: {
@@ -142,14 +164,19 @@ export const useSupabaseProfile = () => {
   }) => {
     if (!user) return;
 
-    const { data, error } = await supabase
-      .from('game_sessions')
-      .insert({
-        user_id: user.id,
-        ...sessionData
-      });
+    try {
+      const { data, error } = await supabase
+        .from('game_sessions')
+        .insert({
+          user_id: user.id,
+          ...sessionData
+        });
 
-    return { data, error };
+      return { data, error };
+    } catch (error) {
+      console.error('Exception saving game session:', error);
+      return { data: null, error };
+    }
   };
 
   return {
