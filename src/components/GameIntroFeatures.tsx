@@ -2,44 +2,46 @@
 import { Heart, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserMode } from '../types/userTypes';
+import { useI18n } from '../hooks/useI18n';
 
 interface GameIntroFeaturesProps {
   userMode: UserMode;
 }
 
 const GameIntroFeatures = ({ userMode }: GameIntroFeaturesProps) => {
+  const { t } = useI18n();
   const isProMode = userMode === 'career-pro';
 
   const getFeatureContent = () => {
     if (isProMode) {
       return {
         whatYoullDo: [
-          { icon: '🔍', text: 'Analyze complex security logs and SIEM alerts' },
-          { icon: '🛡️', text: 'Practice incident response procedures' },
-          { icon: '📊', text: 'Learn threat intelligence and risk assessment' },
-          { icon: '🎯', text: 'Build skills for SOC analyst and security roles' }
+          { icon: '🔍', text: t.analyzeComplexSecurityLogs },
+          { icon: '🛡️', text: t.practiceIncidentResponse },
+          { icon: '📊', text: t.learnThreatIntelligence },
+          { icon: '🎯', text: t.buildSkillsForSOC }
         ],
         howYoullGrow: [
-          { icon: '🏆', text: '+150 expertise for mastering advanced scenarios' },
-          { icon: '🎖️', text: '+100 recognition for proper incident handling' },
-          { icon: '📈', text: '+75 insight for identifying subtle threats' },
-          { icon: '🌟', text: 'Professional skill badges and certifications' }
+          { icon: '🏆', text: t.masteringAdvancedScenarios },
+          { icon: '🎖️', text: t.properIncidentHandling },
+          { icon: '📈', text: t.identifyingSubtleThreats },
+          { icon: '🌟', text: t.professionalSkillBadges }
         ]
       };
     }
 
     return {
       whatYoullDo: [
-        { icon: '🌸', text: 'Read gentle log stories with your Logling friends' },
-        { icon: '🌿', text: 'Help Loglings understand what they\'re seeing' },
-        { icon: '✨', text: 'Learn together—every choice teaches something beautiful' },
-        { icon: '🍃', text: 'Collect cozy moments and grow your understanding' }
+        { icon: '🌸', text: t.readGentleLogStories },
+        { icon: '🌿', text: t.helpLoglingsUnderstand },
+        { icon: '✨', text: t.learnTogetherEveryChoice },
+        { icon: '🍃', text: t.collectCozyMoments }
       ],
       howYoullGrow: [
-        { icon: '🌱', text: '+100 joy for helping Loglings feel safe' },
-        { icon: '🌼', text: '+75 wonder for noticing curious things' },
-        { icon: '🌺', text: '+50 wisdom for learning something new' },
-        { icon: '🍀', text: 'Gentle encouragement helps you grow stronger' }
+        { icon: '🌱', text: t.helpingLoglingsFeel },
+        { icon: '🌼', text: t.noticingCuriousThings },
+        { icon: '🌺', text: t.learningSomethingNew },
+        { icon: '🍀', text: t.gentleEncouragement }
       ]
     };
   };
@@ -50,7 +52,7 @@ const GameIntroFeatures = ({ userMode }: GameIntroFeaturesProps) => {
     <Card className="cozy-card cozy-glow candlelit-warmth">
       <CardHeader>
         <CardTitle className="text-center text-3xl text-primary">
-          Your {isProMode ? 'Professional' : 'Cozy'} Adventure Awaits
+          {t.yourAdventureAwaits.replace('{mode}', isProMode ? t.professional : t.cozy)}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -58,7 +60,7 @@ const GameIntroFeatures = ({ userMode }: GameIntroFeaturesProps) => {
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-primary flex items-center gap-2">
               <Heart className="w-5 h-5" />
-              What You'll Do
+              {t.whatYoullDo}
             </h3>
             <ul className="space-y-3 text-muted-foreground">
               {content.whatYoullDo.map((item, index) => (
@@ -72,7 +74,7 @@ const GameIntroFeatures = ({ userMode }: GameIntroFeaturesProps) => {
           <div className="space-y-4">
             <h3 className="text-xl font-semibold text-accent flex items-center gap-2">
               <Sparkles className="w-5 h-5" />
-              How You'll Grow
+              {t.howYoullGrow}
             </h3>
             <ul className="space-y-3 text-muted-foreground">
               {content.howYoullGrow.map((item, index) => (

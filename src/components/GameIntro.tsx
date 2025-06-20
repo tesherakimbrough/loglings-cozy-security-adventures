@@ -64,7 +64,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
               className="cozy-card flex items-center gap-2 w-full sm:w-auto min-h-[44px]"
             >
               <HelpCircle className="w-4 h-4" />
-              <span className="text-sm md:text-base">{t.tutorial} - What is Loglings?</span>
+              <span className="text-sm md:text-base">{t.tutorial} - {t.whatIsLoglings}</span>
             </Button>
           </div>
 
@@ -98,7 +98,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
             >
               <Play className="w-6 h-6 md:w-8 md:h-8 mr-2 md:mr-3" />
               <span className="truncate">
-                {isProMode ? t.beginAdventure.replace('Cozy', 'Professional Training') : t.beginAdventure}
+                {isProMode ? t.beginAdventure.replace(t.cozy, t.professionalTraining) : t.beginAdventure}
               </span>
             </Button>
           </div>
@@ -106,7 +106,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
           {/* Creator Credit - Cozy Style - Mobile Optimized */}
           <div className="text-center pt-6 md:pt-8 border-t border-border/50 px-4">
             <p className="text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-sm md:text-base">
-              <span>Lovingly crafted by</span>
+              <span>{t.lovinglyCreatedBy}</span>
               <span className="text-primary font-semibold flex items-center gap-1">
                 <Heart className="w-4 h-4" />
                 Teshera Kimbrough

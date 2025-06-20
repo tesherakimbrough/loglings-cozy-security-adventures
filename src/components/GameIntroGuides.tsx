@@ -2,32 +2,34 @@
 import { Heart, Sparkles, TreePine, Shield } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserMode } from '../types/userTypes';
+import { useI18n } from '../hooks/useI18n';
 
 interface GameIntroGuidesProps {
   userMode: UserMode;
 }
 
 const GameIntroGuides = ({ userMode }: GameIntroGuidesProps) => {
+  const { t } = useI18n();
   const isProMode = userMode === 'career-pro';
 
   const getGuides = () => {
     if (isProMode) {
       return [
         {
-          name: 'Analyst Pip',
-          description: 'Your senior SOC analyst mentor who guides you through complex incident analysis with patience and expertise.',
+          name: t.analystPip,
+          description: t.analystPipDescription,
           icon: Shield,
           color: 'blue'
         },
         {
-          name: 'Detective Luna',
-          description: 'Specializes in threat hunting and anomaly detection. Luna helps you develop your investigative instincts.',
+          name: t.detectiveLuna,
+          description: t.detectiveLunaDescription,
           icon: Sparkles,
           color: 'purple'
         },
         {
-          name: 'Guardian Sage',
-          description: 'Incident response veteran who teaches you proper escalation procedures and crisis management.',
+          name: t.guardianSage,
+          description: t.guardianSageDescription,
           icon: TreePine,
           color: 'green'
         }
@@ -36,20 +38,20 @@ const GameIntroGuides = ({ userMode }: GameIntroGuidesProps) => {
 
     return [
       {
-        name: 'Pip the Safe Logling',
-        description: 'A gentle spirit who loves when everything is peaceful and secure. Pip will cheer you on and celebrate safe discoveries!',
+        name: t.pipTheSafeLogling,
+        description: t.pipDescription,
         icon: Heart,
         color: 'green'
       },
       {
-        name: 'Luna the Curious Logling',
-        description: 'Always wondering "What\'s this?" Luna helps you notice interesting patterns that might need a closer look—with patience and encouragement.',
+        name: t.lunaTheCuriousLogling,
+        description: t.lunaDescription,
         icon: Sparkles,
         color: 'amber'
       },
       {
-        name: 'Sage the Alert Logling',
-        description: 'Wise and protective, Sage helps you spot when something needs immediate care. Don\'t worry—they\'ll guide you through it step by step.',
+        name: t.sageTheAlertLogling,
+        description: t.sageDescription,
         icon: TreePine,
         color: 'rose'
       }

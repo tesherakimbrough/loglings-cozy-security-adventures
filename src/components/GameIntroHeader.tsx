@@ -1,25 +1,27 @@
 
 import { TreePine, Shield, Sparkles } from 'lucide-react';
 import { UserMode } from '../types/userTypes';
+import { useI18n } from '../hooks/useI18n';
 
 interface GameIntroHeaderProps {
   userMode: UserMode;
 }
 
 const GameIntroHeader = ({ userMode }: GameIntroHeaderProps) => {
+  const { t } = useI18n();
   const isProMode = userMode === 'career-pro';
   
   const getHeaderContent = () => {
     if (isProMode) {
       return {
-        subtitle: 'Professional Security Adventures',
-        description: 'Welcome to your cybersecurity skill-building journey! Analyze real-world scenarios, build SOC expertise, and advance your career—all in a supportive, cozy environment.'
+        subtitle: t.professionalSecurityAdventures,
+        description: t.welcomeToYourCybersecuritySkillBuildingJourney
       };
     }
     
     return {
-      subtitle: 'Cozy Security Adventures',
-      description: 'Welcome to a gentle world where adorable Loglings help you discover the magic of cybersecurity. Learn, explore, and protect our cozy digital forest—no pressure, just curiosity and kindness.'
+      subtitle: t.cozySecurityAdventures,
+      description: t.welcomeToAGentleWorld
     };
   };
 

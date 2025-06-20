@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { DailyChallenge } from '../hooks/useDailyChallenges';
 import GameStats from './GameStats';
 import InGameNavigation from './InGameNavigation';
+import { useI18n } from '../hooks/useI18n';
 
 interface GameHeaderProps {
   todaysChallenge: DailyChallenge | null;
@@ -30,6 +31,8 @@ const GameHeader = ({
   onResume,
   isPaused = false
 }: GameHeaderProps) => {
+  const { t } = useI18n();
+
   return (
     <div className="space-y-6">
       {/* Navigation Controls */}
@@ -45,7 +48,7 @@ const GameHeader = ({
             totalRounds={totalRounds}
           />
           <div className="text-sm text-muted-foreground">
-            Chapter {currentRound} of {totalRounds}
+            {t.chapter} {currentRound} {t.of} {totalRounds}
           </div>
         </div>
       )}
@@ -58,14 +61,14 @@ const GameHeader = ({
               <span className="text-2xl">{todaysChallenge.emoji}</span>
               <div className="flex-1">
                 <div className="font-semibold text-amber-700 dark:text-amber-300">
-                  Daily Challenge: {todaysChallenge.title}
+                  {t.dailyChallenge}: {todaysChallenge.title}
                 </div>
                 <div className="text-sm text-amber-600 dark:text-amber-400">
                   {todaysChallenge.description} ({todaysChallenge.progress}/{todaysChallenge.target})
                 </div>
               </div>
               <Badge variant="outline" className="text-amber-600 border-amber-300">
-                +{todaysChallenge.reward.joyPoints} Joy
+                +{todaysChallenge.reward.joyPoints} {t.joy}
               </Badge>
             </div>
           </CardContent>

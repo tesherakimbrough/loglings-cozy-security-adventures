@@ -7,6 +7,7 @@ import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
 import { useEnhancedGameLogic } from '../hooks/useEnhancedGameLogic';
 import { useMobileOptimization } from '../hooks/useMobileOptimization';
+import { useI18n } from '../hooks/useI18n';
 
 interface GamePlayProps {
   onEndGame: (gameData: GameData) => void;
@@ -14,6 +15,7 @@ interface GamePlayProps {
 }
 
 const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
+  const { t } = useI18n();
   const { shouldUseCompactLayout } = useMobileOptimization();
   const {
     currentRound,
@@ -37,7 +39,7 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="text-center space-y-4">
         <div className="w-8 h-8 md:w-12 md:h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="text-sm md:text-base text-muted-foreground">Preparing your enhanced adventure...</p>
+        <p className="text-sm md:text-base text-muted-foreground">{t.preparingEnhancedAdventure}</p>
       </div>
     </div>
   );
@@ -74,17 +76,17 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
               
               {/* Enhanced Stats Panel - Mobile Optimized */}
               <div className="cozy-card p-3 md:p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30">
-                <h3 className="font-semibold text-sm md:text-base mb-3">Session Stats</h3>
+                <h3 className="font-semibold text-sm md:text-base mb-3">{t.sessionStats}</h3>
                 <div className="grid grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm">
                   <div className="text-center md:text-left">
                     <div className="text-lg md:text-xl font-bold text-blue-600">{scenariosPlayed}</div>
-                    <div className="text-muted-foreground text-xs">Unique Scenarios</div>
+                    <div className="text-muted-foreground text-xs">{t.uniqueScenarios}</div>
                   </div>
                   <div className="text-center md:text-left">
                     <div className="text-lg md:text-xl font-bold text-purple-600">
                       {Object.keys(correctByCategory).length}
                     </div>
-                    <div className="text-muted-foreground text-xs">Categories Mastered</div>
+                    <div className="text-muted-foreground text-xs">{t.categoriesMastered}</div>
                   </div>
                 </div>
               </div>
@@ -103,7 +105,7 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
           {/* Enhanced Progress Garden - Mobile Optimized */}
           <div className="space-y-2">
             <p className="text-xs md:text-sm text-muted-foreground text-center px-2">
-              Your Security Journey 🌱 ({currentRound}/{totalRounds})
+              {t.securityJourney} 🌱 ({currentRound}/{totalRounds})
             </p>
             <div className="w-full bg-muted/50 rounded-full h-2 md:h-3 overflow-hidden mx-auto max-w-md md:max-w-full">
               <div 
@@ -114,8 +116,8 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
               </div>
             </div>
             <div className="flex justify-between text-xs text-muted-foreground px-2">
-              <span>Started</span>
-              <span>Expert! 🛡️</span>
+              <span>{t.started}</span>
+              <span>{t.expert}! 🛡️</span>
             </div>
           </div>
         </div>
