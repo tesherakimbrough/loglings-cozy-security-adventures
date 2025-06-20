@@ -11,9 +11,6 @@ import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { CozyThemeProvider } from "./components/CozyThemeProvider";
 import { I18nProvider } from "./hooks/useI18n";
-import { usePerformance } from "./hooks/usePerformance";
-import { useSession } from "./hooks/useSession";
-import { useEffect } from "react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,23 +26,6 @@ const queryClient = new QueryClient({
 });
 
 const AppContent = () => {
-  const { metrics, isLoadingSlow } = usePerformance();
-  const { session } = useSession();
-
-  useEffect(() => {
-    // Log performance metrics for monitoring
-    if (metrics.loadTime > 0) {
-      console.log('App Performance Metrics:', metrics);
-    }
-  }, [metrics]);
-
-  useEffect(() => {
-    // Warn users about slow loading
-    if (isLoadingSlow) {
-      console.warn('App is loading slowly. Consider optimizing bundle size.');
-    }
-  }, [isLoadingSlow]);
-
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
