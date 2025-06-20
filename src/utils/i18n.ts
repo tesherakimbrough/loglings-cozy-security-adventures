@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type Language = 'en' | 'es' | 'fr' | 'ja' | 'ko' | 'zh';
@@ -131,6 +130,17 @@ const englishTranslations: Translations = {
   cozy: "Cozy",
   professionalTraining: "Professional Training",
   lovinglyCreatedBy: "Lovingly created by",
+  language: "Language",
+  tutorial: "Tutorial",
+  beginAdventure: "Begin Adventure",
+  gameSubtitle: "Game Subtitle",
+  chapter: "Chapter",
+  analystPip: "Analyst Pip",
+  detectiveLuna: "Detective Luna",
+  guardianSage: "Guardian Sage",
+  pipDescription: "Pip Description",
+  lunaDescription: "Luna Description",
+  sageDescription: "Sage Description",
   
   // GameIntroFeatures
   analyzeComplexSecurityLogs: "Analyze complex security logs and incident patterns",
@@ -219,6 +229,17 @@ const spanishTranslations: Translations = {
   cozy: "Acogedor",
   professionalTraining: "Entrenamiento Profesional",
   lovinglyCreatedBy: "Creado con amor por",
+  language: "Idioma",
+  tutorial: "Tutorial",
+  beginAdventure: "Comenzar Aventura",
+  gameSubtitle: "Subtítulo del Juego",
+  chapter: "Capítulo",
+  analystPip: "Analista Pip",
+  detectiveLuna: "Detective Luna",
+  guardianSage: "Guardián Sabio",
+  pipDescription: "Descripción de Pip",
+  lunaDescription: "Descripción de Luna",
+  sageDescription: "Descripción de Sage",
   
   // GameIntroFeatures Spanish
   analyzeComplexSecurityLogs: "Analizar registros de seguridad complejos y patrones de incidentes",
@@ -307,6 +328,17 @@ const frenchTranslations: Translations = {
   cozy: "Douillet",
   professionalTraining: "Formation Professionnelle",
   lovinglyCreatedBy: "Créé avec amour par",
+  language: "Langue",
+  tutorial: "Tutoriel",
+  beginAdventure: "Commencer l'Aventure",
+  gameSubtitle: "Sous-titre du Jeu",
+  chapter: "Chapitre",
+  analystPip: "Analyste Pip",
+  detectiveLuna: "Détective Luna",
+  guardianSage: "Gardien Sage",
+  pipDescription: "Description de Pip",
+  lunaDescription: "Description de Luna",
+  sageDescription: "Description de Sage",
   
   // GameIntroFeatures French
   analyzeComplexSecurityLogs: "Analyser des journaux de sécurité complexes et des modèles d'incidents",
@@ -395,6 +427,17 @@ const japaneseTranslations: Translations = {
   cozy: "心地良い",
   professionalTraining: "プロフェッショナルトレーニング",
   lovinglyCreatedBy: "愛情を込めて作成",
+  language: "言語",
+  tutorial: "チュートリアル",
+  beginAdventure: "冒険を始める",
+  gameSubtitle: "ゲームのサブタイトル",
+  chapter: "章",
+  analystPip: "アナリストピップ",
+  detectiveLuna: "探偵ルナ",
+  guardianSage: "守護者セージ",
+  pipDescription: "ピップの説明",
+  lunaDescription: "ルナの説明",
+  sageDescription: "セージの説明",
   
   // GameIntroFeatures Japanese
   analyzeComplexSecurityLogs: "複雑なセキュリティログとインシデントパターンを分析する",
@@ -483,6 +526,17 @@ const koreanTranslations: Translations = {
   cozy: "아늑한",
   professionalTraining: "전문 교육",
   lovinglyCreatedBy: "사랑으로 만든",
+  language: "언어",
+  tutorial: "튜토리얼",
+  beginAdventure: "모험 시작",
+  gameSubtitle: "게임 부제",
+  chapter: "장",
+  analystPip: "분석가 핍",
+  detectiveLuna: "탐정 루나",
+  guardianSage: "수호자 세이지",
+  pipDescription: "핍 설명",
+  lunaDescription: "루나 설명",
+  sageDescription: "세이지 설명",
   
   // GameIntroFeatures Korean
   analyzeComplexSecurityLogs: "복잡한 보안 로그 및 사건 패턴 분석",
@@ -571,6 +625,17 @@ const chineseTranslations: Translations = {
   cozy: "舒适",
   professionalTraining: "专业培训",
   lovinglyCreatedBy: "用爱创造",
+  language: "语言",
+  tutorial: "教程",
+  beginAdventure: "开始冒险",
+  gameSubtitle: "游戏副标题",
+  chapter: "章节",
+  analystPip: "分析师Pip",
+  detectiveLuna: "侦探Luna",
+  guardianSage: "守护者Sage",
+  pipDescription: "Pip描述",
+  lunaDescription: "Luna描述",
+  sageDescription: "Sage描述",
   
   // GameIntroFeatures Chinese
   analyzeComplexSecurityLogs: "分析复杂的安全日志和事件模式",
