@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -24,7 +23,9 @@ const sanitizeGameData = (gameData: GameData): GameData => {
     correctAnswers: Math.max(0, Math.min(gameData.correctAnswers, 999999)),
     totalRounds: Math.max(0, Math.min(gameData.totalRounds, 999999)),
     timeElapsed: Math.max(0, Math.min(gameData.timeElapsed, 999999)),
-    difficulty: gameData.difficulty || 'beginner'
+    difficulty: gameData.difficulty || 'beginner',
+    accuracy: gameData.accuracy || 0,
+    totalQuestions: gameData.totalQuestions || gameData.totalRounds
   };
 };
 
