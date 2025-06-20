@@ -25,34 +25,26 @@ const queryClient = new QueryClient({
   },
 });
 
-const AppContent = () => {
-  return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <I18nProvider>
-          <CozyThemeProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/waitlist" element={<Waitlist />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
-          </CozyThemeProvider>
-        </I18nProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
-  );
-};
-
 const App = () => (
   <ErrorBoundary>
-    <AppContent />
+    <QueryClientProvider client={queryClient}>
+      <I18nProvider>
+        <CozyThemeProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/waitlist" element={<Waitlist />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </CozyThemeProvider>
+      </I18nProvider>
+    </QueryClientProvider>
   </ErrorBoundary>
 );
 

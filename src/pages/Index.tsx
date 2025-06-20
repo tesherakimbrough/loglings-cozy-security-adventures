@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import GameIntro from '../components/GameIntro';
 import AdvancedGamePlay from '../components/AdvancedGamePlay';
@@ -26,7 +25,6 @@ export interface GameData {
 type GameState = 'intro' | 'playing' | 'results';
 
 const Index = () => {
-  // Ensure i18n is available before rendering anything that uses it
   const { t } = useI18n();
   
   const [gameState, setGameState] = useState<GameState>('intro');
