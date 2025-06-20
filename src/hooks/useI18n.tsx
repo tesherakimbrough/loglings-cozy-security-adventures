@@ -56,7 +56,13 @@ export const I18nProvider = ({ children }: I18nProviderProps) => {
 export const useI18n = () => {
   const context = useContext(I18nContext);
   if (!context) {
-    throw new Error('useI18n must be used within an I18nProvider');
+    console.error('useI18n must be used within an I18nProvider');
+    // Return fallback values to prevent crash
+    return {
+      language: 'en' as Language,
+      setLanguage: () => {},
+      t: translations.en
+    };
   }
   return context;
 };

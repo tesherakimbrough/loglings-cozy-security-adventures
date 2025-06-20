@@ -48,14 +48,14 @@ const GameSettings = () => {
       </Button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <Card className="w-full max-w-2xl cozy-card cozy-glow max-h-[95vh] overflow-hidden">
-            <CardHeader className="relative pb-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <Card className="w-full max-w-2xl bg-background cozy-card cozy-glow max-h-[95vh] overflow-hidden shadow-xl border">
+            <CardHeader className="relative pb-4 bg-background">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsOpen(false)}
-                className="absolute right-2 top-2 h-8 w-8"
+                className="absolute right-2 top-2 h-8 w-8 hover:bg-muted"
                 aria-label="Close settings"
               >
                 <X className="w-4 h-4" />
@@ -65,12 +65,12 @@ const GameSettings = () => {
                 Cozy Settings
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-6 overflow-y-auto max-h-[calc(95vh-120px)]">
+            <CardContent className="pb-6 overflow-y-auto max-h-[calc(95vh-120px)] bg-background">
               <Tabs defaultValue="general" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="general">General</TabsTrigger>
-                  <TabsTrigger value="audio">Audio</TabsTrigger>
-                  <TabsTrigger value="accessibility">
+                <TabsList className="grid w-full grid-cols-3 bg-muted">
+                  <TabsTrigger value="general" className="text-sm">General</TabsTrigger>
+                  <TabsTrigger value="audio" className="text-sm">Audio</TabsTrigger>
+                  <TabsTrigger value="accessibility" className="text-sm">
                     <Eye className="w-4 h-4 mr-1" />
                     Accessibility
                   </TabsTrigger>
@@ -79,14 +79,14 @@ const GameSettings = () => {
                 <TabsContent value="general" className="space-y-6 mt-6">
                   {/* Current Mode Display */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold flex items-center gap-2 text-sm text-foreground">
                       <ModeIcon className={`w-4 h-4 ${modeInfo.color} shrink-0`} />
                       Current Adventure Mode
                     </h4>
                     <div className="p-4 bg-muted/30 rounded-xl border">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">{modeInfo.name}</div>
+                          <div className="font-medium text-foreground">{modeInfo.name}</div>
                           <div className="text-xs text-muted-foreground mt-1">
                             {profile.mode === 'cozy-everyday' 
                               ? 'Gentle learning for everyone'
@@ -109,7 +109,7 @@ const GameSettings = () => {
 
                   {/* Difficulty Settings */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold flex items-center gap-2 text-sm text-foreground">
                       <Smartphone className="w-4 h-4 text-primary shrink-0" />
                       Adventure Difficulty
                     </h4>
@@ -117,10 +117,10 @@ const GameSettings = () => {
                       value={profile.preferences.difficulty}
                       onValueChange={(value) => handlePreferenceChange('difficulty', value)}
                     >
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full bg-background">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border shadow-lg">
                         <SelectItem value="beginner">🌱 Gentle Explorer</SelectItem>
                         <SelectItem value="intermediate">🌿 Curious Adventurer</SelectItem>
                         <SelectItem value="advanced">🌳 Forest Guardian</SelectItem>
@@ -130,7 +130,7 @@ const GameSettings = () => {
 
                   {/* Notifications */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold flex items-center gap-2 text-sm text-foreground">
                       <Bell className="w-4 h-4 text-accent shrink-0" />
                       Daily Reminders
                     </h4>
@@ -147,7 +147,7 @@ const GameSettings = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold flex items-center gap-2 text-sm text-foreground">
                       <Share2 className="w-4 h-4 text-green-600 shrink-0" />
                       Share Achievements
                     </h4>
@@ -172,7 +172,7 @@ const GameSettings = () => {
 
                   {/* Sound Effects Settings */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold flex items-center gap-2 text-sm text-foreground">
                       {profile.preferences.soundEffectsEnabled ? (
                         <Volume2 className="w-4 h-4 text-accent shrink-0" />
                       ) : (
@@ -211,7 +211,7 @@ const GameSettings = () => {
 
                   {/* General Audio Settings */}
                   <div className="space-y-3">
-                    <h4 className="font-semibold flex items-center gap-2 text-sm">
+                    <h4 className="font-semibold flex items-center gap-2 text-sm text-foreground">
                       {profile.preferences.audioEnabled ? (
                         <Volume2 className="w-4 h-4 text-accent shrink-0" />
                       ) : (
