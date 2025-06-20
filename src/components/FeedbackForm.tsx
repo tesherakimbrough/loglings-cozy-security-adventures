@@ -10,13 +10,24 @@ import { toast } from 'sonner';
 import { sanitizeHtml, validateTextInput, rateLimiter } from '../utils/securityUtils';
 import { useMobileOptimization } from '../hooks/useMobileOptimization';
 
-interface FeedbackFormProps {
-  onSubmit: (feedback: any) => void;
-  onClose: () => void;
-  initialData?: any;
+export interface FeedbackData {
+  rating: number;
+  feedback: string;
+  email: string;
+  name: string;
+  timestamp: string;
+  userAgent: string;
+  url: string;
 }
 
-const FeedbackForm = ({ onSubmit, onClose, initialData }: FeedbackFormProps) => {
+interface FeedbackFormProps {
+  onSubmit: (feedback: FeedbackData) => void;
+  onClose: () => void;
+  onSkip?: () => void;
+  initialData?: Partial<FeedbackData>;
+}
+
+const FeedbackForm = ({ onSubmit, onClose, onSkip, initialData }: FeedbackFormProps) => {
   const { shouldUseCompactLayout } = useMobileOptimization();
   const [rating, setRating] = useState(initialData?.rating || 0);
   const [feedback, setFeedback] = useState(initialData?.feedback || '');
@@ -58,7 +69,7 @@ const FeedbackForm = ({ onSubmit, onClose, initialData }: FeedbackFormProps) => 
 
     try {
       // Sanitize all inputs
-      const sanitizedData = {
+      const sanitizedData: FeedbackData = {
         rating,
         feedback: sanitizeHtml(feedback.trim()),
         email: email.trim(),
@@ -76,6 +87,14 @@ const FeedbackForm = ({ onSubmit, onClose, initialData }: FeedbackFormProps) => 
       toast.error('Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSkip = () => {
+    if (onSkip) {
+      onSkip();
+    } else {
+      onClose();
     }
   };
 
@@ -167,24 +186,36 @@ const FeedbackForm = ({ onSubmit, onClose, initialData }: FeedbackFormProps) => 
             </div>
           </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            disabled={isSubmitting || rating === 0}
-            className="w-full logling-button h-12 md:h-auto text-base"
-          >
-            {isSubmitting ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Sending...
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Send className="w-4 h-4" />
-                Send Feedback
-              </div>
+          {/* Submit and Skip Buttons */}
+          <div className="flex gap-3">
+            {onSkip && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleSkip}
+                className="flex-1"
+              >
+                Skip
+              </Button>
             )}
-          </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting || rating === 0}
+              className={`${onSkip ? 'flex-1' : 'w-full'} logling-button h-12 md:h-auto text-base`}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Sending...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Send className="w-4 h-4" />
+                  Send Feedback
+                </div>
+              )}
+            </Button>
+          </div>
         </form>
 
         {/* Privacy Note */}
