@@ -5,6 +5,7 @@ import WaitlistButton from './WaitlistButton';
 import DonationButton from './DonationButton';
 import GameSettings from './GameSettings';
 import AuthButton from './AuthButton';
+import LanguageSelector from './LanguageSelector';
 
 const GameIntroNavigation = () => {
   return (
@@ -14,6 +15,7 @@ const GameIntroNavigation = () => {
         <AuthButton />
         <DonationButton />
         <WaitlistButton />
+        <LanguageSelector />
         <ThemeToggle />
       </div>
     </div>

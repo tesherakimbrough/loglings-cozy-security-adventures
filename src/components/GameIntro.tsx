@@ -1,5 +1,5 @@
-
-import { Play, Heart } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Heart, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { UserMode } from '../types/userTypes';
 import ProgressTracker from './ProgressTracker';
@@ -15,7 +15,9 @@ import EarlyAccessBanner from './EarlyAccessBanner';
 import LevelProgressionSystem from './LevelProgressionSystem';
 import LearningPaths from './LearningPaths';
 import AchievementSystem from './AchievementSystem';
+import GameTutorial from './GameTutorial';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { useI18n } from '../hooks/useI18n';
 
 interface GameIntroProps {
   onStartGame: (mode: UserMode) => void;
@@ -25,10 +27,17 @@ interface GameIntroProps {
 const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) => {
   const isProMode = userMode === 'career-pro';
   const { profile } = useUserProfile();
+  const { t } = useI18n();
   const achievementSystem = AchievementSystem();
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const handleStartClick = () => {
     onStartGame(userMode);
+  };
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false);
+    // You could also track that the user has completed the tutorial
   };
 
   return (
@@ -42,6 +51,18 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
 
         {/* Main Header */}
         <GameIntroHeader userMode={userMode} />
+
+        {/* Tutorial Button */}
+        <div className="text-center">
+          <Button
+            variant="outline"
+            onClick={() => setShowTutorial(true)}
+            className="cozy-card flex items-center gap-2"
+          >
+            <HelpCircle className="w-4 h-4" />
+            {t.tutorial} - What is Loglings?
+          </Button>
+        </div>
 
         {/* Enhanced Progress Section */}
         <div className="grid lg:grid-cols-2 gap-6">
@@ -72,7 +93,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
             className="logling-button text-xl px-12 py-8 animate-cozy-pulse"
           >
             <Play className="w-8 h-8 mr-3" />
-            Begin {isProMode ? 'Professional Training' : 'Cozy Adventure'}
+            {isProMode ? t.beginAdventure.replace('Cozy', 'Professional Training') : t.beginAdventure}
           </Button>
         </div>
 
@@ -86,7 +107,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
             </span>
           </p>
           <p className="text-sm text-muted-foreground mt-2">
-            Where learning cybersecurity feels like a warm hug 🤗
+            {t.gameSubtitle}
           </p>
         </div>
 
@@ -97,6 +118,14 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
           currentScore={profile.progress.totalScore}
         />
       </div>
+
+      {/* Tutorial Modal */}
+      {showTutorial && (
+        <GameTutorial
+          onClose={() => setShowTutorial(false)}
+          onComplete={handleTutorialComplete}
+        />
+      )}
     </div>
   );
 };

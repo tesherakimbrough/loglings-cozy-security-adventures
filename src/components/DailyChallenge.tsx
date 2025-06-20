@@ -1,9 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { Calendar, Gift, Star, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useI18n } from '../hooks/useI18n';
 
 interface DailyChallenge {
   id: string;
@@ -20,6 +20,7 @@ interface DailyChallengeProps {
 }
 
 const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
+  const { t } = useI18n();
   const [todaysChallenge, setTodaysChallenge] = useState<DailyChallenge | null>(null);
   const [timeUntilNext, setTimeUntilNext] = useState<string>('');
 
@@ -133,7 +134,7 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-primary">
           <Calendar className="w-5 h-5 animate-gentle-float" />
-          Today's Cozy Challenge
+          {t.todaysChallenge}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
