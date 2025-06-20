@@ -1,5 +1,6 @@
 
 import { Clock, TreePine } from 'lucide-react';
+import { useI18n } from '../hooks/useI18n';
 
 interface GameStatsProps {
   currentRound: number;
@@ -9,6 +10,8 @@ interface GameStatsProps {
 }
 
 const GameStats = ({ currentRound, totalRounds, score, timeElapsed }: GameStatsProps) => {
+  const { t } = useI18n();
+  
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -21,7 +24,7 @@ const GameStats = ({ currentRound, totalRounds, score, timeElapsed }: GameStatsP
         <div className="animate-gentle-float">
           <TreePine className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-primary">Loglings Adventure</h1>
+        <h1 className="text-3xl font-bold text-primary">{t.gameTitle.split(':')[0]}</h1>
       </div>
       <div className="flex gap-8 text-right">
         <div className="cozy-card px-4 py-2">

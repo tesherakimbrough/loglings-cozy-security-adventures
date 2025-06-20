@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Calendar, Gift, Star, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,8 +43,8 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
     const challenges = [
       {
         id: 'perfect-harmony',
-        title: 'Perfect Harmony',
-        description: 'Complete an adventure with 100% accuracy',
+        title: t.perfectHarmony,
+        description: t.perfectHarmonyDesc,
         difficulty: 'Ancient Tree' as const,
         reward: 'Golden Logling Badge',
         completed: false,
@@ -51,8 +52,8 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
       },
       {
         id: 'quick-explorer',
-        title: 'Quick Explorer',
-        description: 'Complete 3 adventures in under 10 minutes',
+        title: t.quickExplorer,
+        description: t.quickExplorerDesc,
         difficulty: 'Sapling' as const,
         reward: 'Sparkle Collection',
         completed: false,
@@ -60,8 +61,8 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
       },
       {
         id: 'gentle-helper',
-        title: 'Gentle Helper',
-        description: 'Help Pip identify 5 safe scenarios',
+        title: t.gentleHelper,
+        description: t.gentleHelperDesc,
         difficulty: 'Seedling' as const,
         reward: 'Cozy Garden Decoration',
         completed: false,
@@ -69,8 +70,8 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
       },
       {
         id: 'curious-mind',
-        title: 'Curious Mind',
-        description: 'Work with Luna to explore 7 warning scenarios',
+        title: t.curiousMind,
+        description: t.curiousMindDesc,
         difficulty: 'Sapling' as const,
         reward: 'Mystery Logling Friend',
         completed: false,
@@ -78,8 +79,8 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
       },
       {
         id: 'wise-guardian',
-        title: 'Wise Guardian',
-        description: 'Help Sage protect the forest from 3 critical threats',
+        title: t.wiseGuardian,
+        description: t.wiseGuardianDesc,
         difficulty: 'Ancient Tree' as const,
         reward: 'Ancient Wisdom Scroll',
         completed: false,
@@ -121,6 +122,15 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
     }
   };
 
+  const getDifficultyName = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Seedling': return t.seedling;
+      case 'Sapling': return t.sapling;
+      case 'Ancient Tree': return t.ancientTree;
+      default: return difficulty;
+    }
+  };
+
   const handleStartAdventure = () => {
     if (onStartAdventure) {
       onStartAdventure();
@@ -145,7 +155,7 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
               <p className="text-sm text-muted-foreground">{todaysChallenge.description}</p>
             </div>
             <Badge className={`text-xs ${getDifficultyColor(todaysChallenge.difficulty)}`}>
-              {todaysChallenge.difficulty}
+              {getDifficultyName(todaysChallenge.difficulty)}
             </Badge>
           </div>
 
@@ -156,7 +166,7 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
             </div>
             <div className="flex items-center gap-1 text-muted-foreground">
               <Timer className="w-4 h-4" />
-              <span>{timeUntilNext} until next</span>
+              <span>{timeUntilNext} {t.untilNext}</span>
             </div>
           </div>
         </div>
@@ -164,7 +174,7 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
         {todaysChallenge.completed ? (
           <div className="text-center py-6 space-y-2">
             <div className="text-4xl">🎉</div>
-            <div className="font-semibold text-primary">Challenge Complete!</div>
+            <div className="font-semibold text-primary">{t.challengeComplete}</div>
             <div className="text-sm text-muted-foreground">
               You've earned: {todaysChallenge.reward}
             </div>
@@ -172,7 +182,7 @@ const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
         ) : (
           <Button className="w-full logling-button" onClick={handleStartAdventure}>
             <Star className="w-4 h-4 mr-2" />
-            Start Today's Adventure
+            {t.startTodaysAdventure}
           </Button>
         )}
       </CardContent>

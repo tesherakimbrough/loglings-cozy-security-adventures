@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import GameHeader from './GameHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +10,7 @@ import GameSettings from './GameSettings';
 import { useAdvancedGameLogic } from '../hooks/useAdvancedGameLogic';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../pages/Index';
+import { useI18n } from '../hooks/useI18n';
 
 interface AdvancedGamePlayProps {
   onEndGame: (gameData: GameData) => void;
@@ -17,6 +19,7 @@ interface AdvancedGamePlayProps {
 }
 
 const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' }: AdvancedGamePlayProps) => {
+  const { t } = useI18n();
   const [showFeedback, setShowFeedback] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -93,19 +96,19 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
               <CardHeader>
                 <CardTitle className="text-center flex items-center justify-center gap-2">
                   <Sparkles className="w-5 h-5 text-accent" />
-                  Adventure Paused
+                  {t.adventurePaused}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-center space-y-4">
                 <p className="text-muted-foreground">
-                  Take your time! Your progress is safe. Resume whenever you're ready to continue your security journey.
+                  {t.takeYourTime}
                 </p>
                 <Button 
                   onClick={handleResume}
                   className="logling-button w-full"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Resume Adventure
+                  {t.resumeAdventure}
                 </Button>
               </CardContent>
             </Card>
@@ -120,18 +123,18 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-2xl">
                       <Sparkles className="w-6 h-6 text-accent animate-sparkle" />
-                      Chapter {currentRound}: {currentScenario.eventType}
+                      {t.chapter} {currentRound}: {currentScenario.eventType}
                       <Badge variant="outline" className="ml-2 text-xs">
                         {currentScenario.category}
                       </Badge>
                       <Badge variant={difficulty === 'advanced' ? 'destructive' : difficulty === 'intermediate' ? 'default' : 'secondary'}>
-                        {difficulty}
+                        {difficulty === 'advanced' ? t.advanced : difficulty === 'intermediate' ? t.intermediate : t.beginner}
                       </Badge>
                     </CardTitle>
                     <p className="text-muted-foreground">
                       {userMode === 'career-pro' 
-                        ? "Analyze this advanced security scenario and determine the appropriate response level."
-                        : "The Loglings have discovered something in their forest. Let's explore it together with gentle curiosity."
+                        ? t.analysisMode
+                        : t.gentleCuriosity
                       }
                     </p>
                   </CardHeader>
@@ -165,8 +168,8 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                             className="h-auto p-6 flex flex-col gap-2 hover:scale-105 transition-transform cozy-button"
                           >
                             <span className="text-3xl">🌸</span>
-                            <span className="font-semibold">Safe & Peaceful</span>
-                            <span className="text-xs text-muted-foreground">Everything looks normal</span>
+                            <span className="font-semibold">{t.safeAndPeaceful}</span>
+                            <span className="text-xs text-muted-foreground">{t.everythingNormal}</span>
                           </Button>
                           
                           <Button
@@ -175,8 +178,8 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                             className="h-auto p-6 flex flex-col gap-2 hover:scale-105 transition-transform cozy-button"
                           >
                             <span className="text-3xl">🤔</span>
-                            <span className="font-semibold">Curious & Watchful</span>
-                            <span className="text-xs text-muted-foreground">Something seems different</span>
+                            <span className="font-semibold">{t.curiousAndWatchful}</span>
+                            <span className="text-xs text-muted-foreground">{t.somethingDifferent}</span>
                           </Button>
                           
                           <Button
@@ -185,8 +188,8 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                             className="h-auto p-6 flex flex-col gap-2 hover:scale-105 transition-transform cozy-button"
                           >
                             <span className="text-3xl">🚨</span>
-                            <span className="font-semibold">Alert & Protective</span>
-                            <span className="text-xs text-muted-foreground">Danger detected!</span>
+                            <span className="font-semibold">{t.alertAndProtective}</span>
+                            <span className="text-xs text-muted-foreground">{t.dangerDetected}</span>
                           </Button>
                         </div>
                       </div>
@@ -200,14 +203,14 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                               <>
                                 <Sparkles className="w-5 h-5 text-green-600" />
                                 <span className="font-semibold text-green-700 dark:text-green-300">
-                                  Excellent intuition!
+                                  {t.excellentIntuition}
                                 </span>
                               </>
                             ) : (
                               <>
                                 <Brain className="w-5 h-5 text-orange-600" />
                                 <span className="font-semibold text-orange-700 dark:text-orange-300">
-                                  Learning moment!
+                                  {t.learningMoment}
                                 </span>
                               </>
                             )}
@@ -225,7 +228,7 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                               className="logling-button"
                               size="lg"
                             >
-                              {currentRound >= totalRounds ? 'Complete Adventure' : 'Continue Journey'}
+                              {currentRound >= totalRounds ? t.completeAdventure : t.continueJourney}
                               <Sparkles className="w-4 h-4 ml-2" />
                             </Button>
                           </div>
@@ -241,27 +244,27 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
                       <TrendingUp className="w-4 h-4" />
-                      Your Growth
+                      {t.yourGrowth}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">{streakCount}</div>
-                        <div className="text-xs text-muted-foreground">Streak</div>
+                        <div className="text-xs text-muted-foreground">{t.streak}</div>
                       </div>
                       <div className="text-center">
                         <div className="text-2xl font-bold text-primary">
                           {currentRound > 1 ? Math.round((correctAnswers / (currentRound - 1)) * 100) : 100}%
                         </div>
-                        <div className="text-xs text-muted-foreground">Accuracy</div>
+                        <div className="text-xs text-muted-foreground">{t.accuracy}</div>
                       </div>
                     </div>
                     
                     <div className="text-center">
                       <Badge variant={difficulty === 'advanced' ? 'destructive' : difficulty === 'intermediate' ? 'default' : 'secondary'}>
                         <Shield className="w-3 h-3 mr-1" />
-                        {difficulty} level
+                        {difficulty === 'advanced' ? t.advanced : difficulty === 'intermediate' ? t.intermediate : t.beginner} {t.level}
                       </Badge>
                     </div>
                   </CardContent>
@@ -270,7 +273,7 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
                 {currentScenario && (
                   <Card className="cozy-card">
                     <CardHeader>
-                      <CardTitle className="text-sm">Real-World Insight</CardTitle>
+                      <CardTitle className="text-sm">{t.realWorldInsight}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground">
@@ -284,7 +287,7 @@ const AdvancedGamePlay = ({ onEndGame, onBackToHome, userMode = 'cozy-everyday' 
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm text-muted-foreground">
-                <span>Security Journey Progress</span>
+                <span>{t.securityJourney}</span>
                 <span>{currentRound}/{totalRounds}</span>
               </div>
               <div className="w-full bg-muted/50 rounded-full h-4 overflow-hidden">

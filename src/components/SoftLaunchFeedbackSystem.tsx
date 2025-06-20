@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Star, Send, MessageSquare, TrendingUp, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { useI18n } from '../hooks/useI18n';
 
 interface SoftLaunchFeedback {
   // User Experience
@@ -52,6 +54,7 @@ interface SoftLaunchFeedbackSystemProps {
 
 const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchFeedbackSystemProps) => {
   const { profile } = useUserProfile();
+  const { t } = useI18n();
   const [currentStep, setCurrentStep] = useState(0);
   const [feedback, setFeedback] = useState<Partial<SoftLaunchFeedback>>({
     favoriteFeatures: []
@@ -61,23 +64,23 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
   const steps = [
     {
       id: 'experience-rating',
-      title: 'Your Experience So Far',
-      description: 'Help us understand how Loglings feels to you'
+      title: t.yourExperienceSoFar,
+      description: t.helpUsUnderstand
     },
     {
       id: 'learning-effectiveness',
-      title: 'Learning & Growth',
-      description: 'Tell us about your learning journey'
+      title: t.learningAndGrowth,
+      description: t.tellUsAboutJourney
     },
     {
       id: 'features-feedback',
-      title: 'Features & Improvements',
-      description: 'What\'s working and what could be better?'
+      title: t.featuresAndImprovements,
+      description: t.whatsWorking
     },
     {
       id: 'open-feedback',
-      title: 'Your Thoughts',
-      description: 'Anything else you\'d like to share?'
+      title: t.yourThoughts,
+      description: t.anythingElse
     }
   ];
 
@@ -115,8 +118,8 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    toast.success('Thank you for your valuable feedback! 🌟', {
-      description: 'Your insights help us create a better learning experience for everyone.'
+    toast.success(t.valuableFeedback, {
+      description: t.helpsBetter
     });
     
     setIsSubmitting(false);
@@ -151,41 +154,41 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
           <div className="space-y-6">
             <div className="space-y-4">
               <div>
-                <Label className="text-base font-medium">How would you rate the difficulty progression?</Label>
+                <Label className="text-base font-medium">{t.rateDifficulty}</Label>
                 {renderRatingStars(feedback.difficultyRating || 0, (rating) => handleRatingChange('difficultyRating', rating))}
-                <p className="text-sm text-muted-foreground mt-1">1 = Too easy, 5 = Too hard</p>
+                <p className="text-sm text-muted-foreground mt-1">1 = {t.tooEasy}, 5 = {t.tooHard}</p>
               </div>
 
               <div>
-                <Label className="text-base font-medium">How engaging did you find the scenarios?</Label>
+                <Label className="text-base font-medium">{t.howEngaging}</Label>
                 {renderRatingStars(feedback.engagementRating || 0, (rating) => handleRatingChange('engagementRating', rating))}
-                <p className="text-sm text-muted-foreground mt-1">1 = Boring, 5 = Very engaging</p>
+                <p className="text-sm text-muted-foreground mt-1">1 = {t.boring}, 5 = {t.veryEngaging}</p>
               </div>
 
               <div>
-                <Label className="text-base font-medium">How clear were the explanations?</Label>
+                <Label className="text-base font-medium">{t.howClear}</Label>
                 {renderRatingStars(feedback.clarityRating || 0, (rating) => handleRatingChange('clarityRating', rating))}
-                <p className="text-sm text-muted-foreground mt-1">1 = Confusing, 5 = Very clear</p>
+                <p className="text-sm text-muted-foreground mt-1">1 = {t.confusing}, 5 = {t.veryClear}</p>
               </div>
             </div>
 
             <div>
-              <Label className="text-base font-medium mb-3 block">The difficulty progression felt:</Label>
+              <Label className="text-base font-medium mb-3 block">{t.difficultyFelt}</Label>
               <RadioGroup 
                 value={feedback.difficultyProgression || ''} 
                 onValueChange={(value) => setFeedback(prev => ({ ...prev, difficultyProgression: value as any }))}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="too-slow" id="too-slow" />
-                  <Label htmlFor="too-slow">Too gradual (I got bored)</Label>
+                  <Label htmlFor="too-slow">{t.tooGradual}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="just-right" id="just-right" />
-                  <Label htmlFor="just-right">Just right (perfect challenge)</Label>
+                  <Label htmlFor="just-right">{t.justRight}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="too-fast" id="too-fast" />
-                  <Label htmlFor="too-fast">Too steep (I felt overwhelmed)</Label>
+                  <Label htmlFor="too-fast">{t.tooSteep}</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -196,44 +199,44 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
         return (
           <div className="space-y-6">
             <div>
-              <Label className="text-base font-medium">Do you feel more confident about cybersecurity after using Loglings?</Label>
+              <Label className="text-base font-medium">{t.moreConfident}</Label>
               {renderRatingStars(feedback.confidenceIncrease || 0, (rating) => handleRatingChange('confidenceIncrease', rating))}
-              <p className="text-sm text-muted-foreground mt-1">1 = No change, 5 = Much more confident</p>
+              <p className="text-sm text-muted-foreground mt-1">1 = {t.noChange}, 5 = {t.muchMoreConfident}</p>
             </div>
 
             <div>
-              <Label className="text-base font-medium">How relevant are the scenarios to real-world situations?</Label>
+              <Label className="text-base font-medium">{t.howRelevant}</Label>
               {renderRatingStars(feedback.realWorldRelevance || 0, (rating) => handleRatingChange('realWorldRelevance', rating))}
-              <p className="text-sm text-muted-foreground mt-1">1 = Not realistic, 5 = Very realistic</p>
+              <p className="text-sm text-muted-foreground mt-1">1 = {t.notRealistic}, 5 = {t.veryRealistic}</p>
             </div>
 
             <div>
-              <Label className="text-base font-medium">Would you recommend Loglings to a friend?</Label>
+              <Label className="text-base font-medium">{t.wouldRecommend}</Label>
               {renderRatingStars(feedback.wouldRecommend || 0, (rating) => handleRatingChange('wouldRecommend', rating))}
-              <p className="text-sm text-muted-foreground mt-1">1 = Definitely not, 5 = Absolutely yes</p>
+              <p className="text-sm text-muted-foreground mt-1">1 = {t.definitelyNot}, 5 = {t.absolutelyYes}</p>
             </div>
 
             <div>
-              <Label className="text-base font-medium mb-3 block">What's your experience level with cybersecurity?</Label>
+              <Label className="text-base font-medium mb-3 block">{t.experienceLevel}</Label>
               <RadioGroup 
                 value={feedback.experienceLevel || ''} 
                 onValueChange={(value) => setFeedback(prev => ({ ...prev, experienceLevel: value as any }))}
               >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="complete-beginner" id="complete-beginner" />
-                  <Label htmlFor="complete-beginner">Complete beginner</Label>
+                  <Label htmlFor="complete-beginner">{t.completeBeginner}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="some-experience" id="some-experience" />
-                  <Label htmlFor="some-experience">Some exposure to security concepts</Label>
+                  <Label htmlFor="some-experience">{t.someExposure}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="intermediate" id="intermediate" />
-                  <Label htmlFor="intermediate">Intermediate knowledge</Label>
+                  <Label htmlFor="intermediate">{t.intermediateKnowledge}</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="advanced" id="advanced" />
-                  <Label htmlFor="advanced">Advanced/Professional</Label>
+                  <Label htmlFor="advanced">{t.advancedProfessional}</Label>
                 </div>
               </RadioGroup>
             </div>
@@ -244,17 +247,17 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
         return (
           <div className="space-y-6">
             <div>
-              <Label className="text-base font-medium mb-3 block">Which features do you enjoy most? (Select all that apply)</Label>
+              <Label className="text-base font-medium mb-3 block">{t.whichFeatures} ({t.selectAll})</Label>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  'The Logling characters',
-                  'Story-based scenarios',
-                  'Gentle explanations',
-                  'Progress tracking',
-                  'Achievement system',
-                  'Daily challenges',
-                  'Learning tips',
-                  'Real-world context'
+                  t.loglingCharacters,
+                  t.storyBasedScenarios,
+                  t.gentleExplanations,
+                  t.progressTracking,
+                  t.achievementSystem,
+                  t.dailyChallenges,
+                  t.learningTips,
+                  t.realWorldContext
                 ].map((feature) => (
                   <div key={feature} className="flex items-center space-x-2">
                     <Checkbox
@@ -269,10 +272,10 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
             </div>
 
             <div>
-              <Label htmlFor="missing-features" className="text-base font-medium">What features would you like to see added?</Label>
+              <Label htmlFor="missing-features" className="text-base font-medium">{t.featuresWanted}</Label>
               <Textarea
                 id="missing-features"
-                placeholder="Tell us about features that would make your learning experience even better..."
+                placeholder={t.makeBetter}
                 value={feedback.missingFeatures || ''}
                 onChange={(e) => setFeedback(prev => ({ ...prev, missingFeatures: e.target.value }))}
                 className="mt-2"
@@ -281,7 +284,7 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
             </div>
 
             <div>
-              <Label htmlFor="most-enjoyable" className="text-base font-medium">What aspect of Loglings do you enjoy most?</Label>
+              <Label htmlFor="most-enjoyable" className="text-base font-medium">{t.enjoyMost}</Label>
               <Input
                 id="most-enjoyable"
                 placeholder="The characters, the stories, the learning style..."
@@ -292,10 +295,10 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
             </div>
 
             <div>
-              <Label htmlFor="most-confusing" className="text-base font-medium">What aspect is most confusing or could be improved?</Label>
+              <Label htmlFor="most-confusing" className="text-base font-medium">{t.mostConfusing}</Label>
               <Input
                 id="most-confusing"
-                placeholder="Anything that felt unclear or frustrating..."
+                placeholder={t.anythingUnclear}
                 value={feedback.mostConfusingAspect || ''}
                 onChange={(e) => setFeedback(prev => ({ ...prev, mostConfusingAspect: e.target.value }))}
                 className="mt-2"
@@ -308,10 +311,10 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
         return (
           <div className="space-y-6">
             <div>
-              <Label htmlFor="general-feedback" className="text-base font-medium">Any other thoughts about your Loglings experience?</Label>
+              <Label htmlFor="general-feedback" className="text-base font-medium">{t.generalFeedback}</Label>
               <Textarea
                 id="general-feedback"
-                placeholder="What you love, what could be better, ideas for improvement..."
+                placeholder={t.whatYouLove}
                 value={feedback.generalFeedback || ''}
                 onChange={(e) => setFeedback(prev => ({ ...prev, generalFeedback: e.target.value }))}
                 className="mt-2"
@@ -320,10 +323,10 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
             </div>
 
             <div>
-              <Label htmlFor="bug-reports" className="text-base font-medium">Did you encounter any bugs or technical issues?</Label>
+              <Label htmlFor="bug-reports" className="text-base font-medium">{t.bugReports}</Label>
               <Textarea
                 id="bug-reports"
-                placeholder="Describe any problems you experienced..."
+                placeholder={t.describeProblem}
                 value={feedback.bugReports || ''}
                 onChange={(e) => setFeedback(prev => ({ ...prev, bugReports: e.target.value }))}
                 className="mt-2"
@@ -334,11 +337,10 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
             <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-950/30 dark:to-blue-950/30 p-4 rounded-xl">
               <h4 className="font-semibold mb-2 flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                Thank You for Being a Beta Explorer! 🌟
+                {t.thankYouBeta}
               </h4>
               <p className="text-sm">
-                Your feedback directly shapes how we build Loglings. As one of our early users, 
-                you're helping create a more gentle and effective way to learn cybersecurity.
+                {t.betaExplorer}
               </p>
             </div>
           </div>
@@ -354,10 +356,10 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="w-6 h-6 text-accent" />
-          Share Your Loglings Experience
+          {t.shareExperience}
         </CardTitle>
         <p className="text-muted-foreground">
-          {steps[currentStep].description} (Step {currentStep + 1} of {steps.length})
+          {steps[currentStep].description} ({t.stepOf.replace('{current}', (currentStep + 1).toString()).replace('{total}', steps.length.toString())})
         </p>
         <div className="w-full bg-muted/50 rounded-full h-2">
           <div 
@@ -376,11 +378,11 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
               variant="outline"
               onClick={() => setCurrentStep(currentStep - 1)}
             >
-              Previous
+              {t.previous}
             </Button>
           ) : (
             <Button variant="ghost" onClick={onClose}>
-              Skip
+              {t.skip}
             </Button>
           )}
           
@@ -389,7 +391,7 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
               onClick={() => setCurrentStep(currentStep + 1)}
               className="logling-button"
             >
-              Next
+              {t.next}
             </Button>
           ) : (
             <Button
@@ -400,12 +402,12 @@ const SoftLaunchFeedbackSystem = ({ trigger, sessionData, onClose }: SoftLaunchF
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Sending...
+                  {t.sendingFeedback}
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Send className="w-4 h-4" />
-                  Submit Feedback
+                  {t.submitFeedback}
                 </div>
               )}
             </Button>
