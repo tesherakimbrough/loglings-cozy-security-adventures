@@ -15,7 +15,11 @@ interface DailyChallenge {
   expiresAt: string;
 }
 
-const DailyChallenge = () => {
+interface DailyChallengeProps {
+  onStartAdventure?: () => void;
+}
+
+const DailyChallenge = ({ onStartAdventure }: DailyChallengeProps) => {
   const [todaysChallenge, setTodaysChallenge] = useState<DailyChallenge | null>(null);
   const [timeUntilNext, setTimeUntilNext] = useState<string>('');
 
@@ -116,6 +120,12 @@ const DailyChallenge = () => {
     }
   };
 
+  const handleStartAdventure = () => {
+    if (onStartAdventure) {
+      onStartAdventure();
+    }
+  };
+
   if (!todaysChallenge) return null;
 
   return (
@@ -159,7 +169,7 @@ const DailyChallenge = () => {
             </div>
           </div>
         ) : (
-          <Button className="w-full logling-button">
+          <Button className="w-full logling-button" onClick={handleStartAdventure}>
             <Star className="w-4 h-4 mr-2" />
             Start Today's Adventure
           </Button>

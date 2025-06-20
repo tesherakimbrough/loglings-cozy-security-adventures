@@ -45,7 +45,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
 
         {/* Enhanced Progress Section */}
         <div className="grid lg:grid-cols-2 gap-6">
-          <DailyChallenge />
+          <DailyChallenge onStartAdventure={handleStartClick} />
           <LevelProgressionSystem />
         </div>
 
