@@ -205,6 +205,85 @@ export interface Translations {
   lunaAppreciatesResponse: string;
   sageRespectsResponse: string;
   yourCozyLearningJourney: string;
+  howWeMakeCybersecurity: string;
+  progressiveGrowth: string;
+  progressiveGrowthDescription: string;
+  understandingOverMemorization: string;
+  understandingOverMemorizationDescription: string;
+  realWorldRelevance: string;
+  realWorldRelevanceDescription: string;
+  readyToBeginGentleJourney: string;
+  welcomeJourney: string;
+  skipForNow: string;
+  beginMyJourney: string;
+  continue: string;
+
+  // Missing keys from SoftLaunchFeedbackSystem
+  yourExperienceSoFar: string;
+  helpUsUnderstand: string;
+  learningAndGrowth: string;
+  tellUsAboutJourney: string;
+  featuresAndImprovements: string;
+  whatsWorking: string;
+  yourThoughts: string;
+  anythingElse: string;
+  valuableFeedback: string;
+  helpsBetter: string;
+  rateDifficulty: string;
+  tooEasy: string;
+  tooHard: string;
+  howEngaging: string;
+  boring: string;
+  veryEngaging: string;
+  howClear: string;
+  confusing: string;
+  veryClear: string;
+  difficultyFelt: string;
+  tooGradual: string;
+  justRight: string;
+  tooSteep: string;
+  moreConfident: string;
+  noChange: string;
+  muchMoreConfident: string;
+  howRelevant: string;
+  notRealistic: string;
+  veryRealistic: string;
+  wouldRecommend: string;
+  definitelyNot: string;
+  absolutelyYes: string;
+  experienceLevel: string;
+  completeBeginner: string;
+  someExposure: string;
+  intermediateKnowledge: string;
+  advancedProfessional: string;
+  whichFeatures: string;
+  selectAll: string;
+  loglingCharacters: string;
+  storyBasedScenarios: string;
+  gentleExplanations: string;
+  progressTracking: string;
+  achievementSystem: string;
+  dailyChallenges: string;
+  learningTips: string;
+  realWorldContext: string;
+  featuresWanted: string;
+  makeBetter: string;
+  enjoyMost: string;
+  mostConfusing: string;
+  anythingUnclear: string;
+  generalFeedback: string;
+  whatYouLove: string;
+  bugReports: string;
+  describeProblem: string;
+  thankYouBeta: string;
+  betaExplorer: string;
+  stepOf: string;
+  previous: string;
+  next: string;
+  skip: string;
+  sendingFeedback: string;
+  submitFeedback: string;
+  shareExperience: string;
 }
 
 const englishTranslations: Translations = {
@@ -389,7 +468,86 @@ const englishTranslations: Translations = {
   pipAgreesResponse: "Pip agrees - sometimes people work late",
   lunaAppreciatesResponse: "Luna appreciates your curiosity",
   sageRespectsResponse: "Sage respects your protective instincts",
-  yourCozyLearningJourney: "Your Cozy Learning Journey"
+  yourCozyLearningJourney: "Your Cozy Learning Journey",
+  howWeMakeCybersecurity: "How we make cybersecurity approachable",
+  progressiveGrowth: "Progressive Growth",
+  progressiveGrowthDescription: "Start simple and gradually build expertise",
+  understandingOverMemorization: "Understanding over Memorization",
+  understandingOverMemorizationDescription: "Learn why things work, not just what to do",
+  realWorldRelevance: "Real-World Relevance",
+  realWorldRelevanceDescription: "Every lesson connects to actual security scenarios",
+  readyToBeginGentleJourney: "Ready to begin your gentle journey into cybersecurity?",
+  welcomeJourney: "Welcome Journey",
+  skipForNow: "Skip for now",
+  beginMyJourney: "Begin My Journey",
+  continue: "Continue",
+
+  // SoftLaunchFeedbackSystem translations
+  yourExperienceSoFar: "Your Experience So Far",
+  helpUsUnderstand: "Help us understand how you're finding Loglings",
+  learningAndGrowth: "Learning and Growth",
+  tellUsAboutJourney: "Tell us about your learning journey",
+  featuresAndImprovements: "Features and Improvements",
+  whatsWorking: "What's working well and what could be better?",
+  yourThoughts: "Your Thoughts",
+  anythingElse: "Anything else you'd like to share?",
+  valuableFeedback: "Thank you for your valuable feedback!",
+  helpsBetter: "Your input helps us make Loglings better for everyone.",
+  rateDifficulty: "How would you rate the difficulty level?",
+  tooEasy: "Too easy",
+  tooHard: "Too hard",
+  howEngaging: "How engaging is the experience?",
+  boring: "Boring",
+  veryEngaging: "Very engaging",
+  howClear: "How clear are the explanations?",
+  confusing: "Confusing",
+  veryClear: "Very clear",
+  difficultyFelt: "How did the difficulty progression feel?",
+  tooGradual: "Too gradual",
+  justRight: "Just right",
+  tooSteep: "Too steep",
+  moreConfident: "Do you feel more confident about cybersecurity?",
+  noChange: "No change",
+  muchMoreConfident: "Much more confident",
+  howRelevant: "How relevant are the scenarios to real-world security?",
+  notRealistic: "Not realistic",
+  veryRealistic: "Very realistic",
+  wouldRecommend: "Would you recommend Loglings to others?",
+  definitelyNot: "Definitely not",
+  absolutelyYes: "Absolutely yes",
+  experienceLevel: "What's your cybersecurity experience level?",
+  completeBeginner: "Complete beginner",
+  someExposure: "Some exposure to cybersecurity",
+  intermediateKnowledge: "Intermediate knowledge",
+  advancedProfessional: "Advanced professional",
+  whichFeatures: "Which features did you enjoy most?",
+  selectAll: "select all that apply",
+  loglingCharacters: "Logling characters",
+  storyBasedScenarios: "Story-based scenarios",
+  gentleExplanations: "Gentle explanations",
+  progressTracking: "Progress tracking",
+  achievementSystem: "Achievement system",
+  dailyChallenges: "Daily challenges",
+  learningTips: "Learning tips",
+  realWorldContext: "Real-world context",
+  featuresWanted: "What features would you like to see added?",
+  makeBetter: "What would make Loglings even better?",
+  enjoyMost: "What did you enjoy most?",
+  mostConfusing: "What was most confusing?",
+  anythingUnclear: "Was anything unclear or hard to understand?",
+  generalFeedback: "General feedback",
+  whatYouLove: "Tell us what you love, what needs improvement, or any suggestions",
+  bugReports: "Bug reports",
+  describeProblem: "Describe any technical problems you encountered",
+  thankYouBeta: "Thank You for Being a Beta Explorer!",
+  betaExplorer: "Your feedback is shaping the future of cybersecurity education.",
+  stepOf: "Step {current} of {total}",
+  previous: "Previous",
+  next: "Next",
+  skip: "Skip",
+  sendingFeedback: "Sending feedback...",
+  submitFeedback: "Submit Feedback",
+  shareExperience: "Share Your Experience"
 };
 
 // For now, using English as fallback for all other languages to resolve build errors
