@@ -7,8 +7,10 @@ import OnboardingTutorial from '../components/OnboardingTutorial';
 import FeedbackCollectionSystem from '../components/FeedbackCollectionSystem';
 import GameErrorBoundary from '../components/GameErrorBoundary';
 import BetaLaunchBanner from '../components/BetaLaunchBanner';
+import { ResponsiveWrapper } from '../components/ResponsiveWrapper';
 import { UserMode } from '../types/userTypes';
 import { useUserProfile } from '../hooks/useUserProfile';
+import { useMobileOptimization } from '../hooks/useMobileOptimization';
 
 export interface GameData {
   score: number;
@@ -28,6 +30,7 @@ const Index = () => {
   const [userMode, setUserMode] = useState<UserMode>('cozy-everyday');
   const [showFeedback, setShowFeedback] = useState(false);
   const { profile } = useUserProfile();
+  const { shouldUseCompactLayout } = useMobileOptimization();
 
   const handleStartGame = (mode: UserMode) => {
     setUserMode(mode);
@@ -75,54 +78,66 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Global Error Boundary */}
-      <GameErrorBoundary onError={handleGameError}>
-        {/* Onboarding Tutorial */}
-        <OnboardingTutorial />
-        
-        {/* Beta Launch Banner */}
-        {gameState === 'intro' && <div className="p-4"><BetaLaunchBanner /></div>}
-        
-        {gameState === 'intro' && (
-          <GameIntro onStartGame={handleStartGame} userMode={userMode} />
-        )}
-        
-        {gameState === 'playing' && (
-          <GameErrorBoundary onError={handleGameError}>
-            <AdvancedGamePlay 
-              onEndGame={handleEndGame} 
-              onBackToHome={handleBackToHome}
-              userMode={userMode} 
-            />
-          </GameErrorBoundary>
-        )}
-        
-        {gameState === 'results' && gameData && (
-          <GameErrorBoundary onError={handleGameError}>
-            <GameResults 
-              gameData={gameData} 
-              onRestart={handlePlayAgain}
-              userMode={userMode}
-            />
-            <FeedbackCollectionSystem
-              trigger="post-session"
-              onSubmit={() => {}}
-              onClose={() => {}}
-            />
-          </GameErrorBoundary>
-        )}
+    <ResponsiveWrapper>
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        {/* Global Error Boundary */}
+        <GameErrorBoundary onError={handleGameError}>
+          {/* Onboarding Tutorial */}
+          <OnboardingTutorial />
+          
+          {/* Beta Launch Banner */}
+          {gameState === 'intro' && (
+            <div className={`p-2 md:p-4 ${shouldUseCompactLayout ? 'px-4' : ''}`}>
+              <BetaLaunchBanner />
+            </div>
+          )}
+          
+          {gameState === 'intro' && (
+            <GameIntro onStartGame={handleStartGame} userMode={userMode} />
+          )}
+          
+          {gameState === 'playing' && (
+            <GameErrorBoundary onError={handleGameError}>
+              <AdvancedGamePlay 
+                onEndGame={handleEndGame} 
+                onBackToHome={handleBackToHome}
+                userMode={userMode} 
+              />
+            </GameErrorBoundary>
+          )}
+          
+          {gameState === 'results' && gameData && (
+            <GameErrorBoundary onError={handleGameError}>
+              <div className="p-2 md:p-4">
+                <GameResults 
+                  gameData={gameData} 
+                  onRestart={handlePlayAgain}
+                  userMode={userMode}
+                />
+                <FeedbackCollectionSystem
+                  trigger="post-session"
+                  onSubmit={() => {}}
+                  onClose={() => {}}
+                />
+              </div>
+            </GameErrorBoundary>
+          )}
 
-        {/* Global Feedback System */}
-        {showFeedback && (
-          <FeedbackCollectionSystem
-            trigger="manual"
-            onSubmit={() => setShowFeedback(false)}
-            onClose={() => setShowFeedback(false)}
-          />
-        )}
-      </GameErrorBoundary>
-    </div>
+          {/* Global Feedback System */}
+          {showFeedback && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+              <div className="w-full max-w-md">
+                <FeedbackCollectionSystem
+                  trigger="manual"
+                  onSubmit={() => setShowFeedback(false)}
+                  onClose={() => setShowFeedback(false)}
+                />
+              </div>
+            </div>
+          )}
+        </GameErrorBoundary>
+      </div>
+    </ResponsiveWrapper>
   );
 };
 
