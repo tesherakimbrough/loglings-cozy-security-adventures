@@ -3,6 +3,27 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 
 export type Language = 'en' | 'es' | 'fr' | 'ja' | 'ko' | 'zh';
 
+export const languageNames = {
+  en: 'English',
+  es: 'Español', 
+  fr: 'Français',
+  ja: '日本語',
+  ko: '한국어',
+  zh: '中文'
+};
+
+export const getLanguageFlag = (lang: Language): string => {
+  const flags = {
+    en: '🇺🇸',
+    es: '🇪🇸',
+    fr: '🇫🇷', 
+    ja: '🇯🇵',
+    ko: '🇰🇷',
+    zh: '🇨🇳'
+  };
+  return flags[lang];
+};
+
 export interface Translations {
   of: string;
   dailyChallenge: string;
@@ -11,6 +32,17 @@ export interface Translations {
   cozy: string;
   professionalTraining: string;
   lovinglyCreatedBy: string;
+  language: string;
+  tutorial: string;
+  beginAdventure: string;
+  gameSubtitle: string;
+  chapter: string;
+  analystPip: string;
+  detectiveLuna: string;
+  guardianSage: string;
+  pipDescription: string;
+  lunaDescription: string;
+  sageDescription: string;
   
   // GameIntroFeatures keys
   analyzeComplexSecurityLogs: string;
