@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ThreatLevel } from '../utils/logGenerator';
 import { generateAdvancedScenario } from '../utils/expandedScenarioDatabase';
@@ -8,6 +7,8 @@ import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
 import { useAnalytics } from './useAnalytics';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../pages/Index';
+import { getBridgeScenario } from '../utils/bridgeScenarios';
+import { achievementTracker } from '../utils/enhancedAchievementSystem';
 
 interface LogEntry {
   timestamp: string;
@@ -65,10 +66,42 @@ export const useEnhancedGameLogic = (
       let attempts = 0;
       let newLog;
       
+      // Enhanced difficulty selection with bridge scenarios
+      const accuracy = currentRound > 1 ? (correctAnswers / (currentRound - 1)) * 100 : 100;
+      let targetDifficulty = calculateOptimalDifficulty();
+      
+      // Use bridge scenarios for smoother progression
+      if (accuracy >= 70 && accuracy < 85 && targetDifficulty === 'intermediate') {
+        // Try bridge scenarios first
+        const bridgeScenario = getBridgeScenario('beginner-plus', scenariosPlayed);
+        if (bridgeScenario) {
+          setCurrentLog(bridgeScenario as LogEntry);
+          if (bridgeScenario.id) {
+            setScenariosPlayed(prev => [...prev, bridgeScenario.id!]);
+          }
+          setFeedback(null);
+          setShowNextRound(false);
+          setIsCorrect(null);
+          return;
+        }
+      } else if (accuracy >= 85 && accuracy < 95 && targetDifficulty === 'advanced') {
+        // Try pre-intermediate bridge scenarios
+        const bridgeScenario = getBridgeScenario('pre-intermediate', scenariosPlayed);
+        if (bridgeScenario) {
+          setCurrentLog(bridgeScenario as LogEntry);
+          if (bridgeScenario.id) {
+            setScenariosPlayed(prev => [...prev, bridgeScenario.id!]);
+          }
+          setFeedback(null);
+          setShowNextRound(false);
+          setIsCorrect(null);
+          return;
+        }
+      }
+      
       // Try to avoid repeating scenarios
       do {
-        const difficulty = calculateOptimalDifficulty();
-        newLog = generateAdvancedScenario(difficulty);
+        newLog = generateAdvancedScenario(targetDifficulty);
         attempts++;
       } while (
         scenariosPlayed.includes(newLog.id || '') && 
@@ -240,16 +273,25 @@ export const useEnhancedGameLogic = (
         correctByCategory
       });
       
+      // Update achievement tracker
+      const gameData = {
+        score: score + pointsEarned,
+        accuracy: finalAccuracy,
+        timeElapsed,
+        correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
+        totalQuestions: totalRounds,
+        totalRounds,
+        difficulty: calculateOptimalDifficulty()
+      };
+      
+      achievementTracker.updateProgress(gameData, {
+        totalSessions: 1, // This would come from user profile
+        currentStreak: 1, // This would come from user profile
+        correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0)
+      });
+      
       setTimeout(() => {
-        onEndGame({
-          score: score + pointsEarned,
-          accuracy: finalAccuracy,
-          timeElapsed,
-          correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
-          totalQuestions: totalRounds,
-          totalRounds,
-          difficulty: calculateOptimalDifficulty()
-        });
+        onEndGame(gameData);
       }, 2500);
     }
   };

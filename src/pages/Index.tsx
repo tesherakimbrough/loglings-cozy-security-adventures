@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import GameIntro from '../components/GameIntro';
 import AdvancedGamePlay from '../components/AdvancedGamePlay';
 import GameResults from '../components/GameResults';
-import OnboardingTutorial from '../components/OnboardingTutorial';
+import ImprovedOnboarding from '../components/ImprovedOnboarding';
 import FeedbackCollectionSystem from '../components/FeedbackCollectionSystem';
 import GameErrorBoundary from '../components/GameErrorBoundary';
 import BetaLaunchBanner from '../components/BetaLaunchBanner';
@@ -82,8 +81,8 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         {/* Global Error Boundary */}
         <GameErrorBoundary onError={handleGameError}>
-          {/* Onboarding Tutorial */}
-          <OnboardingTutorial />
+          {/* Improved Onboarding Tutorial */}
+          <ImprovedOnboarding />
           
           {/* Beta Launch Banner */}
           {gameState === 'intro' && (
