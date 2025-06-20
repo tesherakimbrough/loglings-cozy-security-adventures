@@ -64,6 +64,10 @@ const Waitlist = () => {
     setShowFeedback(false);
   };
 
+  const handleFeedbackClose = () => {
+    setShowFeedback(false);
+  };
+
   const handleCelebrationContinue = () => {
     setShowCelebration(false);
   };
@@ -92,6 +96,7 @@ const Waitlist = () => {
           <FeedbackForm 
             onSubmit={handleFeedbackSubmit}
             onSkip={handleFeedbackSkip}
+            onClose={handleFeedbackClose}
           />
         ) : showCelebration ? (
           <WaitlistCelebration
