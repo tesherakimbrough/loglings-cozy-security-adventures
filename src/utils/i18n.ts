@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type Language = 'en' | 'es' | 'fr' | 'ja' | 'ko' | 'zh';
@@ -627,6 +628,12 @@ export const translations = {
   zh: chineseTranslations
 };
 
+interface I18nContextType {
+  language: Language;
+  setLanguage: (lang: Language) => void;
+  t: Translations;
+}
+
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 interface I18nProviderProps {
@@ -647,7 +654,7 @@ export const I18nProvider = ({ children }: I18nProviderProps) => {
     if (browserLang.startsWith('ko')) return 'ko';
     if (browserLang.startsWith('zh')) return 'zh';
     
-    return 'en'; // Default fallback
+    return 'en';
   });
 
   const setLanguage = (lang: Language) => {
