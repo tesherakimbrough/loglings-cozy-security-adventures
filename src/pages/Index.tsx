@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import GameIntro from '../components/GameIntro';
 import AdvancedGamePlay from '../components/AdvancedGamePlay';
@@ -10,6 +11,7 @@ import { ResponsiveWrapper } from '../components/ResponsiveWrapper';
 import { UserMode } from '../types/userTypes';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useMobileOptimization } from '../hooks/useMobileOptimization';
+import { useI18n } from '../hooks/useI18n';
 
 export interface GameData {
   score: number;
@@ -24,6 +26,9 @@ export interface GameData {
 type GameState = 'intro' | 'playing' | 'results';
 
 const Index = () => {
+  // Ensure i18n is available before rendering anything that uses it
+  const { t } = useI18n();
+  
   const [gameState, setGameState] = useState<GameState>('intro');
   const [gameData, setGameData] = useState<GameData | null>(null);
   const [userMode, setUserMode] = useState<UserMode>('cozy-everyday');
