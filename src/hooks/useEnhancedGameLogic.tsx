@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { ThreatLevel } from '../utils/logGenerator';
 import { generateAdvancedScenario } from '../utils/expandedScenarioDatabase';
 import { useAudioSystem } from './useAudioSystem';
 import { useDailyChallenges } from './useDailyChallenges';
 import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
 import { useAnalytics } from './useAnalytics';
+import { useOfflineMode } from './useOfflineMode';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../pages/Index';
 import { getBridgeScenario } from '../utils/bridgeScenarios';
@@ -47,6 +49,7 @@ export const useEnhancedGameLogic = (
   const { todaysChallenge, updateChallengeProgress } = useDailyChallenges();
   const { calculateOptimalDifficulty, updateMetrics, getEncouragementMessage } = useAdaptiveDifficulty();
   const { trackThreatAssessment } = useAnalytics();
+  const { isOfflineMode, getOfflineScenario, addToPendingSync } = useOfflineMode();
   const totalRounds = 15; // Increased for more comprehensive gameplay
 
   useEffect(() => {
@@ -69,6 +72,19 @@ export const useEnhancedGameLogic = (
       // Enhanced difficulty selection with bridge scenarios
       const accuracy = currentRound > 1 ? (correctAnswers / (currentRound - 1)) * 100 : 100;
       let targetDifficulty = calculateOptimalDifficulty();
+      
+      // Use offline scenarios if in offline mode
+      if (isOfflineMode) {
+        newLog = getOfflineScenario(targetDifficulty);
+        setCurrentLog(newLog as LogEntry);
+        if (newLog.id) {
+          setScenariosPlayed(prev => [...prev, newLog.id!]);
+        }
+        setFeedback(null);
+        setShowNextRound(false);
+        setIsCorrect(null);
+        return;
+      }
       
       // Use bridge scenarios for smoother progression
       if (accuracy >= 70 && accuracy < 85 && targetDifficulty === 'intermediate') {
@@ -219,8 +235,10 @@ export const useEnhancedGameLogic = (
     const answerIsCorrect = playerChoice === currentLog.threatLevel;
     const roundTime = timeElapsed - ((currentRound - 1) * 45); // Estimate per round
     
-    // Track the assessment for analytics
-    trackThreatAssessment(answerIsCorrect, currentLog.threatLevel);
+    // Track the assessment for analytics (skip if offline)
+    if (!isOfflineMode) {
+      trackThreatAssessment(answerIsCorrect, currentLog.threatLevel);
+    }
 
     // Enhanced scoring system
     const pointsEarned = calculateScore(playerChoice, currentLog, answerIsCorrect, roundTime);
@@ -240,8 +258,8 @@ export const useEnhancedGameLogic = (
       playErrorSound();
     }
 
-    // Enhanced daily challenge progress tracking
-    if (todaysChallenge && answerIsCorrect) {
+    // Enhanced daily challenge progress tracking (skip if offline)
+    if (todaysChallenge && answerIsCorrect && !isOfflineMode) {
       if (todaysChallenge.type === 'accuracy') {
         const currentAccuracy = ((correctAnswers + 1) / currentRound) * 100;
         updateChallengeProgress(todaysChallenge.id, Math.floor(currentAccuracy));
@@ -264,14 +282,29 @@ export const useEnhancedGameLogic = (
     setIsCorrect(answerIsCorrect);
     setShowNextRound(true);
 
-    if (currentRound >= totalRounds) {
-      // Update adaptive difficulty metrics
-      const finalAccuracy = ((correctAnswers + (answerIsCorrect ? 1 : 0)) / totalRounds) * 100;
-      updateMetrics({
-        accuracy: finalAccuracy,
-        timeSpent: timeElapsed,
-        correctByCategory
+    // Store for offline sync if needed
+    if (isOfflineMode) {
+      addToPendingSync({
+        type: 'threat_assessment',
+        playerChoice,
+        scenarioId: currentLog.id,
+        correct: answerIsCorrect,
+        points: pointsEarned,
+        round: currentRound,
+        timestamp: Date.now()
       });
+    }
+
+    if (currentRound >= totalRounds) {
+      // Update adaptive difficulty metrics (skip if offline)
+      const finalAccuracy = ((correctAnswers + (answerIsCorrect ? 1 : 0)) / totalRounds) * 100;
+      if (!isOfflineMode) {
+        updateMetrics({
+          accuracy: finalAccuracy,
+          timeSpent: timeElapsed,
+          correctByCategory
+        });
+      }
       
       // Update achievement tracker
       const gameData = {

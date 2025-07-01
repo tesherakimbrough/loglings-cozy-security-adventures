@@ -6,6 +6,8 @@ import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
 import { useEnhancedGameLogic } from '../hooks/useEnhancedGameLogic';
 import { useMobileOptimization } from '../hooks/useMobileOptimization';
+import { useHapticFeedback } from '../hooks/useHapticFeedback';
+import { useOfflineMode } from '../hooks/useOfflineMode';
 import { useI18n } from '../hooks/useI18n';
 
 interface GamePlayProps {
@@ -16,6 +18,9 @@ interface GamePlayProps {
 const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   const { t } = useI18n();
   const { shouldUseCompactLayout } = useMobileOptimization();
+  const { success, error, tap } = useHapticFeedback();
+  const { isOfflineMode, getOfflineScenario, addToPendingSync } = useOfflineMode();
+  
   const {
     currentRound,
     score,
@@ -34,11 +39,45 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
     nextRound
   } = useEnhancedGameLogic(userMode, onEndGame);
 
+  // Enhanced threat assessment with haptic feedback
+  const handleThreatAssessmentWithFeedback = (choice: string) => {
+    tap(); // Immediate feedback on button press
+    
+    handleThreatAssessment(choice);
+    
+    // Haptic feedback based on result (will trigger after assessment)
+    setTimeout(() => {
+      if (isCorrect) {
+        success();
+      } else {
+        error();
+      }
+    }, 100);
+
+    // Store offline progress if needed
+    if (isOfflineMode) {
+      addToPendingSync({
+        type: 'game_progress',
+        round: currentRound,
+        choice,
+        timestamp: Date.now()
+      });
+    }
+  };
+
+  // Enhanced next round with haptic feedback
+  const handleNextRound = () => {
+    tap();
+    nextRound();
+  };
+
   if (!currentLog) return (
     <div className="h-full flex items-center justify-center p-4">
       <div className="text-center space-y-4">
         <div className="w-8 h-8 md:w-12 md:h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="text-sm md:text-base text-muted-foreground">{t.preparingEnhancedAdventure}</p>
+        <p className="text-sm md:text-base text-muted-foreground">
+          {isOfflineMode ? t.preparingOfflineAdventure : t.preparingEnhancedAdventure}
+        </p>
       </div>
     </div>
   );
@@ -64,8 +103,8 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
               isCorrect={isCorrect}
               showNextRound={showNextRound}
               isProMode={isProMode}
-              onThreatAssessment={handleThreatAssessment}
-              onNextRound={nextRound}
+              onThreatAssessment={handleThreatAssessmentWithFeedback}
+              onNextRound={handleNextRound}
             />
           </div>
           
@@ -74,7 +113,10 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
             
             {/* Enhanced Stats Panel - Mobile Optimized */}
             <div className="cozy-card p-3 md:p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30">
-              <h3 className="font-semibold text-sm md:text-base mb-3">{t.sessionStats}</h3>
+              <h3 className="font-semibold text-sm md:text-base mb-3 flex items-center gap-2">
+                {t.sessionStats}
+                {isOfflineMode && <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded">Offline</span>}
+              </h3>
               <div className="grid grid-cols-2 gap-2 md:gap-3 text-xs md:text-sm">
                 <div className="text-center md:text-left">
                   <div className="text-lg md:text-xl font-bold text-blue-600">{scenariosPlayed}</div>
