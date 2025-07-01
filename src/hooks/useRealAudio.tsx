@@ -13,7 +13,8 @@ export const useRealAudio = () => {
   const currentHowlRef = useRef<Howl | null>(null);
 
   const getCurrentTrackInfo = (trackId: MusicType) => {
-    return audioTracks.find(track => track.id === trackId) || audioTracks[0];
+    const foundTrack = audioTracks.find(track => track.id === trackId);
+    return foundTrack || audioTracks.find(track => track.id === 'silence') || audioTracks[0];
   };
 
   const stopMusic = useCallback(async (): Promise<void> => {
@@ -51,6 +52,15 @@ export const useRealAudio = () => {
     if (trackId === 'external') {
       await stopMusic();
       setCurrentTrack('external');
+      setIsPlaying(true);
+      return;
+    }
+
+    // Handle new music types that might not have audio files yet
+    if (trackId === 'lofi-beats' || trackId === 'forest-ambience') {
+      console.log('New music type detected, falling back to silence mode:', trackId);
+      await stopMusic();
+      setCurrentTrack('silence');
       setIsPlaying(true);
       return;
     }
