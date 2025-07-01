@@ -1,10 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useGameData } from '../hooks/useGameData';
 import { useI18n } from '../hooks/useI18n';
-import { useSoundFeedback } from '../hooks/useSoundFeedback';
+import { useAudioSystem } from '../hooks/useAudioSystem';
 import GamePlay from '../components/GamePlay';
 import GameResults from '../components/GameResults';
 import { Button } from '@/components/ui/button';
@@ -25,24 +26,17 @@ import UsageTrackingDisplay from '../components/UsageTrackingDisplay';
 import PremiumPrompt from '../components/PremiumPrompt';
 import { useFeedbackAndPremium } from '../hooks/useFeedbackAndPremium';
 import { useUsageTracking } from '../hooks/useUsageTracking';
-
-interface GameData {
-  score: number;
-  timeElapsed: number;
-  correctAnswers: number;
-  incorrectAnswers: number;
-  sessionsPlayed: number;
-}
+import { GameData } from '../types/gameTypes';
 
 type GameState = 'intro' | 'playing' | 'results';
 type UserMode = 'cozy-everyday' | 'pro-challenge';
 
 const Index = () => {
-  const { isAuthenticated, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile, isLoading: isProfileLoading } = useUserProfile();
   const { gameData, resetGameData, updateGameData } = useGameData();
-  const { t, changeLanguage, currentLanguage } = useI18n();
-  const { playSound } = useSoundFeedback();
+  const { t, setLanguage, language } = useI18n();
+  const { playTrack, stopMusic } = useAudioSystem();
   const navigate = useNavigate();
   const { trackPremiumInquiry } = useMonetizationTracking();
   
@@ -54,10 +48,10 @@ const Index = () => {
   const [userMode, setUserMode] = useState<UserMode>('cozy-everyday');
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!user) {
       navigate('/auth');
     }
-  }, [isAuthenticated, navigate]);
+  }, [user, navigate]);
 
   useEffect(() => {
     // Load previous session data on mount
@@ -87,12 +81,12 @@ const Index = () => {
   }, [gameState, gameData.sessionsPlayed, isLimitReached, shouldShowPremiumPrompt, markPromptShown]);
 
   const handleStartGame = () => {
-    playSound('start');
+    playTrack('lofi-beats');
     setGameState('playing');
   };
 
   const handleEndGame = (newGameData: GameData) => {
-    playSound('complete');
+    playTrack('forest-ambience');
     setGameState('results');
 
     // Update game data with results
@@ -112,19 +106,19 @@ const Index = () => {
   };
 
   const handlePlayAgain = () => {
-    playSound('start');
+    playTrack('lofi-beats');
     resetGameData();
     setGameState('playing');
   };
 
   const handleEndSession = () => {
-    playSound('end');
+    stopMusic();
     resetGameData();
     setGameState('intro');
   };
 
   const handleLanguageChange = (lang: string) => {
-    changeLanguage(lang);
+    setLanguage(lang as any);
   };
 
   const handlePremiumPromptDismiss = () => {
@@ -155,8 +149,8 @@ const Index = () => {
                       <Skeleton className="h-8 w-8 rounded-full" />
                     ) : (
                       <>
-                        <AvatarImage src={profile?.avatar} alt={profile?.name} />
-                        <AvatarFallback>{profile?.name?.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={profile?.display_name} alt={profile?.display_name} />
+                        <AvatarFallback>{profile?.display_name?.charAt(0)}</AvatarFallback>
                       </>
                     )}
                   </Avatar>
@@ -165,14 +159,14 @@ const Index = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => navigate('/waitlist')}>
-                  {t.profile}
+                  Profile
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/pricing')}>
-                  {t.pricing}
+                  Pricing
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel>
-                  {t.language}: {currentLanguage}
+                  Language: {language}
                 </DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
                   English
@@ -182,7 +176,7 @@ const Index = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>
-                  {t.signOut}
+                  Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -195,19 +189,19 @@ const Index = () => {
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-primary mb-4">
-                {t.welcome}
+                Welcome to Logling Forest!
               </h2>
               <p className="text-muted-foreground leading-relaxed max-w-md mx-auto">
-                {t.introText}
+                Embark on a cozy cybersecurity adventure with your Logling friends.
               </p>
             </div>
 
             <div className="flex justify-center space-x-4">
               <Button onClick={handleStartGame} className="logling-button">
-                {t.startGame}
+                Start Adventure
               </Button>
               <Button variant="outline" onClick={() => navigate('/waitlist')}>
-                {t.learnMore}
+                Learn More
               </Button>
             </div>
             
@@ -218,21 +212,21 @@ const Index = () => {
             
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                {t.tip}: {t.customizeProfile}
+                Tip: Customize your profile to enhance your adventure experience.
               </p>
             </div>
           </div>
         )}
 
         {gameState === 'playing' && (
-          <GamePlay onEndGame={handleEndGame} userMode={userMode} />
+          <GamePlay onEndGame={handleEndGame} userMode={userMode as any} />
         )}
 
         {gameState === 'results' && (
           <GameResults
             gameData={gameData}
-            onPlayAgain={handlePlayAgain}
-            onEndSession={handleEndSession}
+            onRestart={handlePlayAgain}
+            userMode={userMode as any}
           />
         )}
       </main>
