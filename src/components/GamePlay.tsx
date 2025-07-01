@@ -1,9 +1,9 @@
-
 import GameHeader from './GameHeader';
 import LogAnalysisCard from './LogAnalysisCard';
 import LevelProgressionSystem from './LevelProgressionSystem';
 import { GameData } from '../pages/Index';
 import { UserMode } from '../types/userTypes';
+import { ThreatLevel } from '../utils/logGenerator';
 import { useEnhancedGameLogic } from '../hooks/useEnhancedGameLogic';
 import { useMobileOptimization } from '../hooks/useMobileOptimization';
 import { useHapticFeedback } from '../hooks/useHapticFeedback';
@@ -40,7 +40,7 @@ const GamePlay = ({ onEndGame, userMode = 'cozy-everyday' }: GamePlayProps) => {
   } = useEnhancedGameLogic(userMode, onEndGame);
 
   // Enhanced threat assessment with haptic feedback
-  const handleThreatAssessmentWithFeedback = (choice: string) => {
+  const handleThreatAssessmentWithFeedback = (choice: ThreatLevel) => {
     tap(); // Immediate feedback on button press
     
     handleThreatAssessment(choice);

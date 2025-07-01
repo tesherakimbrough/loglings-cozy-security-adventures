@@ -1,5 +1,4 @@
-
-import { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { usePerformance } from './usePerformance';
 
 export const usePerformanceOptimizer = () => {
