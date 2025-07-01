@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { AdvancedScenario } from '../utils/advancedScenarioDatabase';
 import { useAudioSystem } from './useAudioSystem';
@@ -148,13 +147,16 @@ export const useAdvancedGameLogic = (
 
       if (currentRound >= totalRounds) {
         setTimeout(() => {
+          const finalCorrectAnswers = correctAnswers + (answerIsCorrect ? 1 : 0);
           onEndGame({
             score: score + pointsEarned,
-            accuracy: ((correctAnswers + (answerIsCorrect ? 1 : 0)) / totalRounds) * 100,
+            accuracy: (finalCorrectAnswers / totalRounds) * 100,
             timeElapsed,
-            correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
+            correctAnswers: finalCorrectAnswers,
+            incorrectAnswers: totalRounds - finalCorrectAnswers,
             totalQuestions: totalRounds,
             totalRounds,
+            sessionsPlayed: 1,
             difficulty
           });
         }, 3000);

@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
-import { useSupabaseProfile } from './useSupabaseProfile';
 import { GameData } from '../types/gameTypes';
+import { supabase } from '../integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface GameSession {
   id: string;
@@ -15,42 +17,28 @@ interface GameSession {
   created_at: string;
 }
 
-// Enhanced input sanitization for game data with security validation
+// Simplified input sanitization
 const sanitizeGameData = (gameData: GameData): GameData => {
-  // Validate game score integrity
-  if (!validateGameScore(gameData.score, gameData.correctAnswers, gameData.totalRounds)) {
-    logSecurityEvent('suspicious_input', { 
-      reason: 'invalid_game_score',
-      data: { score: gameData.score, correct: gameData.correctAnswers, total: gameData.totalRounds }
-    });
-    throw new Error('Game data validation failed for security reasons');
-  }
-
-  // Sanitize string inputs
-  const difficulty = sanitizeHtml(gameData.difficulty || 'beginner');
-  
-  // Validate difficulty value
-  const allowedDifficulties = ['beginner', 'intermediate', 'advanced', 'expert'];
-  const validDifficulty = allowedDifficulties.includes(difficulty) ? difficulty : 'beginner';
-
   return {
     score: Math.max(0, Math.min(gameData.score, 999999)),
     correctAnswers: Math.max(0, Math.min(gameData.correctAnswers, 999999)),
+    incorrectAnswers: Math.max(0, Math.min(gameData.incorrectAnswers || 0, 999999)),
     totalRounds: Math.max(0, Math.min(gameData.totalRounds, 999999)),
     timeElapsed: Math.max(0, Math.min(gameData.timeElapsed, 999999)),
-    difficulty: validDifficulty,
+    difficulty: gameData.difficulty || 'beginner',
     accuracy: gameData.accuracy || 0,
-    totalQuestions: gameData.totalQuestions || gameData.totalRounds
+    totalQuestions: gameData.totalQuestions || gameData.totalRounds,
+    sessionsPlayed: gameData.sessionsPlayed || 1
   };
 };
 
 export const useSupabaseGameData = () => {
   const { user } = useAuth();
-  const { logAdvancedError } = useAdvancedErrorHandling();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [gameHistory, setGameHistory] = useState<GameSession[]>([]);
 
-  // Enhanced save game session with security validation
+  // Simplified save game session
   const saveGameSession = async (gameData: GameData) => {
     if (!user) {
       console.log('No user logged in, saving to localStorage as fallback');
@@ -66,21 +54,8 @@ export const useSupabaseGameData = () => {
         existingData.push(sessionData);
         localStorage.setItem('loglings-game-history', JSON.stringify(existingData));
       } catch (error) {
-        logAdvancedError(error as Error, {
-          component: 'GameSession',
-          action: 'save',
-          securityLevel: 'medium'
-        });
+        console.error('Error saving to localStorage:', error);
       }
-      return;
-    }
-
-    // Rate limiting for game saves
-    const rateLimitKey = `game-save-${user.id}`;
-    if (!rateLimiter.isAllowed(rateLimitKey, 10, 60000)) { // 10 saves per minute max
-      const remainingTime = rateLimiter.getRemainingTime(rateLimitKey);
-      logSecurityEvent('rate_limit_exceeded', { action: 'game_save', remainingTime });
-      toast.error(`Rate limit exceeded. Please wait ${Math.ceil(remainingTime / 1000)} seconds.`);
       return;
     }
 
@@ -96,62 +71,49 @@ export const useSupabaseGameData = () => {
           correct_answers: sanitizedData.correctAnswers,
           total_rounds: sanitizedData.totalRounds,
           time_elapsed: sanitizedData.timeElapsed,
-          difficulty_level: sanitizedData.difficulty,
+          difficulty_level: sanitizedData.difficulty || 'beginner',
           scenarios_played: []
         })
         .select()
         .maybeSingle();
 
       if (error) {
-        logAdvancedError(new Error('Game session save failed'), {
-          component: 'GameSession',
-          action: 'save',
-          userId: user.id,
-          securityLevel: 'medium',
-          additionalData: sanitizedData
+        console.error('Game session save failed:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save game progress",
+          variant: "destructive"
         });
-        toast.error('Failed to save game progress');
         return;
       }
 
       console.log('Game session saved successfully');
       await loadGameHistory();
-      toast.success('Game progress saved! 🌟');
+      toast({
+        title: "Success",
+        description: "Game progress saved! 🌟"
+      });
       
     } catch (error) {
-      logAdvancedError(error as Error, {
-        component: 'GameSession',
-        action: 'save',
-        userId: user.id,
-        securityLevel: 'high',
-        additionalData: gameData
+      console.error('Error saving game session:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save game progress",
+        variant: "destructive"
       });
-      toast.error('Failed to save game progress');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Enhanced load game history with security validation
+  // Simplified load game history
   const loadGameHistory = async () => {
     if (!user) {
       try {
         const localData = JSON.parse(localStorage.getItem('loglings-game-history') || '[]');
-        // Validate local data for security
-        const validatedData = localData.filter((session: any) => {
-          try {
-            return validateGameScore(session.score || 0, session.correct_answers || 0, session.total_rounds || 0);
-          } catch {
-            return false;
-          }
-        });
-        setGameHistory(validatedData);
+        setGameHistory(localData);
       } catch (error) {
-        logAdvancedError(error as Error, {
-          component: 'GameSession',
-          action: 'load',
-          securityLevel: 'low'
-        });
+        console.error('Error loading from localStorage:', error);
         setGameHistory([]);
       }
       return;
@@ -167,48 +129,25 @@ export const useSupabaseGameData = () => {
         .limit(50);
 
       if (error) {
-        logAdvancedError(new Error('Game history load failed'), {
-          component: 'GameSession',
-          action: 'load',
-          userId: user.id,
-          securityLevel: 'medium'
-        });
+        console.error('Game history load failed:', error);
         return;
       }
 
-      // Validate loaded data for security
-      const validatedData = data?.filter(session => {
-        try {
-          return validateGameScore(session.score, session.correct_answers, session.total_rounds);
-        } catch {
-          logSecurityEvent('suspicious_input', { 
-            reason: 'invalid_stored_game_data',
-            sessionId: session.id 
-          });
-          return false;
-        }
-      }) || [];
-
-      const transformedData = validatedData.map(session => ({
+      const transformedData = data?.map(session => ({
         ...session,
         scenarios_played: session.scenarios_played || []
-      }));
+      })) || [];
 
       setGameHistory(transformedData);
       
     } catch (error) {
-      logAdvancedError(error as Error, {
-        component: 'GameSession',
-        action: 'load',
-        userId: user.id,
-        securityLevel: 'medium'
-      });
+      console.error('Error loading game history:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Enhanced update user progress with security validation
+  // Simplified update user progress
   const updateUserProgress = async (gameData: GameData) => {
     if (!user) return;
 
@@ -222,12 +161,7 @@ export const useSupabaseGameData = () => {
         .maybeSingle();
 
       if (fetchError) {
-        logAdvancedError(new Error('User progress fetch failed'), {
-          component: 'UserProgress',
-          action: 'fetch',
-          userId: user.id,
-          securityLevel: 'medium'
-        });
+        console.error('User progress fetch failed:', fetchError);
         return;
       }
 
@@ -235,16 +169,6 @@ export const useSupabaseGameData = () => {
         const newTotalSessions = currentProgress.total_sessions + 1;
         const newTotalScore = currentProgress.total_score + sanitizedData.score;
         const newCorrectAnswers = currentProgress.correct_answers + sanitizedData.correctAnswers;
-        
-        // Validate progress calculations for security
-        if (newTotalSessions < 0 || newTotalScore < 0 || newCorrectAnswers < 0) {
-          logSecurityEvent('suspicious_input', { 
-            reason: 'invalid_progress_calculation',
-            current: currentProgress,
-            new: { newTotalSessions, newTotalScore, newCorrectAnswers }
-          });
-          return;
-        }
         
         const lastSessionDate = new Date(currentProgress.updated_at).toDateString();
         const today = new Date().toDateString();
@@ -272,24 +196,13 @@ export const useSupabaseGameData = () => {
           .eq('user_id', user.id);
 
         if (updateError) {
-          logAdvancedError(new Error('User progress update failed'), {
-            component: 'UserProgress',
-            action: 'update',
-            userId: user.id,
-            securityLevel: 'medium'
-          });
+          console.error('User progress update failed:', updateError);
         } else {
           console.log('User progress updated successfully');
         }
       }
     } catch (error) {
-      logAdvancedError(error as Error, {
-        component: 'UserProgress',
-        action: 'update',
-        userId: user.id,
-        securityLevel: 'high',
-        additionalData: gameData
-      });
+      console.error('Error updating user progress:', error);
     }
   };
 

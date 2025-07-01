@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ThreatLevel } from '../utils/logGenerator';
 import { generateAdvancedScenario } from '../utils/expandedScenarioDatabase';
@@ -258,7 +257,11 @@ export const useEnhancedGameLogic = (
       }
     }
 
-    const enhancedFeedback = getEnhancedFeedback(playerChoice, currentLog, answerIsCorrect);
+    const enhancedFeedback = getEnhancedFeedback(
+      playerChoice, 
+      currentLog, 
+      answerIsCorrect
+    );
     
     setScore(prev => prev + pointsEarned);
     setFeedback(enhancedFeedback);
@@ -275,20 +278,23 @@ export const useEnhancedGameLogic = (
       });
       
       // Update achievement tracker
-      const gameData = {
+      const finalCorrectAnswers = correctAnswers + (answerIsCorrect ? 1 : 0);
+      const gameData: GameData = {
         score: score + pointsEarned,
         accuracy: finalAccuracy,
         timeElapsed,
-        correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
+        correctAnswers: finalCorrectAnswers,
+        incorrectAnswers: totalRounds - finalCorrectAnswers,
         totalQuestions: totalRounds,
         totalRounds,
+        sessionsPlayed: 1,
         difficulty: calculateOptimalDifficulty()
       };
       
       achievementTracker.updateProgress(gameData, {
         totalSessions: 1, // This would come from user profile
         currentStreak: 1, // This would come from user profile
-        correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0)
+        correctAnswers: finalCorrectAnswers
       });
       
       setTimeout(() => {
