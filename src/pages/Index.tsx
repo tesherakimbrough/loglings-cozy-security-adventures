@@ -1,145 +1,254 @@
-import React, { useState } from 'react';
-import GameIntro from '../components/GameIntro';
-import AdvancedGamePlay from '../components/AdvancedGamePlay';
-import GameResults from '../components/GameResults';
-import ImprovedOnboarding from '../components/ImprovedOnboarding';
-import FeedbackCollectionSystem from '../components/FeedbackCollectionSystem';
-import GameErrorBoundary from '../components/GameErrorBoundary';
-import BetaLaunchBanner from '../components/BetaLaunchBanner';
-import { ResponsiveWrapper } from '../components/ResponsiveWrapper';
-import { UserMode } from '../types/userTypes';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import { useUserProfile } from '../hooks/useUserProfile';
-import { useMobileOptimization } from '../hooks/useMobileOptimization';
+import { useGameData } from '../hooks/useGameData';
 import { useI18n } from '../hooks/useI18n';
+import { useSoundFeedback } from '../hooks/useSoundFeedback';
+import GamePlay from '../components/GamePlay';
+import GameResults from '../components/GameResults';
+import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/components/ModeToggle';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/hooks/use-toast"
+import { useMonetizationTracking } from '@/hooks/useMonetizationTracking';
+import UsageTrackingDisplay from '../components/UsageTrackingDisplay';
+import PremiumPrompt from '../components/PremiumPrompt';
+import { useFeedbackAndPremium } from '../hooks/useFeedbackAndPremium';
+import { useUsageTracking } from '../hooks/useUsageTracking';
 
-export interface GameData {
+interface GameData {
   score: number;
-  accuracy: number;
   timeElapsed: number;
   correctAnswers: number;
-  totalQuestions: number;
-  totalRounds: number;
-  difficulty: string;
+  incorrectAnswers: number;
+  sessionsPlayed: number;
 }
 
 type GameState = 'intro' | 'playing' | 'results';
+type UserMode = 'cozy-everyday' | 'pro-challenge';
 
 const Index = () => {
-  const { t } = useI18n();
+  const { isAuthenticated, signOut } = useAuth();
+  const { profile, isLoading: isProfileLoading } = useUserProfile();
+  const { gameData, resetGameData, updateGameData } = useGameData();
+  const { t, changeLanguage, currentLanguage } = useI18n();
+  const { playSound } = useSoundFeedback();
+  const navigate = useNavigate();
+  const { trackPremiumInquiry } = useMonetizationTracking();
   
+  const { shouldShowPremiumPrompt, markPromptShown, markPromptDismissed, handleUpgrade } = useFeedbackAndPremium();
+  const { isLimitReached, usage } = useUsageTracking();
+  const [showPremiumPrompt, setShowPremiumPrompt] = useState(false);
+  const [premiumPromptTrigger, setPremiumPromptTrigger] = useState<'sessions' | 'achievement' | 'score' | 'usage_limit'>('sessions');
   const [gameState, setGameState] = useState<GameState>('intro');
-  const [gameData, setGameData] = useState<GameData | null>(null);
   const [userMode, setUserMode] = useState<UserMode>('cozy-everyday');
-  const [showFeedback, setShowFeedback] = useState(false);
-  const { profile } = useUserProfile();
-  const { shouldUseCompactLayout } = useMobileOptimization();
 
-  const handleStartGame = (mode: UserMode) => {
-    setUserMode(mode);
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/auth');
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    // Load previous session data on mount
+    const savedSessions = localStorage.getItem('loglings-session-history');
+    if (savedSessions) {
+      const sessions = JSON.parse(savedSessions);
+      updateGameData({ sessionsPlayed: sessions.length });
+    }
+  }, [updateGameData]);
+
+  // Check for premium prompt triggers
+  useEffect(() => {
+    if (gameState === 'intro') {
+      // Check for usage limit prompt
+      if (isLimitReached('scenariosPerDay') && shouldShowPremiumPrompt('usage_limit')) {
+        setPremiumPromptTrigger('usage_limit');
+        setShowPremiumPrompt(true);
+        markPromptShown('usage_limit');
+      }
+      // Check for session-based prompt
+      else if (shouldShowPremiumPrompt('sessions', gameData.sessionsPlayed)) {
+        setPremiumPromptTrigger('sessions');
+        setShowPremiumPrompt(true);
+        markPromptShown('sessions');
+      }
+    }
+  }, [gameState, gameData.sessionsPlayed, isLimitReached, shouldShowPremiumPrompt, markPromptShown]);
+
+  const handleStartGame = () => {
+    playSound('start');
     setGameState('playing');
   };
 
-  const handleEndGame = (data: GameData) => {
-    setGameData(data);
+  const handleEndGame = (newGameData: GameData) => {
+    playSound('complete');
     setGameState('results');
+
+    // Update game data with results
+    updateGameData(newGameData);
+
+    // Save session to history
+    const savedSessions = localStorage.getItem('loglings-session-history');
+    const sessions = savedSessions ? JSON.parse(savedSessions) : [];
+    sessions.push({
+      ...newGameData,
+      date: new Date().toISOString()
+    });
+    localStorage.setItem('loglings-session-history', JSON.stringify(sessions));
+
+    // Update sessions played count
+    updateGameData({ sessionsPlayed: sessions.length });
   };
 
   const handlePlayAgain = () => {
-    setGameData(null);
+    playSound('start');
+    resetGameData();
+    setGameState('playing');
+  };
+
+  const handleEndSession = () => {
+    playSound('end');
+    resetGameData();
     setGameState('intro');
   };
 
-  const handleBackToHome = () => {
-    // Save any current progress if needed
-    setGameData(null);
-    setGameState('intro');
+  const handleLanguageChange = (lang: string) => {
+    changeLanguage(lang);
   };
 
-  const handleGameError = (error: Error, errorInfo: any) => {
-    console.error('Game error caught by boundary:', error, errorInfo);
-    
-    // Save current state for recovery
-    const recoveryData = {
-      gameState,
-      userMode,
-      gameData,
-      timestamp: new Date().toISOString(),
-      error: error.message
-    };
-    localStorage.setItem('loglings-error-recovery', JSON.stringify(recoveryData));
+  const handlePremiumPromptDismiss = () => {
+    setShowPremiumPrompt(false);
+    markPromptDismissed();
   };
 
-  // Listen for feedback trigger events
-  React.useEffect(() => {
-    const handleFeedbackEvent = () => {
-      setShowFeedback(true);
-    };
-    
-    window.addEventListener('loglings-open-feedback', handleFeedbackEvent);
-    return () => window.removeEventListener('loglings-open-feedback', handleFeedbackEvent);
-  }, []);
+  const handlePremiumUpgrade = () => {
+    setShowPremiumPrompt(false);
+    handleUpgrade();
+  };
 
   return (
-    <ResponsiveWrapper>
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        {/* Global Error Boundary */}
-        <GameErrorBoundary onError={handleGameError}>
-          {/* Improved Onboarding Tutorial */}
-          <ImprovedOnboarding />
-          
-          {/* Beta Launch Banner */}
-          {gameState === 'intro' && (
-            <div className={`p-2 md:p-4 ${shouldUseCompactLayout ? 'px-4' : ''}`}>
-              <BetaLaunchBanner />
-            </div>
-          )}
-          
-          {gameState === 'intro' && (
-            <GameIntro onStartGame={handleStartGame} userMode={userMode} />
-          )}
-          
-          {gameState === 'playing' && (
-            <GameErrorBoundary onError={handleGameError}>
-              <AdvancedGamePlay 
-                onEndGame={handleEndGame} 
-                onBackToHome={handleBackToHome}
-                userMode={userMode} 
-              />
-            </GameErrorBoundary>
-          )}
-          
-          {gameState === 'results' && gameData && (
-            <GameErrorBoundary onError={handleGameError}>
-              <div className="p-2 md:p-4">
-                <GameResults 
-                  gameData={gameData} 
-                  onRestart={handlePlayAgain}
-                  userMode={userMode}
-                />
-                <FeedbackCollectionSystem
-                  trigger="post-session"
-                  onSubmit={() => {}}
-                  onClose={() => {}}
-                />
-              </div>
-            </GameErrorBoundary>
-          )}
+    <div className="min-h-screen bg-background">
+      <header className="bg-secondary py-2 md:py-4">
+        <div className="container mx-auto px-4 flex items-center justify-between">
+          <h1 className="text-xl md:text-2xl font-bold text-primary">
+            Logling Forest 🌲
+          </h1>
 
-          {/* Global Feedback System */}
-          {showFeedback && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-              <div className="w-full max-w-md">
-                <FeedbackCollectionSystem
-                  trigger="manual"
-                  onSubmit={() => setShowFeedback(false)}
-                  onClose={() => setShowFeedback(false)}
-                />
-              </div>
+          <nav className="flex items-center space-x-4 md:space-x-6">
+            <ModeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <Avatar className="h-8 w-8">
+                    {isProfileLoading ? (
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                    ) : (
+                      <>
+                        <AvatarImage src={profile?.avatar} alt={profile?.name} />
+                        <AvatarFallback>{profile?.name?.charAt(0)}</AvatarFallback>
+                      </>
+                    )}
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => navigate('/waitlist')}>
+                  {t.profile}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/pricing')}>
+                  {t.pricing}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel>
+                  {t.language}: {currentLanguage}
+                </DropdownMenuLabel>
+                <DropdownMenuItem onClick={() => handleLanguageChange('en')}>
+                  English
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleLanguageChange('es')}>
+                  Español
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>
+                  {t.signOut}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </nav>
+        </div>
+      </header>
+      
+      <main className="container mx-auto px-4 py-8">
+        {gameState === 'intro' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-primary mb-4">
+                {t.welcome}
+              </h2>
+              <p className="text-muted-foreground leading-relaxed max-w-md mx-auto">
+                {t.introText}
+              </p>
             </div>
-          )}
-        </GameErrorBoundary>
-      </div>
-    </ResponsiveWrapper>
+
+            <div className="flex justify-center space-x-4">
+              <Button onClick={handleStartGame} className="logling-button">
+                {t.startGame}
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/waitlist')}>
+                {t.learnMore}
+              </Button>
+            </div>
+            
+            {/* Add Usage Tracking Display */}
+            <div className="max-w-md mx-auto">
+              <UsageTrackingDisplay />
+            </div>
+            
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground">
+                {t.tip}: {t.customizeProfile}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {gameState === 'playing' && (
+          <GamePlay onEndGame={handleEndGame} userMode={userMode} />
+        )}
+
+        {gameState === 'results' && (
+          <GameResults
+            gameData={gameData}
+            onPlayAgain={handlePlayAgain}
+            onEndSession={handleEndSession}
+          />
+        )}
+      </main>
+
+      {/* Premium Prompt Modal */}
+      {showPremiumPrompt && (
+        <PremiumPrompt
+          trigger={premiumPromptTrigger}
+          onDismiss={handlePremiumPromptDismiss}
+          onUpgrade={handlePremiumUpgrade}
+          sessionsPlayed={gameData.sessionsPlayed}
+          currentScore={gameData.score}
+          limitType={premiumPromptTrigger === 'usage_limit' ? 'Daily scenarios' : undefined}
+        />
+      )}
+    </div>
   );
 };
 
