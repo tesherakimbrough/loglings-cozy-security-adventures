@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
-import { MusicType, DEFAULT_MUSIC_TYPE } from '../types/musicTypes';
+import { MusicType } from '../types/musicTypes';
 import { audioTracks } from '../config/audioTracks';
 
 export const useRealAudio = () => {
@@ -12,10 +12,9 @@ export const useRealAudio = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicType | null>(null);
   const currentHowlRef = useRef<Howl | null>(null);
 
-  const getCurrentTrackInfo = useCallback((trackId: MusicType) => {
-    const foundTrack = audioTracks.find(track => track.id === trackId);
-    return foundTrack || audioTracks.find(track => track.id === 'silence') || audioTracks[0];
-  }, []);
+  const getCurrentTrackInfo = (trackId: MusicType) => {
+    return audioTracks.find(track => track.id === trackId) || audioTracks[0];
+  };
 
   const stopMusic = useCallback(async (): Promise<void> => {
     return new Promise((resolve) => {
@@ -65,7 +64,7 @@ export const useRealAudio = () => {
       const trackInfo = getCurrentTrackInfo(trackId);
       
       if (!trackInfo.audioUrl) {
-        console.log('No audio file specified, playing silence mode for:', trackId);
+        console.log('No audio file specified, playing silence mode');
         setCurrentTrack('silence');
         setIsPlaying(true);
         setIsLoading(false);
@@ -89,14 +88,14 @@ export const useRealAudio = () => {
           setCurrentTrack('silence');
           setIsPlaying(true);
           setIsLoading(false);
-          setError(null);
+          setError(null); // Don't show error for missing files
         },
         onplayerror: (id, error) => {
           console.log('Audio playback failed, falling back to silence mode:', error);
           setCurrentTrack('silence');
           setIsPlaying(true);
           setIsLoading(false);
-          setError(null);
+          setError(null); // Don't show error for playback issues
         }
       });
       
@@ -108,7 +107,7 @@ export const useRealAudio = () => {
       setCurrentTrack('silence');
       setIsPlaying(true);
       setIsLoading(false);
-      setError(null);
+      setError(null); // Graceful fallback instead of error
     }
   }, [stopMusic, getCurrentTrackInfo]);
 

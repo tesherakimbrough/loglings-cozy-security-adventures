@@ -26,7 +26,7 @@ export const useAudioSystem = () => {
   const currentHowlRef = useRef<Howl | null>(null);
 
   const getCurrentTrackInfo = useCallback((trackId: MusicType) => {
-    return audioTracks.find(track => track.id === trackId) || audioTracks.find(track => track.id === 'silence') || audioTracks[0];
+    return audioTracks.find(track => track.id === trackId) || audioTracks[0];
   }, []);
 
   const stopMusic = useCallback(async (): Promise<void> => {

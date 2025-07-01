@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Play, Pause, Volume2, Loader2 } from 'lucide-react';
 import { useRealAudio } from '../hooks/useRealAudio';
 import { useEnhancedProgress } from '../hooks/useEnhancedProgress';
-import { MusicType } from '../types/musicTypes';
 
 const MusicControlBar = () => {
   const { progress } = useEnhancedProgress();

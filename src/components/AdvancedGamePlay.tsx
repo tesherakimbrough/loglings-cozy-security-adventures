@@ -9,7 +9,7 @@ import FeedbackCollectionSystem from './FeedbackCollectionSystem';
 import GameSettings from './GameSettings';
 import { useAdvancedGameLogic } from '../hooks/useAdvancedGameLogic';
 import { UserMode } from '../types/userTypes';
-import { GameData } from '../types/gameTypes';
+import { GameData } from '../pages/Index';
 import { useI18n } from '../hooks/useI18n';
 
 interface AdvancedGamePlayProps {

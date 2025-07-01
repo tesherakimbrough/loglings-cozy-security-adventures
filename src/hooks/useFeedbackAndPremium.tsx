@@ -42,7 +42,7 @@ export const useFeedbackAndPremium = () => {
   };
 
   const shouldShowPremiumPrompt = (
-    type: 'sessions' | 'score' | 'achievement' | 'usage_limit',
+    type: 'sessions' | 'score' | 'achievement',
     sessionsPlayed?: number,
     currentScore?: number
   ): boolean => {
@@ -63,14 +63,12 @@ export const useFeedbackAndPremium = () => {
         return !feedbackState.hasShownScorePrompt && (currentScore || 0) >= 100;
       case 'achievement':
         return !feedbackState.hasShownAchievementPrompt;
-      case 'usage_limit':
-        return true; // Always show when usage limit is reached
       default:
         return false;
     }
   };
 
-  const markPromptShown = (type: 'sessions' | 'score' | 'achievement' | 'usage_limit') => {
+  const markPromptShown = (type: 'sessions' | 'score' | 'achievement') => {
     const newState = {
       ...feedbackState,
       lastPromptDate: new Date().toISOString()
@@ -85,9 +83,6 @@ export const useFeedbackAndPremium = () => {
         break;
       case 'achievement':
         newState.hasShownAchievementPrompt = true;
-        break;
-      case 'usage_limit':
-        // Don't permanently mark as shown, allow it to show again when limit is reached
         break;
     }
 

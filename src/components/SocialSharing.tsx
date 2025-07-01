@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import { Share2, Download, Copy, Check, Camera, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { GameData } from '../types/gameTypes';
+import { GameData } from '../pages/Index';
 
 interface SocialSharingProps {
   gameData: GameData;

@@ -1,10 +1,10 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { AdvancedScenario } from '../utils/advancedScenarioDatabase';
 import { useAudioSystem } from './useAudioSystem';
 import { useEnhancedErrorHandling } from './useEnhancedErrorHandling';
 import { UserMode } from '../types/userTypes';
-import { GameData } from '../types/gameTypes';
-import { MusicType } from '../types/musicTypes';
+import { GameData } from '../pages/Index';
 import { 
   generateScenarioWithFallbacks, 
   createUltimateFallbackScenario,
@@ -148,16 +148,13 @@ export const useAdvancedGameLogic = (
 
       if (currentRound >= totalRounds) {
         setTimeout(() => {
-          const finalCorrectAnswers = correctAnswers + (answerIsCorrect ? 1 : 0);
           onEndGame({
             score: score + pointsEarned,
-            accuracy: (finalCorrectAnswers / totalRounds) * 100,
+            accuracy: ((correctAnswers + (answerIsCorrect ? 1 : 0)) / totalRounds) * 100,
             timeElapsed,
-            correctAnswers: finalCorrectAnswers,
-            incorrectAnswers: totalRounds - finalCorrectAnswers,
+            correctAnswers: correctAnswers + (answerIsCorrect ? 1 : 0),
             totalQuestions: totalRounds,
             totalRounds,
-            sessionsPlayed: 1,
             difficulty
           });
         }, 3000);
