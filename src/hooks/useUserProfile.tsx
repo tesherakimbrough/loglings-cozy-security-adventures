@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { UserProfile, UserMode, DifficultyLevel } from '../types/userTypes';
+import { MusicType } from '../types/musicTypes';
 import { useAuth } from './useAuth';
 import { useSupabaseUserProfile } from './useSupabaseUserProfile';
 
@@ -11,7 +12,7 @@ const defaultProfile: UserProfile = {
     difficulty: 'beginner' as DifficultyLevel,
     audioEnabled: true,
     soundEffectsEnabled: true,
-    musicType: 'forest',
+    musicType: 'forest' as MusicType,
     musicVolume: 0.3,
     soundEffectsVolume: 0.4,
     notifications: true,
@@ -63,6 +64,7 @@ export const useUserProfile = () => {
               soundEffectsEnabled: parsed.preferences?.soundEffectsEnabled ?? true,
               soundEffectsVolume: parsed.preferences?.soundEffectsVolume ?? 0.4,
               difficulty: (parsed.preferences?.difficulty as DifficultyLevel) || 'beginner',
+              musicType: (parsed.preferences?.musicType as MusicType) || 'forest',
               highContrast: parsed.preferences?.highContrast ?? false,
               reduceMotion: parsed.preferences?.reduceMotion ?? false,
               fontSize: parsed.preferences?.fontSize ?? 'medium',
@@ -103,12 +105,12 @@ export const useUserProfile = () => {
         'cozy-everyday': {
           difficulty: 'beginner' as DifficultyLevel,
           audioEnabled: true,
-          musicType: 'forest'
+          musicType: 'forest' as MusicType
         },
         'career-pro': {
           difficulty: 'advanced' as DifficultyLevel,
           audioEnabled: true,
-          musicType: 'lofi'
+          musicType: 'lofi' as MusicType
         }
       };
 

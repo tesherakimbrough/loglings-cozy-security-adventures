@@ -11,8 +11,7 @@ export const ResponsiveWrapper = ({ children, className = '' }: ResponsiveWrappe
   const { getMobileClasses, shouldUseCompactLayout, shouldShowMobileWarning } = useMobileOptimization();
 
   return (
-    <div className={`w-full min-h-screen ${getMobileClasses()} ${className}`} style={{
-      minHeight: '100vh', // Fallback for older browsers
+    <div className={`w-full ${getMobileClasses()} ${className}`} style={{
       minHeight: '100dvh', // Dynamic viewport height for modern browsers
       paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
       paddingLeft: 'env(safe-area-inset-left)',

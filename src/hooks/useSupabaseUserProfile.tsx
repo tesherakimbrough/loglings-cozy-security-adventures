@@ -1,6 +1,13 @@
 
 import { useSupabaseProfile } from './useSupabaseProfile';
 import { UserProfile } from '../types/userTypes';
+import { MusicType } from '../types/musicTypes';
+
+// Type guard to ensure database string is valid MusicType
+const isMusicType = (value: string): value is MusicType => {
+  const validTypes: MusicType[] = ['forest', 'rain', 'cozy-cafe', 'fireplace', 'lofi', 'silence', 'external'];
+  return validTypes.includes(value as MusicType);
+};
 
 export const useSupabaseUserProfile = () => {
   const { progress, preferences, updateProgress, updatePreferences, loading } = useSupabaseProfile();
@@ -13,7 +20,7 @@ export const useSupabaseUserProfile = () => {
       difficulty: progress.difficulty_level as 'beginner' | 'intermediate' | 'advanced',
       audioEnabled: preferences.audio_enabled,
       soundEffectsEnabled: preferences.sound_effects_enabled,
-      musicType: preferences.music_type,
+      musicType: isMusicType(preferences.music_type) ? preferences.music_type as MusicType : 'forest',
       musicVolume: preferences.music_volume,
       soundEffectsVolume: preferences.sound_effects_volume,
       notifications: preferences.notifications,
@@ -84,12 +91,12 @@ export const useSupabaseUserProfile = () => {
       'cozy-everyday': {
         difficulty_level: 'beginner',
         audio_enabled: true,
-        music_type: 'forest'
+        music_type: 'forest' as MusicType
       },
       'career-pro': {
         difficulty_level: 'advanced',
         audio_enabled: true,
-        music_type: 'lofi'
+        music_type: 'lofi' as MusicType
       }
     };
 
