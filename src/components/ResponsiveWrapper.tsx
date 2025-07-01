@@ -11,9 +11,13 @@ export const ResponsiveWrapper = ({ children, className = '' }: ResponsiveWrappe
   const { getMobileClasses, shouldUseCompactLayout, shouldShowMobileWarning } = useMobileOptimization();
 
   return (
-    <div className={`w-full ${getMobileClasses()} ${className}`} style={{
-      height: '100dvh', // Use dynamic viewport height for modern browsers, fallback handled by CSS
-      overflow: 'hidden'
+    <div className={`w-full min-h-screen ${getMobileClasses()} ${className}`} style={{
+      minHeight: '100vh', // Fallback for older browsers
+      minHeight: '100dvh', // Dynamic viewport height for modern browsers
+      paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
+      paddingLeft: 'env(safe-area-inset-left)',
+      paddingRight: 'env(safe-area-inset-right)',
+      paddingTop: 'env(safe-area-inset-top)'
     }}>
       {shouldShowMobileWarning && (
         <div className="fixed top-0 left-0 right-0 bg-amber-500 text-white p-2 text-xs text-center z-50">
@@ -21,12 +25,11 @@ export const ResponsiveWrapper = ({ children, className = '' }: ResponsiveWrappe
         </div>
       )}
       <div 
-        className={`w-full h-full overflow-y-auto overflow-x-hidden ${shouldUseCompactLayout ? 'space-y-3' : 'space-y-6'}`}
+        className={`w-full min-h-full ${shouldUseCompactLayout ? 'space-y-3' : 'space-y-6'}`}
         style={{
-          paddingBottom: 'max(2rem, env(safe-area-inset-bottom))',
-          paddingLeft: 'env(safe-area-inset-left)',
-          paddingRight: 'env(safe-area-inset-right)',
-          paddingTop: 'env(safe-area-inset-top)'
+          overflowX: 'hidden',
+          overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch' // iOS smooth scrolling
         }}
       >
         {children}

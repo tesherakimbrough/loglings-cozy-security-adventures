@@ -1,7 +1,8 @@
 
 #root {
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   text-align: center;
 }
 
@@ -39,4 +40,70 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Enhanced Mobile Optimization */
+.mobile-optimized {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.touch-device {
+  touch-action: manipulation;
+}
+
+.mobile-xs {
+  --mobile-padding: 0.75rem;
+}
+
+.mobile-sm {
+  --mobile-padding: 1rem;
+}
+
+.mobile-md {
+  --mobile-padding: 1.25rem;
+}
+
+.mobile-lg {
+  --mobile-padding: 1.5rem;
+}
+
+/* Ensure minimum touch targets on mobile */
+@media (max-width: 768px) {
+  button, .button, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  input, textarea, select {
+    min-height: 44px;
+  }
+  
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  /* Better text rendering on mobile */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .mobile-optimized {
+    height: -webkit-fill-available;
+  }
+}
+
+/* Handle notched devices */
+@supports (padding: max(0px)) {
+  .mobile-safe-area {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 }

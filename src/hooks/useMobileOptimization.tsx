@@ -43,7 +43,7 @@ export const useMobileOptimization = () => {
     window.addEventListener('resize', updateMobileState);
     window.addEventListener('orientationchange', () => {
       // Delay to account for orientation change completion
-      setTimeout(updateMobileState, 100);
+      setTimeout(updateMobileState, 150);
     });
     
     return () => {
@@ -52,13 +52,13 @@ export const useMobileOptimization = () => {
     };
   }, [isMobile]);
 
-  // Optimize touch interactions
+  // Optimize touch interactions and prevent iOS zoom
   useEffect(() => {
     if (mobileState.touchSupported) {
       // Add touch-action optimization
       document.body.style.touchAction = 'manipulation';
       
-      // Prevent zoom on double tap
+      // Prevent zoom on double tap for iOS
       let lastTouchEnd = 0;
       const handleTouchEnd = (event: TouchEvent) => {
         const now = new Date().getTime();
@@ -68,22 +68,58 @@ export const useMobileOptimization = () => {
         lastTouchEnd = now;
       };
       
+      // Prevent pinch zoom
+      const handleTouchMove = (event: TouchEvent) => {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      };
+      
       document.addEventListener('touchend', handleTouchEnd, { passive: false });
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
       
       return () => {
         document.removeEventListener('touchend', handleTouchEnd);
+        document.removeEventListener('touchmove', handleTouchMove);
       };
     }
   }, [mobileState.touchSupported]);
+
+  // Handle viewport height changes (especially on iOS Safari)
+  useEffect(() => {
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(setViewportHeight, 150);
+    });
+
+    return () => {
+      window.removeEventListener('resize', setViewportHeight);
+      window.removeEventListener('orientationchange', setViewportHeight);
+    };
+  }, []);
 
   // Provide mobile-specific CSS classes
   const getMobileClasses = () => {
     const classes = [];
     
-    if (mobileState.isMobile) classes.push('mobile-optimized');
+    if (mobileState.isMobile) {
+      classes.push('mobile-optimized');
+      classes.push('touch-device');
+      // Add specific classes for different mobile breakpoints
+      if (mobileState.screenWidth <= 320) classes.push('mobile-xs');
+      else if (mobileState.screenWidth <= 375) classes.push('mobile-sm');
+      else if (mobileState.screenWidth <= 414) classes.push('mobile-md');
+      else classes.push('mobile-lg');
+    }
+    
     if (mobileState.isLandscape) classes.push('landscape-mode');
     if (mobileState.isSmallScreen) classes.push('small-screen');
-    if (mobileState.touchSupported) classes.push('touch-device');
     
     return classes.join(' ');
   };
@@ -92,6 +128,7 @@ export const useMobileOptimization = () => {
     ...mobileState,
     getMobileClasses,
     shouldUseCompactLayout: mobileState.isMobile || mobileState.isSmallScreen,
-    shouldShowMobileWarning: mobileState.isMobile && mobileState.isLandscape && mobileState.screenHeight < 400
+    shouldShowMobileWarning: mobileState.isMobile && mobileState.isLandscape && mobileState.screenHeight < 400,
+    isVerySmallScreen: mobileState.screenWidth <= 320 || mobileState.screenHeight <= 568
   };
 };

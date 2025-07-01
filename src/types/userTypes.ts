@@ -1,4 +1,6 @@
 
+import { MusicType } from './musicTypes';
+
 export type UserMode = 'cozy-everyday' | 'career-pro';
 export type DifficultyLevel = 'beginner' | 'intermediate' | 'advanced';
 
@@ -9,7 +11,7 @@ export interface UserProfile {
     difficulty: DifficultyLevel;
     audioEnabled: boolean;
     soundEffectsEnabled: boolean;
-    musicType: string;
+    musicType: MusicType;
     musicVolume: number;
     soundEffectsVolume: number;
     notifications: boolean;
