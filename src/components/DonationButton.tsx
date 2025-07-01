@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,18 +12,14 @@ const DonationButton = () => {
   const handleDonationClick = (platform: string, amount?: string) => {
     trackPremiumInterest(`donation_${platform}_${amount || 'custom'}`);
     
-    // In a real implementation, these would be actual donation links
     const donationUrls = {
-      kofi: 'https://ko-fi.com/your-username', // Replace with actual Ko-fi URL
-      paypal: 'https://paypal.me/your-username', // Replace with actual PayPal URL
+      kofi: 'https://ko-fi.com/your-username', // Replace with actual Ko-fi URL when ready
+      paypal: 'https://paypal.me/BeautifullySpkn',
       github: 'https://github.com/sponsors/your-username' // Replace with actual GitHub Sponsors URL
     };
 
-    // For now, show a message since these aren't real URLs
-    console.log(`Would redirect to: ${donationUrls[platform as keyof typeof donationUrls]}`);
-    
-    // In production, you'd use:
-    // window.open(donationUrls[platform as keyof typeof donationUrls], '_blank');
+    // Open the donation link in a new tab
+    window.open(donationUrls[platform as keyof typeof donationUrls], '_blank');
     
     setIsOpen(false);
   };
@@ -68,7 +63,7 @@ const DonationButton = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => handleDonationClick('kofi', '3')}
+                onClick={() => handleDonationClick('paypal', '3')}
               >
                 <Coffee className="w-5 h-5" />
                 <span className="text-xs">$3</span>
@@ -77,7 +72,7 @@ const DonationButton = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => handleDonationClick('kofi', '10')}
+                onClick={() => handleDonationClick('paypal', '10')}
               >
                 <TreePine className="w-5 h-5 text-green-600" />
                 <span className="text-xs">$10</span>
@@ -86,7 +81,7 @@ const DonationButton = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => handleDonationClick('kofi', '25')}
+                onClick={() => handleDonationClick('paypal', '25')}
               >
                 <Heart className="w-5 h-5 text-rose-500" />
                 <span className="text-xs">$25</span>
@@ -137,7 +132,6 @@ const DonationButton = () => {
             </div>
           </div>
 
-          {/* What donations support */}
           <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
             <CardContent className="p-4">
               <h5 className="font-medium text-green-800 dark:text-green-200 mb-2">
