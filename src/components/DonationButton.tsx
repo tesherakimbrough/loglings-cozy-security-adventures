@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,17 +10,11 @@ const DonationButton = () => {
   const { trackPremiumInterest } = useLaunchAnalytics();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleDonationClick = (platform: string, amount?: string) => {
-    trackPremiumInterest(`donation_${platform}_${amount || 'custom'}`);
+  const handleDonationClick = (amount?: string) => {
+    trackPremiumInterest(`donation_paypal_${amount || 'custom'}`);
     
-    const donationUrls = {
-      kofi: 'https://ko-fi.com/your-username', // Replace with actual Ko-fi URL when ready
-      paypal: 'https://paypal.me/BeautifullySpkn',
-      github: 'https://github.com/sponsors/your-username' // Replace with actual GitHub Sponsors URL
-    };
-
-    // Open the donation link in a new tab
-    window.open(donationUrls[platform as keyof typeof donationUrls], '_blank');
+    // Open PayPal donation link in a new tab
+    window.open('https://paypal.me/BeautifullySpkn', '_blank');
     
     setIsOpen(false);
   };
@@ -63,7 +58,7 @@ const DonationButton = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => handleDonationClick('paypal', '3')}
+                onClick={() => handleDonationClick('3')}
               >
                 <Coffee className="w-5 h-5" />
                 <span className="text-xs">$3</span>
@@ -72,7 +67,7 @@ const DonationButton = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => handleDonationClick('paypal', '10')}
+                onClick={() => handleDonationClick('10')}
               >
                 <TreePine className="w-5 h-5 text-green-600" />
                 <span className="text-xs">$10</span>
@@ -81,7 +76,7 @@ const DonationButton = () => {
               <Button
                 variant="outline"
                 className="h-auto p-4 flex flex-col gap-2"
-                onClick={() => handleDonationClick('paypal', '25')}
+                onClick={() => handleDonationClick('25')}
               >
                 <Heart className="w-5 h-5 text-rose-500" />
                 <span className="text-xs">$25</span>
@@ -89,46 +84,20 @@ const DonationButton = () => {
               </Button>
             </div>
 
-            {/* Platform options */}
+            {/* PayPal option */}
             <div className="space-y-2">
-              <h5 className="text-sm font-medium text-center">Or choose your platform:</h5>
-              <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={() => handleDonationClick('kofi')}
-                >
-                  <div className="flex items-center gap-2">
-                    <Coffee className="w-4 h-4" />
-                    Ko-fi (Quick & Easy)
-                  </div>
-                  <ExternalLink className="w-4 h-4" />
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={() => handleDonationClick('paypal')}
-                >
-                  <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4" />
-                    PayPal (Any Amount)
-                  </div>
-                  <ExternalLink className="w-4 h-4" />
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  className="w-full justify-between"
-                  onClick={() => handleDonationClick('github')}
-                >
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" />
-                    GitHub Sponsors
-                  </div>
-                  <ExternalLink className="w-4 h-4" />
-                </Button>
-              </div>
+              <h5 className="text-sm font-medium text-center">Or donate any amount:</h5>
+              <Button
+                variant="outline"
+                className="w-full justify-between"
+                onClick={() => handleDonationClick()}
+              >
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4" />
+                  PayPal (Any Amount)
+                </div>
+                <ExternalLink className="w-4 h-4" />
+              </Button>
             </div>
           </div>
 
