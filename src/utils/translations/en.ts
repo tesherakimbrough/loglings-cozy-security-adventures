@@ -59,6 +59,7 @@ export const englishTranslations: Translations = {
   
   // GamePlay
   preparingEnhancedAdventure: "Preparing your enhanced security adventure...",
+  preparingOfflineAdventure: "Preparing your offline adventure...",
   sessionStats: "Session Stats",
   uniqueScenarios: "Unique Scenarios",
   categoriesMastered: "Categories Mastered",

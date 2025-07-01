@@ -57,6 +57,7 @@ export interface Translations {
   
   // GamePlay keys
   preparingEnhancedAdventure: string;
+  preparingOfflineAdventure: string;
   sessionStats: string;
   uniqueScenarios: string;
   categoriesMastered: string;
