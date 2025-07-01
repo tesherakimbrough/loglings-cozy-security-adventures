@@ -4,6 +4,7 @@ import { useAudioSystem } from './useAudioSystem';
 import { useEnhancedErrorHandling } from './useEnhancedErrorHandling';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../types/gameTypes';
+import { MusicType } from '../types/musicTypes';
 import { 
   generateScenarioWithFallbacks, 
   createUltimateFallbackScenario,
