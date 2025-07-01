@@ -12,8 +12,7 @@ export const ResponsiveWrapper = ({ children, className = '' }: ResponsiveWrappe
 
   return (
     <div className={`w-full ${getMobileClasses()} ${className}`} style={{
-      height: '100vh',
-      height: '100dvh', // Dynamic viewport height for modern browsers
+      height: '100dvh', // Use dynamic viewport height for modern browsers, fallback handled by CSS
       overflow: 'hidden'
     }}>
       {shouldShowMobileWarning && (
