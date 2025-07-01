@@ -7,6 +7,7 @@ import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
 import { useAnalytics } from './useAnalytics';
 import { UserMode } from '../types/userTypes';
 import { GameData } from '../types/gameTypes';
+import { MusicType } from '../types/musicTypes';
 import { getBridgeScenario } from '../utils/bridgeScenarios';
 import { achievementTracker } from '../utils/enhancedAchievementSystem';
 
@@ -47,7 +48,7 @@ export const useEnhancedGameLogic = (
   const { todaysChallenge, updateChallengeProgress } = useDailyChallenges();
   const { calculateOptimalDifficulty, updateMetrics, getEncouragementMessage } = useAdaptiveDifficulty();
   const { trackThreatAssessment } = useAnalytics();
-  const totalRounds = 15; // Increased for more comprehensive gameplay
+  const totalRounds = 15;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -66,13 +67,10 @@ export const useEnhancedGameLogic = (
       let attempts = 0;
       let newLog;
       
-      // Enhanced difficulty selection with bridge scenarios
       const accuracy = currentRound > 1 ? (correctAnswers / (currentRound - 1)) * 100 : 100;
       let targetDifficulty = calculateOptimalDifficulty();
       
-      // Use bridge scenarios for smoother progression
       if (accuracy >= 70 && accuracy < 85 && targetDifficulty === 'intermediate') {
-        // Try bridge scenarios first
         const bridgeScenario = getBridgeScenario('beginner-plus', scenariosPlayed);
         if (bridgeScenario) {
           setCurrentLog(bridgeScenario as LogEntry);
@@ -85,7 +83,6 @@ export const useEnhancedGameLogic = (
           return;
         }
       } else if (accuracy >= 85 && accuracy < 95 && targetDifficulty === 'advanced') {
-        // Try pre-intermediate bridge scenarios
         const bridgeScenario = getBridgeScenario('pre-intermediate', scenariosPlayed);
         if (bridgeScenario) {
           setCurrentLog(bridgeScenario as LogEntry);
@@ -99,13 +96,12 @@ export const useEnhancedGameLogic = (
         }
       }
       
-      // Try to avoid repeating scenarios
       do {
         newLog = generateAdvancedScenario(targetDifficulty);
         attempts++;
       } while (
         scenariosPlayed.includes(newLog.id || '') && 
-        attempts < 10 // Prevent infinite loop
+        attempts < 10
       );
       
       setCurrentLog(newLog as LogEntry);
@@ -118,7 +114,6 @@ export const useEnhancedGameLogic = (
       setIsCorrect(null);
     } catch (error) {
       console.error('Error generating enhanced scenario:', error);
-      // Fallback scenario
       setCurrentLog({
         timestamp: new Date().toISOString(),
         sourceIP: '192.168.1.100',
@@ -164,12 +159,10 @@ export const useEnhancedGameLogic = (
         : `${randomLearning} ${log.explanation}`;
     }
     
-    // Add learning tip for educational value
     const learningTip = log.learningTip 
       ? `\n\n💡 Pro tip: ${log.learningTip}`
       : '';
     
-    // Add category insight
     const categoryInsight = log.category
       ? `\n\n🔖 This was a ${log.category.replace('_', ' ')} scenario.`
       : '';
@@ -178,9 +171,8 @@ export const useEnhancedGameLogic = (
   };
 
   const calculateScore = (playerChoice: ThreatLevel, log: LogEntry, isCorrect: boolean, roundTime: number) => {
-    if (!isCorrect) return -5; // Reduced penalty to encourage learning
+    if (!isCorrect) return -5;
     
-    // Base scoring system
     const basePoints = {
       'safe': 50,
       'warning': 75,
@@ -189,7 +181,6 @@ export const useEnhancedGameLogic = (
     
     let points = basePoints[log.threatLevel] || 50;
     
-    // Difficulty multiplier
     const difficultyMultiplier = {
       'beginner': 1.0,
       'intermediate': 1.5,
@@ -197,14 +188,12 @@ export const useEnhancedGameLogic = (
     };
     points *= difficultyMultiplier[log.difficulty as keyof typeof difficultyMultiplier] || 1.0;
     
-    // Speed bonus (under 45 seconds)
     if (roundTime < 45) {
       points += Math.floor(points * 0.3);
     } else if (roundTime < 30) {
       points += Math.floor(points * 0.5);
     }
     
-    // Accuracy streak bonus
     const recentCorrect = correctAnswers >= 3;
     if (recentCorrect) {
       points += Math.floor(points * 0.2);
@@ -217,19 +206,16 @@ export const useEnhancedGameLogic = (
     if (!currentLog) return;
 
     const answerIsCorrect = playerChoice === currentLog.threatLevel;
-    const roundTime = timeElapsed - ((currentRound - 1) * 45); // Estimate per round
+    const roundTime = timeElapsed - ((currentRound - 1) * 45);
     
-    // Track the assessment for analytics
     trackThreatAssessment(answerIsCorrect, currentLog.threatLevel);
 
-    // Enhanced scoring system
     const pointsEarned = calculateScore(playerChoice, currentLog, answerIsCorrect, roundTime);
     
     if (answerIsCorrect) {
       playSuccessSound();
       setCorrectAnswers(prev => prev + 1);
       
-      // Track category performance
       if (currentLog.category) {
         setCorrectByCategory(prev => ({
           ...prev,
@@ -240,7 +226,6 @@ export const useEnhancedGameLogic = (
       playErrorSound();
     }
 
-    // Enhanced daily challenge progress tracking
     if (todaysChallenge && answerIsCorrect) {
       if (todaysChallenge.type === 'accuracy') {
         const currentAccuracy = ((correctAnswers + 1) / currentRound) * 100;
@@ -269,7 +254,6 @@ export const useEnhancedGameLogic = (
     setShowNextRound(true);
 
     if (currentRound >= totalRounds) {
-      // Update adaptive difficulty metrics
       const finalAccuracy = ((correctAnswers + (answerIsCorrect ? 1 : 0)) / totalRounds) * 100;
       updateMetrics({
         accuracy: finalAccuracy,
@@ -277,7 +261,6 @@ export const useEnhancedGameLogic = (
         correctByCategory
       });
       
-      // Update achievement tracker
       const finalCorrectAnswers = correctAnswers + (answerIsCorrect ? 1 : 0);
       const gameData: GameData = {
         score: score + pointsEarned,
@@ -292,8 +275,8 @@ export const useEnhancedGameLogic = (
       };
       
       achievementTracker.updateProgress(gameData, {
-        totalSessions: 1, // This would come from user profile
-        currentStreak: 1, // This would come from user profile
+        totalSessions: 1,
+        currentStreak: 1,
         correctAnswers: finalCorrectAnswers
       });
       
