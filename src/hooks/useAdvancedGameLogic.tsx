@@ -4,7 +4,7 @@ import { AdvancedScenario } from '../utils/advancedScenarioDatabase';
 import { useAudioSystem } from './useAudioSystem';
 import { useEnhancedErrorHandling } from './useEnhancedErrorHandling';
 import { UserMode } from '../types/userTypes';
-import { GameData } from '../pages/Index';
+import { GameData } from '../types/gameTypes';
 import { 
   generateScenarioWithFallbacks, 
   createUltimateFallbackScenario,

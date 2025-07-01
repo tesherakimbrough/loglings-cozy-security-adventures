@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ThreatLevel } from '../utils/logGenerator';
 import { generateAdvancedScenario } from '../utils/expandedScenarioDatabase';
@@ -6,7 +7,7 @@ import { useDailyChallenges } from './useDailyChallenges';
 import { useAdaptiveDifficulty } from './useAdaptiveDifficulty';
 import { useAnalytics } from './useAnalytics';
 import { UserMode } from '../types/userTypes';
-import { GameData } from '../pages/Index';
+import { GameData } from '../types/gameTypes';
 import { getBridgeScenario } from '../utils/bridgeScenarios';
 import { achievementTracker } from '../utils/enhancedAchievementSystem';
 

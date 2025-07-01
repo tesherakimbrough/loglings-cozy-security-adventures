@@ -27,9 +27,9 @@ import PremiumPrompt from '../components/PremiumPrompt';
 import { useFeedbackAndPremium } from '../hooks/useFeedbackAndPremium';
 import { useUsageTracking } from '../hooks/useUsageTracking';
 import { GameData } from '../types/gameTypes';
+import { UserMode } from '../types/userTypes';
 
 type GameState = 'intro' | 'playing' | 'results';
-type UserMode = 'cozy-everyday' | 'pro-challenge';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -81,12 +81,12 @@ const Index = () => {
   }, [gameState, gameData.sessionsPlayed, isLimitReached, shouldShowPremiumPrompt, markPromptShown]);
 
   const handleStartGame = () => {
-    playTrack('lofi-beats');
+    playTrack('lofi');
     setGameState('playing');
   };
 
   const handleEndGame = (newGameData: GameData) => {
-    playTrack('forest-ambience');
+    playTrack('forest');
     setGameState('results');
 
     // Update game data with results
@@ -106,7 +106,7 @@ const Index = () => {
   };
 
   const handlePlayAgain = () => {
-    playTrack('lofi-beats');
+    playTrack('lofi');
     resetGameData();
     setGameState('playing');
   };
@@ -149,8 +149,8 @@ const Index = () => {
                       <Skeleton className="h-8 w-8 rounded-full" />
                     ) : (
                       <>
-                        <AvatarImage src={profile?.display_name} alt={profile?.display_name} />
-                        <AvatarFallback>{profile?.display_name?.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={profile?.preferences?.musicType} alt={profile?.mode} />
+                        <AvatarFallback>{profile?.mode?.charAt(0).toUpperCase()}</AvatarFallback>
                       </>
                     )}
                   </Avatar>
@@ -219,14 +219,14 @@ const Index = () => {
         )}
 
         {gameState === 'playing' && (
-          <GamePlay onEndGame={handleEndGame} userMode={userMode as any} />
+          <GamePlay onEndGame={handleEndGame} userMode={userMode} />
         )}
 
         {gameState === 'results' && (
           <GameResults
             gameData={gameData}
             onRestart={handlePlayAgain}
-            userMode={userMode as any}
+            userMode={userMode}
           />
         )}
       </main>

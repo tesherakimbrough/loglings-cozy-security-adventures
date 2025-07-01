@@ -1,5 +1,5 @@
 
-export type MusicType = 'forest' | 'rain' | 'cozy-cafe' | 'fireplace' | 'lofi' | 'silence' | 'external';
+export type MusicType = 'forest' | 'rain' | 'cozy-cafe' | 'fireplace' | 'lofi' | 'silence' | 'external' | 'lofi-beats' | 'forest-ambience';
 
 export interface AudioTrack {
   id: MusicType;

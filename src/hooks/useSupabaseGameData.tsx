@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { GameData } from '../pages/Index';
-import { toast } from 'sonner';
-import { validateGameScore, sanitizeHtml, validateTextInput, rateLimiter, logSecurityEvent } from '../utils/securityUtils';
-import { useAdvancedErrorHandling } from './useAdvancedErrorHandling';
+import { useSupabaseProfile } from './useSupabaseProfile';
+import { GameData } from '../types/gameTypes';
 
 interface GameSession {
   id: string;
