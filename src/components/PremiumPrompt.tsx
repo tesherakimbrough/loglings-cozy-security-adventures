@@ -3,15 +3,18 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Crown, Sparkles, TreePine, Heart, X } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import { Crown, Sparkles, TreePine, Heart, X, Lock, ArrowRight, Star } from 'lucide-react';
+import { useUsageTracking } from '../hooks/useUsageTracking';
 
 interface PremiumPromptProps {
-  trigger: 'sessions' | 'achievement' | 'score';
+  trigger: 'sessions' | 'achievement' | 'score' | 'usage_limit';
   onDismiss: () => void;
   onUpgrade: () => void;
   sessionsPlayed?: number;
   currentScore?: number;
   achievement?: string;
+  limitType?: string;
 }
 
 const PremiumPrompt = ({ 
@@ -20,45 +23,60 @@ const PremiumPrompt = ({
   onUpgrade, 
   sessionsPlayed = 0,
   currentScore = 0,
-  achievement 
+  achievement,
+  limitType 
 }: PremiumPromptProps) => {
   const [isVisible, setIsVisible] = useState(true);
+  const { usage, limits, getRemainingUsage } = useUsageTracking();
 
   if (!isVisible) return null;
 
   const getPromptContent = () => {
     switch (trigger) {
+      case 'usage_limit':
+        return {
+          title: "You've reached your daily forest limit! 🌳",
+          subtitle: `${limitType} limit reached`,
+          message: "Your enthusiasm for learning is wonderful! Upgrade to continue your cybersecurity journey without limits.",
+          icon: Lock,
+          color: "text-amber-600",
+          urgency: "high"
+        };
       case 'sessions':
         return {
           title: "You're becoming quite the Logling whisperer! 🌟",
           subtitle: `${sessionsPlayed} peaceful adventures completed`,
-          message: "Your dedication to learning fills our hearts with joy. Ready to unlock the full forest experience with premium features?",
+          message: "Your dedication to learning fills our hearts with joy. Ready to unlock the full forest experience?",
           icon: TreePine,
-          color: "text-green-600"
+          color: "text-green-600",
+          urgency: "medium"
         };
       case 'achievement':
         return {
-          title: "You've earned early access to premium features! ✨",
-          subtitle: `Achievement unlocked: ${achievement}`,
-          message: "Your wisdom and curiosity have impressed the Forest Elder. Claim your special access to enhanced learning paths!",
+          title: "Achievement unlocked! Time to level up! ✨",
+          subtitle: `Achievement: ${achievement}`,
+          message: "Your progress shows you're ready for advanced features. Unlock premium scenarios and deeper insights!",
           icon: Crown,
-          color: "text-amber-600"
+          color: "text-amber-600",
+          urgency: "medium"
         };
       case 'score':
         return {
-          title: "Ready to unlock the full forest experience? 🏆",
-          subtitle: `Outstanding performance: ${currentScore} joy collected`,
-          message: "Your mastery brings such harmony to our digital grove. Discover what awaits in the deeper forest paths!",
-          icon: Sparkles,
-          color: "text-purple-600"
+          title: "Outstanding performance! 🏆",
+          subtitle: `${currentScore} points earned`,
+          message: "Your mastery deserves recognition. Discover advanced scenarios and detailed analytics in premium!",
+          icon: Star,
+          color: "text-purple-600",
+          urgency: "low"
         };
       default:
         return {
           title: "Join our Premium Forest Community! 🌸",
-          subtitle: "Exclusive early access",
-          message: "Support our cozy learning mission and unlock special features created just for nature-loving learners like you.",
+          subtitle: "Exclusive access awaits",
+          message: "Support our cozy learning mission and unlock features created for dedicated learners like you.",
           icon: Heart,
-          color: "text-rose-600"
+          color: "text-rose-600",
+          urgency: "low"
         };
     }
   };
@@ -71,9 +89,18 @@ const PremiumPrompt = ({
     onDismiss();
   };
 
+  const premiumFeatures = [
+    { name: 'Unlimited daily scenarios', value: '∞ vs 10/day' },
+    { name: 'Premium scenario library', value: '200+ exclusive' },
+    { name: 'Complete audio collection', value: '20+ cozy tracks' },
+    { name: 'Advanced learning paths', value: 'Personalized routes' },
+    { name: 'Detailed progress analytics', value: 'Export & insights' },
+    { name: 'Priority support', value: 'Get help faster' }
+  ];
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg cozy-card animate-scale-in relative">
+      <Card className="w-full max-w-2xl cozy-card animate-scale-in relative">
         <Button
           variant="ghost"
           size="sm"
@@ -85,7 +112,7 @@ const PremiumPrompt = ({
 
         <CardHeader className="text-center pb-4">
           <div className="mx-auto mb-4 w-20 h-20 bg-gradient-to-br from-amber-400 to-rose-400 rounded-full flex items-center justify-center animate-gentle-bounce">
-            <IconComponent className={`w-10 h-10 text-white`} />
+            <IconComponent className="w-10 h-10 text-white" />
           </div>
           
           <div className="space-y-2">
@@ -101,33 +128,58 @@ const PremiumPrompt = ({
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-4">
-          <div className="bg-green-50 dark:bg-green-950/30 rounded-lg p-4 space-y-3">
+        <CardContent className="space-y-6">
+          {trigger === 'usage_limit' && (
+            <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium">Today's Usage</span>
+                <span className="text-sm text-muted-foreground">
+                  {usage.scenariosToday}/{limits.scenariosPerDay}
+                </span>
+              </div>
+              <Progress value={(usage.scenariosToday / limits.scenariosPerDay) * 100} className="h-2 mb-2" />
+              <p className="text-xs text-amber-600 dark:text-amber-400">
+                Resets in {24 - new Date().getHours()} hours, or upgrade for unlimited access
+              </p>
+            </div>
+          )}
+
+          <div className="bg-green-50 dark:bg-green-950/30 rounded-lg p-4 space-y-4">
             <h4 className="font-semibold text-green-700 dark:text-green-300 flex items-center gap-2">
               <Sparkles className="w-4 h-4" />
-              Premium Forest Features
+              What You'll Unlock
             </h4>
-            <ul className="text-sm text-green-600 dark:text-green-400 space-y-1">
-              <li>• 🎵 Complete cozy audio library (60+ ambient tracks)</li>
-              <li>• 🌟 Advanced learning paths & exclusive Loglings</li>
-              <li>• 📊 Detailed progress analytics & insights</li>
-              <li>• 🎁 Early access to new features & content</li>
-              <li>• 💝 Support our mission to make cybersecurity cozy</li>
-            </ul>
+            <div className="space-y-3">
+              {premiumFeatures.map((feature, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
+                    <ArrowRight className="w-3 h-3" />
+                    {feature.name}
+                  </span>
+                  <Badge variant="secondary" className="text-xs">
+                    {feature.value}
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center text-xs">
-            <div className="bg-accent/10 rounded-lg p-2">
-              <div className="font-semibold text-accent">Early Supporter</div>
-              <div className="text-muted-foreground">Pay what feels right</div>
+            <div className="bg-accent/10 rounded-lg p-3 space-y-1">
+              <div className="font-semibold text-accent">Garden Friend</div>
+              <div className="text-lg font-bold">$7</div>
+              <div className="text-muted-foreground">/month</div>
             </div>
-            <div className="bg-primary/10 rounded-lg p-2">
-              <div className="font-semibold text-primary">Garden Friend</div>
-              <div className="text-muted-foreground">$7/month</div>
+            <div className="bg-primary/10 rounded-lg p-3 space-y-1 border-2 border-primary/20">
+              <div className="font-semibold text-primary">Annual Plan</div>
+              <div className="text-lg font-bold">$70</div>
+              <div className="text-muted-foreground">/year</div>
+              <Badge className="bg-green-100 text-green-800 text-xs">Save 17%</Badge>
             </div>
-            <div className="bg-amber-500/10 rounded-lg p-2">
+            <div className="bg-amber-500/10 rounded-lg p-3 space-y-1">
               <div className="font-semibold text-amber-600">Forest Guardian</div>
-              <div className="text-muted-foreground">$15/month</div>
+              <div className="text-lg font-bold">$15</div>
+              <div className="text-muted-foreground">/month</div>
             </div>
           </div>
 
@@ -142,10 +194,17 @@ const PremiumPrompt = ({
             <Button
               onClick={onUpgrade}
               className="flex-1 logling-button"
+              size="lg"
             >
               <Crown className="w-4 h-4 mr-2" />
               Unlock Premium
             </Button>
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">
+              ✨ 30-day money-back guarantee • Cancel anytime • No hidden fees ✨
+            </p>
           </div>
         </CardContent>
       </Card>
