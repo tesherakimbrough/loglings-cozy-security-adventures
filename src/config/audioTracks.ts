@@ -38,6 +38,20 @@ export const audioTracks: AudioTrack[] = [
     audioUrl: '/lofi-beats.mp3'
   },
   {
+    id: 'lofi-beats',
+    name: 'Lofi Hip Hop',
+    emoji: '🎶',
+    description: 'Modern lofi beats for productivity',
+    audioUrl: '' // Will fall back to silence mode
+  },
+  {
+    id: 'forest-ambience',
+    name: 'Deep Forest',
+    emoji: '🌿',
+    description: 'Rich forest soundscape with wildlife',
+    audioUrl: '' // Will fall back to silence mode
+  },
+  {
     id: 'silence',
     name: 'Peaceful Silence',
     emoji: '🔇',

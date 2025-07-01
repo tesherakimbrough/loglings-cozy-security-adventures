@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
 import { MusicType } from '../types/musicTypes';
@@ -12,10 +11,10 @@ export const useRealAudio = () => {
   const [currentTrack, setCurrentTrack] = useState<MusicType | null>(null);
   const currentHowlRef = useRef<Howl | null>(null);
 
-  const getCurrentTrackInfo = (trackId: MusicType) => {
+  const getCurrentTrackInfo = useCallback((trackId: MusicType) => {
     const foundTrack = audioTracks.find(track => track.id === trackId);
     return foundTrack || audioTracks.find(track => track.id === 'silence') || audioTracks[0];
-  };
+  }, []);
 
   const stopMusic = useCallback(async (): Promise<void> => {
     return new Promise((resolve) => {
@@ -56,15 +55,6 @@ export const useRealAudio = () => {
       return;
     }
 
-    // Handle new music types that might not have audio files yet
-    if (trackId === 'lofi-beats' || trackId === 'forest-ambience') {
-      console.log('New music type detected, falling back to silence mode:', trackId);
-      await stopMusic();
-      setCurrentTrack('silence');
-      setIsPlaying(true);
-      return;
-    }
-
     setIsLoading(true);
     setHasUserInteracted(true);
     
@@ -74,7 +64,7 @@ export const useRealAudio = () => {
       const trackInfo = getCurrentTrackInfo(trackId);
       
       if (!trackInfo.audioUrl) {
-        console.log('No audio file specified, playing silence mode');
+        console.log('No audio file specified, playing silence mode for:', trackId);
         setCurrentTrack('silence');
         setIsPlaying(true);
         setIsLoading(false);
@@ -98,14 +88,14 @@ export const useRealAudio = () => {
           setCurrentTrack('silence');
           setIsPlaying(true);
           setIsLoading(false);
-          setError(null); // Don't show error for missing files
+          setError(null);
         },
         onplayerror: (id, error) => {
           console.log('Audio playback failed, falling back to silence mode:', error);
           setCurrentTrack('silence');
           setIsPlaying(true);
           setIsLoading(false);
-          setError(null); // Don't show error for playback issues
+          setError(null);
         }
       });
       
@@ -117,7 +107,7 @@ export const useRealAudio = () => {
       setCurrentTrack('silence');
       setIsPlaying(true);
       setIsLoading(false);
-      setError(null); // Graceful fallback instead of error
+      setError(null);
     }
   }, [stopMusic, getCurrentTrackInfo]);
 
