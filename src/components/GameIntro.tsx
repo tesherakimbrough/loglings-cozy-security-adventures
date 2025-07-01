@@ -43,7 +43,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
   };
 
   return (
-    <div className="w-full p-2 md:p-4">
+    <div className="w-full p-2 md:p-4 pb-8 md:pb-12">
       <div className="max-w-6xl mx-auto space-y-4 md:space-y-8">
         {/* Navigation */}
         <GameIntroNavigation />
@@ -88,7 +88,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         <GameIntroNewFeatures />
 
         {/* Start Adventure Button - Mobile Optimized */}
-        <div className="text-center px-4">
+        <div className="text-center px-4 pb-6">
           <Button 
             onClick={handleStartClick}
             size="lg"
@@ -102,7 +102,7 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         </div>
 
         {/* Creator Credit - Cozy Style - Mobile Optimized */}
-        <div className="text-center pt-6 md:pt-8 border-t border-border/50 px-4">
+        <div className="text-center pt-6 md:pt-8 border-t border-border/50 px-4 pb-8">
           <p className="text-muted-foreground flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-sm md:text-base">
             <span>{t.lovinglyCreatedBy}</span>
             <span className="text-primary font-semibold flex items-center gap-1">
@@ -116,11 +116,13 @@ const GameIntro = ({ onStartGame, userMode = 'cozy-everyday' }: GameIntroProps) 
         </div>
 
         {/* Enhanced User Onboarding and Feedback Collection */}
-        <EnhancedUserOnboarding />
-        <LaunchFeedbackCollector 
-          userSessions={profile.progress.totalSessions}
-          currentScore={profile.progress.totalScore}
-        />
+        <div className="pb-6">
+          <EnhancedUserOnboarding />
+          <LaunchFeedbackCollector 
+            userSessions={profile.progress.totalSessions}
+            currentScore={profile.progress.totalScore}
+          />
+        </div>
       </div>
 
       {/* Tutorial Modal */}

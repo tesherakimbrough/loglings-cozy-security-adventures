@@ -26,7 +26,7 @@ export const useMobileOptimization = () => {
     const updateMobileState = () => {
       const touchSupported = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
       const isLandscape = window.innerWidth > window.innerHeight;
-      const isSmallScreen = window.innerHeight < 600;
+      const isSmallScreen = window.innerHeight < 600 || window.innerWidth < 380;
       
       setMobileState({
         isMobile: !!isMobile,
@@ -41,7 +41,10 @@ export const useMobileOptimization = () => {
     updateMobileState();
     
     window.addEventListener('resize', updateMobileState);
-    window.addEventListener('orientationchange', updateMobileState);
+    window.addEventListener('orientationchange', () => {
+      // Delay to account for orientation change completion
+      setTimeout(updateMobileState, 100);
+    });
     
     return () => {
       window.removeEventListener('resize', updateMobileState);
@@ -50,25 +53,27 @@ export const useMobileOptimization = () => {
   }, [isMobile]);
 
   // Optimize touch interactions
-  const optimizeTouch = () => {
+  useEffect(() => {
     if (mobileState.touchSupported) {
       // Add touch-action optimization
       document.body.style.touchAction = 'manipulation';
       
       // Prevent zoom on double tap
       let lastTouchEnd = 0;
-      document.addEventListener('touchend', (event) => {
+      const handleTouchEnd = (event: TouchEvent) => {
         const now = new Date().getTime();
         if (now - lastTouchEnd <= 300) {
           event.preventDefault();
         }
         lastTouchEnd = now;
-      }, { passive: false });
+      };
+      
+      document.addEventListener('touchend', handleTouchEnd, { passive: false });
+      
+      return () => {
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
     }
-  };
-
-  useEffect(() => {
-    optimizeTouch();
   }, [mobileState.touchSupported]);
 
   // Provide mobile-specific CSS classes

@@ -111,7 +111,7 @@ const Index = () => {
           
           {gameState === 'results' && gameData && (
             <GameErrorBoundary onError={handleGameError}>
-              <div className="p-2 md:p-4">
+              <div className="p-2 md:p-4 pb-8">
                 <GameResults 
                   gameData={gameData} 
                   onRestart={handlePlayAgain}
