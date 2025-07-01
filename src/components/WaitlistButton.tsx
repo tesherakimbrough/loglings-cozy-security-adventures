@@ -8,7 +8,7 @@ const WaitlistButton = () => {
 
   return (
     <Button
-      onClick={() => navigate('/waitlist')}
+      onClick={() => navigate('/waitlist?source=general_button')}
       variant="outline"
       className="cozy-card hover:scale-105 transition-all duration-200 border-2 border-primary/30 hover:border-primary/50"
     >

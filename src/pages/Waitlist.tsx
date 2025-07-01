@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,6 +7,7 @@ import { Heart, Sparkles, TreePine, Mail } from 'lucide-react';
 import ThemeToggle from '@/components/ThemeToggle';
 import FeedbackForm, { FeedbackData } from '@/components/FeedbackForm';
 import WaitlistCelebration from '@/components/WaitlistCelebration';
+import { useWaitlistData } from '@/hooks/useWaitlistData';
 import { toast } from 'sonner';
 
 const Waitlist = () => {
@@ -15,6 +17,8 @@ const Waitlist = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+
+  const { totalCount, addToWaitlist } = useWaitlistData();
 
   // Check for premium upgrade context
   const urlParams = new URLSearchParams(window.location.search);
@@ -31,28 +35,29 @@ const Waitlist = () => {
 
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Store waitlist data
-    const waitlistData = {
-      email,
-      firstName,
-      timestamp: new Date().toISOString(),
-      source: signupSource,
-      isPremium: isPremiumSignup
-    };
-    
-    const existingData = JSON.parse(localStorage.getItem('loglings-waitlist') || '[]');
-    existingData.push(waitlistData);
-    localStorage.setItem('loglings-waitlist', JSON.stringify(existingData));
-    
-    setIsLoading(false);
-    setIsSubmitted(true);
-    setShowCelebration(true);
-    
-    // Show feedback form after celebration
-    setTimeout(() => setShowFeedback(true), 6000);
+    try {
+      const result = await addToWaitlist({
+        email,
+        first_name: firstName,
+        source: signupSource,
+        is_premium: isPremiumSignup
+      });
+
+      if (result.success) {
+        setIsSubmitted(true);
+        setShowCelebration(true);
+        
+        // Show feedback form after celebration
+        setTimeout(() => setShowFeedback(true), 6000);
+      } else {
+        toast.error(result.error || 'Failed to join waitlist');
+      }
+    } catch (error) {
+      console.error('Error submitting waitlist:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleFeedbackSubmit = (feedback: FeedbackData) => {
@@ -223,7 +228,7 @@ const Waitlist = () => {
           
           <div className="mt-6 text-center">
             <p className="text-xs text-muted-foreground">
-              🌿 Join 0+ nature lovers already on the waitlist 🌿
+              🌿 Join {totalCount}+ nature lovers already on the waitlist 🌿
             </p>
           </div>
         </CardContent>

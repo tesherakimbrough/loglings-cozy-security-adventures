@@ -1,29 +1,23 @@
 
-import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Users, Clock, Gift } from 'lucide-react';
 import { useMonetizationTracking } from '../hooks/useMonetizationTracking';
+import { useWaitlistData } from '../hooks/useWaitlistData';
+import { useNavigate } from 'react-router-dom';
 
 const EarlyAccessBanner = () => {
-  const [userCount, setUserCount] = useState(42);
+  const { totalCount, isLoading } = useWaitlistData();
   const { trackPremiumInquiry } = useMonetizationTracking();
-
-  useEffect(() => {
-    // Simulate growing user count for social proof
-    const interval = setInterval(() => {
-      setUserCount(prev => prev + Math.floor(Math.random() * 3));
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const navigate = useNavigate();
 
   const handleEarlyAccessClick = () => {
     trackPremiumInquiry('early_access_banner', 'beta_signup');
-    // Future: Open waitlist modal or redirect to signup
-    alert('🎉 Early access signup coming soon! Follow us for updates.');
+    navigate('/waitlist?premium=true&source=early_access_banner');
   };
+
+  const displayCount = isLoading ? '...' : totalCount;
 
   return (
     <Card className="bg-gradient-to-r from-emerald-50 to-blue-50 dark:from-emerald-950/20 dark:to-blue-950/20 border-emerald-200 dark:border-emerald-800">
@@ -49,7 +43,7 @@ const EarlyAccessBanner = () => {
             <div className="flex items-center gap-4 text-sm text-emerald-600 dark:text-emerald-400">
               <div className="flex items-center gap-1">
                 <Users className="w-4 h-4" />
-                <span>{userCount} pioneers</span>
+                <span>{displayCount} pioneers</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
@@ -57,7 +51,7 @@ const EarlyAccessBanner = () => {
               </div>
               <div className="flex items-center gap-1">
                 <Gift className="w-4 h-4" />
-                <span>Free lifetime</span>
+                <span>Early access</span>
               </div>
             </div>
             
