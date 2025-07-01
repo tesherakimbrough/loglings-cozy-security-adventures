@@ -1,6 +1,7 @@
+
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Howl } from 'howler';
-import { MusicType } from '../types/musicTypes';
+import { MusicType, DEFAULT_MUSIC_TYPE } from '../types/musicTypes';
 import { audioTracks } from '../config/audioTracks';
 
 export const useRealAudio = () => {

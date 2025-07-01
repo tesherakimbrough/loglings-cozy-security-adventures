@@ -1,5 +1,5 @@
 
-import { AudioTrack } from '../types/musicTypes';
+import { AudioTrack, MusicType } from '../types/musicTypes';
 
 export const audioTracks: AudioTrack[] = [
   {
@@ -74,7 +74,7 @@ export const audioPresets = [
     name: 'Rainy Forest Cabin',
     emoji: '🏡',
     description: 'Perfect storm sounds with crackling fire',
-    tracks: ['rain', 'fireplace'],
+    tracks: ['rain', 'fireplace'] as MusicType[],
     volumes: { rain: 0.6, fireplace: 0.4 }
   },
   {
@@ -82,7 +82,7 @@ export const audioPresets = [
     name: 'Cozy Study Night',
     emoji: '📚',
     description: 'Gentle rain with soft lofi beats',
-    tracks: ['rain', 'lofi'],
+    tracks: ['rain', 'lofi'] as MusicType[],
     volumes: { rain: 0.3, lofi: 0.5 }
   },
   {
@@ -90,7 +90,7 @@ export const audioPresets = [
     name: 'Morning Café',
     emoji: '🌅',
     description: 'Coffee shop vibes with gentle background',
-    tracks: ['cozy-cafe'],
+    tracks: ['cozy-cafe'] as MusicType[],
     volumes: { 'cozy-cafe': 0.6 }
   }
 ];
