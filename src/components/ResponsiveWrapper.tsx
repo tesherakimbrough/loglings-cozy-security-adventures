@@ -11,13 +11,13 @@ export const ResponsiveWrapper = ({ children, className = '' }: ResponsiveWrappe
   const { getMobileClasses, shouldUseCompactLayout, shouldShowMobileWarning } = useMobileOptimization();
 
   return (
-    <div className={`${getMobileClasses()} ${className}`}>
+    <div className={`w-full min-h-screen ${getMobileClasses()} ${className}`}>
       {shouldShowMobileWarning && (
         <div className="fixed top-0 left-0 right-0 bg-amber-500 text-white p-2 text-xs text-center z-50">
           For best experience, please rotate to portrait mode
         </div>
       )}
-      <div className={shouldUseCompactLayout ? 'space-y-3' : 'space-y-6'}>
+      <div className={`w-full ${shouldUseCompactLayout ? 'space-y-3' : 'space-y-6'}`}>
         {children}
       </div>
     </div>
