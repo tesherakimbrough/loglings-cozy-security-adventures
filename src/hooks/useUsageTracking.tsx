@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useUserProfile } from './useUserProfile';
 import { useSubscriptionTier } from './useSubscriptionTier';
@@ -19,6 +18,8 @@ interface UsageData {
   exportsUsed: number;
   lastResetDate: string;
 }
+
+type NumericUsageKeys = Exclude<keyof UsageData, 'lastResetDate'>;
 
 export const useUsageTracking = () => {
   const { profile } = useUserProfile();
@@ -57,7 +58,7 @@ export const useUsageTracking = () => {
     }
   }, []);
 
-  const updateUsage = (key: keyof UsageData, increment: number = 1) => {
+  const updateUsage = (key: NumericUsageKeys, increment: number = 1) => {
     setUsage(prev => {
       const newUsage = {
         ...prev,
