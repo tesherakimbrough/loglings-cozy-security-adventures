@@ -139,8 +139,13 @@ We treasure your feedback! Here's how to share it:
 - 📋 **API Access**: Integration with learning management systems
 - 📋 **Certification Paths**: Official cybersecurity skill validation
 
-### Community Wishlist 💝
-*What features would you love to see? Let us know in Discord or GitHub discussions!*
+### Support Our Forest 💝
+Love Loglings? Help us grow! You can now support the project directly through our in-game donation system:
+- **Quick Support**: $3 (Coffee), $10 (Plant Tree), $25 (Forest Love)
+- **Custom Amount**: Any amount via PayPal
+- **100% Goes to Development**: Keeping Loglings free for students, adding new features, and growing our cozy community
+
+*Find the "Support Loglings" button in-game, or visit [paypal.me/BeautifullySpkn](https://paypal.me/BeautifullySpkn)*
 
 ---
 
